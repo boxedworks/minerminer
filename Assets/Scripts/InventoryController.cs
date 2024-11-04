@@ -30,6 +30,7 @@ namespace Controllers
     }
     class ItemInfo : IInfoable
     {
+      public ItemType _ItemType;
       public string _Title;
 
       public int _AmountHeld;
@@ -41,11 +42,16 @@ namespace Controllers
       public TMPro.TextMeshProUGUI _Text;
       public ParticleController.ParticleType _ParticleType;
 
-      public string _Info { get { return @$"<b>{_Title}</b>
-
-Amount:     {_AmountHeld}
+      public string _Info
+      {
+        get
+        {
+          return InfoController.GetInfoString(_Title, @$"Amount:      {_AmountHeld}
 Sell Price: ${_SellValue}
-      "; } }
+
+Sum Value:  ${GetItemCost(_ItemType, _AmountHeld)}");
+        }
+      }
       public RectTransform _Transform { get { return _MenuEntry.transform as RectTransform; } }
     }
     Dictionary<ItemType, ItemInfo> _itemInfos;
@@ -88,9 +94,10 @@ Sell Price: ${_SellValue}
       _selectedItem = ItemType.NONE;
 
       _itemInfos = new();
-      void AddInventoryItemInfo(ItemType inventoryItem, ItemInfo inventoryItemInfo)
+      void AddInventoryItemInfo(ItemType itemType, ItemInfo itemInfo)
       {
-        _itemInfos.Add(inventoryItem, inventoryItemInfo);
+        itemInfo._ItemType = itemType;
+        _itemInfos.Add(itemType, itemInfo);
       }
 
       AddInventoryItemInfo(ItemType.STONE, new ItemInfo()
@@ -129,9 +136,7 @@ Sell Price: ${_SellValue}
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = buttonSell1.gameObject,
-        _Description = @"<b>Sell 1</b>
-
-Add 1 item to sell."
+        _Description = InfoController.GetInfoString("Sell 1", "Add 1 item to sell.")
       });
 
       var buttonSell5 = _menu.GetChild(1).GetChild(1).GetChild(1).GetComponent<UnityEngine.UI.Button>();
@@ -147,9 +152,7 @@ Add 1 item to sell."
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = buttonSell5.gameObject,
-        _Description = @"<b>Sell 5</b>
-
-Add 5 items to sell."
+        _Description = InfoController.GetInfoString("Sell 5", "Add 5 items to sell.")
       });
 
       var buttonSell10 = _menu.GetChild(1).GetChild(1).GetChild(2).GetComponent<UnityEngine.UI.Button>();
@@ -165,9 +168,7 @@ Add 5 items to sell."
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = buttonSell10.gameObject,
-        _Description = @"<b>Sell 10</b>
-
-Add 10 items to sell."
+        _Description = InfoController.GetInfoString("Sell 10", "Add 10 items to sell.")
       });
 
       var buttonSell25 = _menu.GetChild(1).GetChild(1).GetChild(3).GetComponent<UnityEngine.UI.Button>();
@@ -183,9 +184,7 @@ Add 10 items to sell."
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = buttonSell25.gameObject,
-        _Description = @"<b>Sell 25<b>
-
-Add 25 item to sell."
+        _Description = InfoController.GetInfoString("Sell 25", "Add 25 items to sell.")
       });
 
       var buttonClear = _menu.GetChild(1).GetChild(1).GetChild(4).GetComponent<UnityEngine.UI.Button>();
@@ -201,9 +200,7 @@ Add 25 item to sell."
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = buttonClear.gameObject,
-        _Description = @"<b>Clear</b>
-
-Set amount of items to sell to: 0."
+        _Description = InfoController.GetInfoString("Clear", "Set amount of items to sell to: 0.")
       });
 
       var buttonSell = _menu.GetChild(1).GetChild(1).GetChild(5).GetComponent<UnityEngine.UI.Button>();
@@ -231,11 +228,8 @@ Set amount of items to sell to: 0."
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = buttonSell.gameObject,
-        _Description = @"<b>Sell</b>
-
-Sell items."
+        _Description = InfoController.GetInfoString("Sell", "Sell selected items.")
       });
-
 
     }
 
@@ -384,6 +378,16 @@ Sell items."
     }
 
     //
+    public static string GetItemName(ItemType itemType)
+    {
+      return s_Singleton._itemInfos[itemType]._Title;
+    }
+    public static int GetItemCost(ItemType itemType, int amount)
+    {
+      var itemInfo = s_Singleton._itemInfos[itemType];
+      return itemInfo._SellValue * amount;
+    }
+
     public static Sprite GetItemSprite(ItemType itemType)
     {
       return Resources.Load<ItemResourceInfo>($"Items/{itemType.ToString().ToLower()}").Sprite;

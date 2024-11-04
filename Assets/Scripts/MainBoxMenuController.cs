@@ -33,13 +33,16 @@ namespace Controllers
         switch (_currentMenu)
         {
           case MenuType.SHOP:
+            returnData = ShopController.s_Singleton._InfoData;
+            break;
+          case MenuType.SKILLS:
             returnData = StatsController.s_Singleton._InfoData;
             break;
-
           case MenuType.INVENTORY:
             returnData = InventoryController.s_Singleton._InfoData;
             break;
 
+          //
           default:
             returnData = StatsController.s_Singleton._InfoData;
             break;
@@ -99,22 +102,13 @@ namespace Controllers
       {
 
         case "InventoryButton":
-          return @"<b>Inventory</b>
-
-Browse and sell your items.
-          ";
+          return InfoController.GetInfoString("Inventory", "Browse and sell your items.");
         case "ShopButton":
-          return @"<b>Shop</b>
-
-Purchase upgrades with your money.
-          ";
+          return InfoController.GetInfoString("Shop", "Purchase upgrades with your money.");
         case "SkillsButton":
-          return @"<b>Skills</b>
+          return InfoController.GetInfoString("Skills", @"Check out your skills, what they do, and select 1 to level up.
 
-Check out your skills, what they do, and select 1 to level up.
-
-Gain experience by breaking rocks.
-          ";
+Gain experience by breaking rocks.");
 
         default:
           return "NOT_IMPL";

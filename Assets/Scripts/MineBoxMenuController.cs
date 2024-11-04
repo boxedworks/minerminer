@@ -4,12 +4,13 @@ namespace Controllers
 {
 
   //
-  public class MineBoxMenuController : BoxMenuController
+  public class MineBoxMenuController : BoxMenuController, IHasInfoables
   {
 
     //
     public static MineBoxMenuController s_Singleton;
 
+    MenuType _currentMenu { get { return (MenuType)_currentMenuIndex; } }
     public enum MenuType
     {
 
@@ -18,6 +19,37 @@ namespace Controllers
       MINE,
       FORGE,
 
+    }
+
+    //
+    public InfoData _InfoData
+    {
+      get
+      {
+        InfoData returnData;
+
+        switch (_currentMenu)
+        {
+          case MenuType.MINE:
+            returnData = RockController.s_Singleton._InfoData;
+            break;
+          case MenuType.FORGE:
+            returnData = ForgeController.s_Singleton._InfoData;
+            break;
+
+          //
+          default:
+            returnData = StatsController.s_Singleton._InfoData;
+            break;
+        }
+
+        //
+        foreach (var dependency in _dependencyInfos)
+          returnData._Infos.Add(dependency);
+
+        //
+        return returnData;
+      }
     }
 
     //
@@ -61,10 +93,20 @@ namespace Controllers
       return IsMenuActive((int)menuType);
     }
 
-    //
+  //
     protected override string GetButtonDescription(string buttonName)
     {
-      return "NOT_IMPL";
+      switch (buttonName)
+      {
+
+        case "MineButton":
+          return InfoController.GetInfoString("Mine", "Mine rocks to get resources.");
+        case "ForgeButton":
+          return InfoController.GetInfoString("Forge", "Use resources to create more resources.");
+
+        default:
+          return "NOT_IMPL";
+      }
     }
 
   }

@@ -22,7 +22,7 @@ namespace Controllers
       _infoText = InfoBoxMenuController.s_Singleton.GetMenu(InfoBoxMenuController.MenuType.INFO).transform.Find("InfoText").GetComponent<TMPro.TextMeshProUGUI>();
     }
 
-        //
+    //
     IInfoable _defaultInfo;
     public void Update()
     {
@@ -45,9 +45,11 @@ namespace Controllers
     public IInfoable GatherDescriptionObjectName(Vector2 mousePos)
     {
 
-      List<IHasInfoables> checkInfos = new();
-      checkInfos.Add(MainBoxMenuController.s_Singleton);
-
+      var checkInfos = new List<IHasInfoables>()
+      {
+        MainBoxMenuController.s_Singleton,
+        MineBoxMenuController.s_Singleton
+      };
       var defaultInfo = MainBoxMenuController.s_Singleton._InfoData._DefaultInfo;
 
       //
@@ -57,7 +59,7 @@ namespace Controllers
       //
       foreach (var checkInfo in checkInfos)
         foreach (var info in checkInfo._InfoData._Infos)
-          if (RectTransformUtility.RectangleContainsScreenPoint(info._Transform, mousePos))
+          if (info._Transform.gameObject.activeSelf && RectTransformUtility.RectangleContainsScreenPoint(info._Transform, mousePos))
             return info;
 
       return null;
@@ -67,6 +69,15 @@ namespace Controllers
     public static void SetInfoText(string text)
     {
       s_Singleton._infoText.text = text;
+    }
+
+    //
+    public static string GetInfoString(string title, string desc)
+    {
+      return $@"<b>{title}</b>
+
+{desc}
+      ";
     }
   }
 

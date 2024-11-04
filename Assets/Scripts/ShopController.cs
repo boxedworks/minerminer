@@ -24,19 +24,45 @@ namespace Controllers
 
       AUTO_ROCK,
 
-      PIAKCAXE_UPGRADE_0
+      PICKAXE_UPGRADE_0,
+
+      ROCK_0_UPGRADE_0,
+      ROCK_1_UPGRADE_0,
+
+      ROCK_BUY_0,
     }
-    class PurchaseInfo
+    class PurchaseInfo : IInfoable
     {
       public int _Cost;
 
       public string _Title, _Description;
 
       public GameObject _MenuEntry;
+
+      //
+      public string _Info { get { return InfoController.GetInfoString(_Title, _Description); } }
+      public RectTransform _Transform { get { return _MenuEntry.transform as RectTransform; } }
     }
 
     Transform _menu;
     bool _menuIsVisible { get { return MainBoxMenuController.s_Singleton.IsVisible(MainBoxMenuController.MenuType.SHOP); } }
+
+    //
+    public InfoData _InfoData
+    {
+      get
+      {
+        var returnData = new InfoData();
+
+        var returnList = new List<IInfoable>();
+        foreach (var item in _purchaseInfos)
+          if (item.Value._MenuEntry != null)
+            returnList.Add(item.Value);
+        returnData._Infos = returnList;
+
+        return returnData;
+      }
+    }
 
     //
     public ShopController()
@@ -52,17 +78,17 @@ namespace Controllers
 
       AddPurchase(PurchaseType.SKILLS, new PurchaseInfo()
       {
-        _Cost = 100,
+        _Cost = 15,
 
         _Title = "Skills",
-        _Description = "."
+        _Description = "Unlock the Skills tab."
       });
       AddPurchase(PurchaseType.FORGE, new PurchaseInfo()
       {
-        _Cost = 25,
+        _Cost = 250,
 
         _Title = "Forge",
-        _Description = "."
+        _Description = "Unlock the Forge for smelting."
       });
 
       AddPurchase(PurchaseType.AUTO_ROCK, new PurchaseInfo()
@@ -72,7 +98,8 @@ namespace Controllers
         _Title = "Auto Rock",
         _Description = "Automatically replace rocks when they are destroyed."
       });
-      AddPurchase(PurchaseType.PIAKCAXE_UPGRADE_0, new PurchaseInfo()
+
+      AddPurchase(PurchaseType.PICKAXE_UPGRADE_0, new PurchaseInfo()
       {
         _Cost = 1000,
 
@@ -80,14 +107,38 @@ namespace Controllers
         _Description = "Base pickaxe damage: 1 -> 2."
       });
 
+      AddPurchase(PurchaseType.ROCK_0_UPGRADE_0, new PurchaseInfo()
+      {
+        _Cost = 50,
+
+        _Title = "Stone Upgrade",
+        _Description = "Double the drops of the Stone rock."
+      });
+      AddPurchase(PurchaseType.ROCK_1_UPGRADE_0, new PurchaseInfo()
+      {
+        _Cost = 50,
+
+        _Title = "Copper Upgrade",
+        _Description = "Double the drops of the Copper rock."
+      });
+
+      AddPurchase(PurchaseType.ROCK_BUY_0, new PurchaseInfo()
+      {
+        _Cost = 25,
+
+        _Title = "Copper Rock",
+        _Description = "Unlock the Copper rock."
+      });
+
       //
       _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.SHOP).transform;
 
       //
       AddPurchaseToDisplay(PurchaseType.SKILLS);
-      AddPurchaseToDisplay(PurchaseType.FORGE);
+      AddPurchaseToDisplay(PurchaseType.ROCK_0_UPGRADE_0);
+      AddPurchaseToDisplay(PurchaseType.ROCK_BUY_0);
       AddPurchaseToDisplay(PurchaseType.AUTO_ROCK);
-      AddPurchaseToDisplay(PurchaseType.PIAKCAXE_UPGRADE_0);
+      AddPurchaseToDisplay(PurchaseType.FORGE);
 
       UpdatePurchasesUi();
     }
@@ -156,6 +207,20 @@ namespace Controllers
           break;
         case PurchaseType.FORGE:
           UpgradeController.UnlockUpgrade(UpgradeController.UpgradeType.FORGE);
+          break;
+
+        //
+        case PurchaseType.ROCK_0_UPGRADE_0:
+          RockController.UpgradeRock(RockController.RockType.STONE);
+          break;
+        case PurchaseType.ROCK_1_UPGRADE_0:
+          RockController.UpgradeRock(RockController.RockType.COPPER);
+          break;
+
+        case PurchaseType.ROCK_BUY_0:
+          RockController.UnlockRock(RockController.RockType.COPPER);
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_1_UPGRADE_0);
+
           break;
       }
 
