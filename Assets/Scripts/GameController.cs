@@ -36,6 +36,11 @@ namespace Controllers
       AudioController.s_Singleton.Update();
       ForgeController.s_Singleton.Update();
       InfoController.s_Singleton.Update();
+      UpgradeController.s_Singleton.Update();
+
+      // Cheats
+      if (Input.GetKeyDown(KeyCode.Space))
+        StatsController.s_Singleton._Gold += 50;
     }
   }
 

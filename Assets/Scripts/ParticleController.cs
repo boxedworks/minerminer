@@ -22,6 +22,7 @@ namespace Controllers
 
       ORE_0,
       ORE_1,
+      ORE_2,
     }
     Dictionary<ParticleType, ParticleSystem> _particles;
 
@@ -38,6 +39,7 @@ namespace Controllers
 
         { ParticleType.ORE_0, GameObject.Find("Ore0").GetComponent<ParticleSystem>() },
         { ParticleType.ORE_1, GameObject.Find("Ore1").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_2, GameObject.Find("Ore2").GetComponent<ParticleSystem>() },
       };
     }
 

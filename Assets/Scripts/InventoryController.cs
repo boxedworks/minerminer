@@ -27,6 +27,9 @@ namespace Controllers
       STONE,
       COPPER,
       COPPER_INGOT,
+
+      TIN,
+      BRONZE_INGOT,
     }
     class ItemInfo : IInfoable
     {
@@ -49,7 +52,7 @@ namespace Controllers
           return InfoController.GetInfoString(_Title, @$"Amount:      {_AmountHeld}
 Sell Price: ${_SellValue}
 
-Sum Value:  ${GetItemCost(_ItemType, _AmountHeld)}");
+Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         }
       }
       public RectTransform _Transform { get { return _MenuEntry.transform as RectTransform; } }
@@ -119,6 +122,19 @@ Sum Value:  ${GetItemCost(_ItemType, _AmountHeld)}");
       {
         _Title = "Copper Ingot",
         _SellValue = 50
+      });
+
+      AddInventoryItemInfo(ItemType.TIN, new ItemInfo()
+      {
+        _Title = "Tin",
+        _SellValue = 10,
+
+        _ParticleType = ParticleController.ParticleType.ORE_2,
+      });
+      AddInventoryItemInfo(ItemType.BRONZE_INGOT, new ItemInfo()
+      {
+        _Title = "Bronze Ingot",
+        _SellValue = 150
       });
 
       // Sell interface
@@ -246,7 +262,7 @@ Sum Value:  ${GetItemCost(_ItemType, _AmountHeld)}");
           if (!inventoryItem.Value._InInventory) continue;
 
           if (Input.GetMouseButtonDown(0))
-            if (RectTransformUtility.RectangleContainsScreenPoint(inventoryItem.Value._MenuEntry.transform as RectTransform, mousePos))
+            if (RectTransformUtility.RectangleContainsScreenPoint(inventoryItem.Value._MenuEntry.transform as RectTransform, mousePos, Camera.main))
             {
               SelectItem(inventoryItem.Key);
 
@@ -382,7 +398,7 @@ Sum Value:  ${GetItemCost(_ItemType, _AmountHeld)}");
     {
       return s_Singleton._itemInfos[itemType]._Title;
     }
-    public static int GetItemCost(ItemType itemType, int amount)
+    public static int GetItemValue(ItemType itemType, int amount)
     {
       var itemInfo = s_Singleton._itemInfos[itemType];
       return itemInfo._SellValue * amount;

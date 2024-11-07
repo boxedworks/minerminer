@@ -42,7 +42,7 @@ namespace Controllers
         var menuIndex = System.Array.IndexOf(enumOrder, menuType.ToUpper());
 
         _menuIndexes.Add(menuIndex, i);
-        SetMenuActive(menuIndex, false);
+        SetMenuActive(menuIndex, false, false);
 
         button.onClick.AddListener(() =>
         {
@@ -71,7 +71,7 @@ namespace Controllers
     {
       return _menus[ofMenuIndex];
     }
-    GameObject GetMenuButton(int ofMenuIndex)
+    protected GameObject GetMenuButton(int ofMenuIndex)
     {
       return _buttonsContainer.GetChild(_menuIndexes[ofMenuIndex]).gameObject;
     }
@@ -103,9 +103,18 @@ namespace Controllers
       return GetMenu(ofMenuIndex).gameObject.activeSelf;
     }
 
-    protected void SetMenuActive(int ofMenuIndex, bool toggle)
+    protected void SetMenuActive(int ofMenuIndex, bool toggle, bool useNotify, string notifyText = null)
     {
-      GetMenuButton(ofMenuIndex).SetActive(toggle);
+      var button = GetMenuButton(ofMenuIndex);
+      if (toggle)
+      {
+        if (useNotify)
+          UpgradeController.NotifyUnlockButton(button, notifyText);
+        else
+          button.SetActive(toggle);
+      }
+      else
+        button.SetActive(toggle);
     }
     protected bool IsMenuActive(int ofMenuIndex)
     {

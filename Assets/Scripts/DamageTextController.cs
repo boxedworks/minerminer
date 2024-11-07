@@ -38,7 +38,7 @@ namespace Controllers
         textColor.a = 1f - textAliveTime;
         text.color = textColor;
 
-        (text.transform as RectTransform).position += new Vector3(0f, 50f, 0f) * Time.deltaTime;
+        (text.transform as RectTransform).position += new Vector3(0f, 1f, 0f) * Time.deltaTime;
 
         if (textAliveTime > 1f)
         {

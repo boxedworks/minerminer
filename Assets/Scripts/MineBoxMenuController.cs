@@ -72,7 +72,7 @@ namespace Controllers
 
       //
       SetMenuType((int)MenuType.MINE);
-      SetMenuActive(MenuType.MINE, true);
+      SetMenuActive(MenuType.MINE, true, false);
     }
 
     public GameObject GetMenu(MenuType ofMenu)
@@ -84,9 +84,9 @@ namespace Controllers
     {
       return IsVisible((int)ofMenu);
     }
-    public void SetMenuActive(MenuType menuType, bool toggle)
+    public void SetMenuActive(MenuType menuType, bool toggle, bool useNotify, string notifyText = null)
     {
-      SetMenuActive((int)menuType, toggle);
+      SetMenuActive((int)menuType, toggle, useNotify, notifyText);
     }
     public bool IsMenuActive(MenuType menuType)
     {

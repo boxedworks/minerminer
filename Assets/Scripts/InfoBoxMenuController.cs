@@ -36,7 +36,7 @@ namespace Controllers
 
       //
       SetMenuType((int)MenuType.INFO);
-      SetMenuActive(MenuType.INFO, true);
+      SetMenuActive(MenuType.INFO, true, false);
     }
 
     //
@@ -49,9 +49,9 @@ namespace Controllers
     {
       return IsVisible((int)ofMenu);
     }
-    public void SetMenuActive(MenuType menuType, bool toggle)
+    public void SetMenuActive(MenuType menuType, bool toggle, bool useNotify, string notifyText = null)
     {
-      SetMenuActive((int)menuType, toggle);
+      SetMenuActive((int)menuType, toggle, useNotify, notifyText);
     }
     public bool IsMenuActive(MenuType menuType)
     {
@@ -62,6 +62,11 @@ namespace Controllers
     protected override string GetButtonDescription(string buttonName)
     {
       return "NOT_IMPL";
+    }
+
+    public static GameObject GetInfoButton()
+    {
+      return s_Singleton.GetMenuButton((int)MenuType.INFO);
     }
   }
 }

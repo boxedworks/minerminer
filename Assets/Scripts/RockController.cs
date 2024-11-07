@@ -38,14 +38,15 @@ namespace Controllers
 
       STONE,
       COPPER,
+      TIN,
     }
     public class RockInfo : IInfoable
     {
       public RockType _RockType;
       public string _Title;
 
-      public float _Health, _HealthMax;
-      public (InventoryController.ItemType, int)[] _OnHitDrop, _OnBreakDrop;
+      public float _Health, _HealthMax, _XpGain;
+      public (InventoryController.ItemType, float)[] _DropTable;
 
       public GameObject _MenuEntry;
 
@@ -55,30 +56,21 @@ namespace Controllers
         get
         {
 
-          var hitProductString = "";
-          foreach (var drop in _OnHitDrop)
-          {
-            hitProductString += $"- {InventoryController.GetItemName(drop.Item1)} x{drop.Item2}\n";
-          }
-
           var breakProductString = "";
-          foreach (var drop in _OnBreakDrop)
+          foreach (var drop in _DropTable)
           {
-            breakProductString += $"- {InventoryController.GetItemName(drop.Item1)} x{drop.Item2}\n";
+            breakProductString += $"- {InventoryController.GetItemName(drop.Item1)} ({drop.Item2}%)\n";
           }
 
           //
           var desc = "";
-          if (hitProductString.Length > 0)
-          {
-            desc += $"<b>= On hit</b>\n{hitProductString}\n";
-          }
           if (breakProductString.Length > 0)
           {
-            desc += $"<b>= On break</b>\n{breakProductString}";
+            desc += $"<b>Drop table</b>\n\n{breakProductString}";
           }
 
           return InfoController.GetInfoString($"{_Title}", @$"Health: {_HealthMax}
+Xp:     {_XpGain}
 
 {desc}");
         }
@@ -225,10 +217,10 @@ namespace Controllers
       // Break
       if (_health <= 0f)
       {
-        StatsController.s_Singleton.AddXp(8f);
+        StatsController.s_Singleton.AddXp(_rocks[_currentRock]._XpGain);
 
-        foreach (var drop in _rocks[_currentRock]._OnBreakDrop)
-          AddItemAmount(drop.Item1, drop.Item2);
+        for (var i = 0; i < 5; i++)
+          AddItemAmount(GetRockDrop(_currentRock), 1);
 
         ToggleRock(false);
         if (_autoReplaceRock)
@@ -246,8 +238,8 @@ namespace Controllers
       // Normal damage
       else
       {
-        foreach (var drop in _rocks[_currentRock]._OnHitDrop)
-          AddItemAmount(drop.Item1, drop.Item2);
+        for (var i = 0; i < 1; i++)
+          AddItemAmount(GetRockDrop(_currentRock), 1);
       }
 
       // Pickaxe Fx
@@ -321,6 +313,26 @@ namespace Controllers
     }
 
     //
+    InventoryController.ItemType GetRockDrop(RockType rockType)
+    {
+      var rockInfo = _rocks[rockType];
+      var dropTable = rockInfo._DropTable;
+
+      var randomPercent = Random.Range(0, 100f);
+      var percentAdd = 0f;
+      foreach (var drop in dropTable)
+      {
+        var percentThreshhold = drop.Item2;
+        if (randomPercent <= percentThreshhold)
+          return drop.Item1;
+
+        percentAdd += percentThreshhold;
+      }
+
+      return dropTable[^1].Item1;
+    }
+
+    //
     void SetRockSelection(int buttonIndex, RockInfo rockInfo)
     {
 
@@ -372,18 +384,11 @@ namespace Controllers
       return Resources.Load<ItemResourceInfo>($"Rocks/{rockType.ToString().ToLower()}").Sprite;
     }
 
-    public static void UpgradeRock(RockType rockType)
+    public static void SetRockDropTable(RockType rockType, (InventoryController.ItemType, float)[] dropTable)
     {
-      var rockInfo = s_Singleton._rocks[rockType];
-      if (rockInfo._OnHitDrop != null)
-        for (var i = 0; i < rockInfo._OnHitDrop.Length; i++)
-          rockInfo._OnHitDrop[i].Item2 *= 2;
-      if (rockInfo._OnBreakDrop != null)
-        for (var i = 0; i < rockInfo._OnBreakDrop.Length; i++)
-          rockInfo._OnBreakDrop[i].Item2 *= 2;
+      s_Singleton._rocks[rockType]._DropTable = dropTable;
 
-      //
-      if (s_Singleton._currentRock == rockType)
+      if (rockType == s_Singleton._currentRock)
         s_Singleton.SetRockHoverInfos();
     }
 
@@ -405,9 +410,9 @@ namespace Controllers
           {
             _Title = "Stone",
             _HealthMax = 5f,
+            _XpGain = 5f,
 
-            _OnHitDrop = new (InventoryController.ItemType, int)[] { (InventoryController.ItemType.STONE, 1) },
-            _OnBreakDrop = new (InventoryController.ItemType, int)[] { (InventoryController.ItemType.STONE, 6) },
+            _DropTable = new (InventoryController.ItemType, float)[] { (InventoryController.ItemType.STONE, 100f) },
           });
           s_Singleton.SetRockSelection(0, s_Singleton._rocks[rockType]);
 
@@ -419,12 +424,27 @@ namespace Controllers
           AddRockType(rockType, new RockInfo()
           {
             _Title = "Copper",
-            _HealthMax = 10f,
+            _HealthMax = 15f,
+            _XpGain = 10f,
 
-            _OnHitDrop = new (InventoryController.ItemType, int)[] { (InventoryController.ItemType.STONE, 1) },
-            _OnBreakDrop = new (InventoryController.ItemType, int)[] { (InventoryController.ItemType.STONE, 3), (InventoryController.ItemType.COPPER, 1) },
+            _DropTable = new (InventoryController.ItemType, float)[] { (InventoryController.ItemType.COPPER, 10f), (InventoryController.ItemType.STONE, 90f) },
           });
           s_Singleton.SetRockSelection(1, s_Singleton._rocks[rockType]);
+
+          break;
+
+        //
+        case RockType.TIN:
+
+          AddRockType(rockType, new RockInfo()
+          {
+            _Title = "Tin",
+            _HealthMax = 50f,
+            _XpGain = 25f,
+
+            _DropTable = new (InventoryController.ItemType, float)[] { (InventoryController.ItemType.TIN, 10f), (InventoryController.ItemType.STONE, 90f) },
+          });
+          s_Singleton.SetRockSelection(2, s_Singleton._rocks[rockType]);
 
           break;
 

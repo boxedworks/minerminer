@@ -30,8 +30,13 @@ namespace Controllers
     }
 
     //
-    public float _PickaxeSpeed { get { return 0.25f * _skillStats[0]._OnMaths; } }
-    public float _PickaxeDamage { get { return _skillStats[1]._OnMaths; } }
+    public enum StatType
+    {
+      NONE,
+
+      DAMAGE,
+      SPEED
+    }
 
     //
     List<Skill> _skillStats;
@@ -75,19 +80,7 @@ namespace Controllers
       }
 
       _skillStats = new() {
-        new Skill("Speed",
-          (int level) => {
-            return 1f + level * 0.05f;
-          },
-          (Skill skill, int level, float xp, float xpMax) => {
-            return InfoController.GetInfoString("Speed", @$"Increase your pickaxe's speed.
-
-Level: {level} / 99
-Xp:    {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
-Speed: {getSafeFloat(skill._OnMaths * 100)}%");
-        }),
-
-        new Skill("Strength",
+        new Skill(StatType.DAMAGE, "Strength",
           (int level) => {
             return 1f + level * 0.5f;
           },
@@ -97,6 +90,18 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
 Level:  {level} / 99
 Xp:     {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
 Damage: {getSafeFloat(skill._OnMaths)}");
+        }),
+
+        new Skill(StatType.SPEED, "Speed",
+          (int level) => {
+            return (1f + level * 0.05f) * 0.25f;
+          },
+          (Skill skill, int level, float xp, float xpMax) => {
+            return InfoController.GetInfoString("Speed", @$"Increase your pickaxe's speed.
+
+Level: {level} / 99
+Xp:    {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
+Speed: {getSafeFloat(skill._OnMaths * 100)}%");
         }),
 
       };
@@ -131,7 +136,7 @@ Damage: {getSafeFloat(skill._OnMaths)}");
           skillIndex++;
 
           if (Input.GetMouseButtonDown(0))
-            if (RectTransformUtility.RectangleContainsScreenPoint(skillstat._MenuEntry as RectTransform, mousePos))
+            if (RectTransformUtility.RectangleContainsScreenPoint(skillstat._MenuEntry as RectTransform, mousePos, Camera.main))
             {
               SetSkillStatSelector(skillIndex);
 
@@ -151,9 +156,16 @@ Damage: {getSafeFloat(skill._OnMaths)}");
     }
 
     //
+    public static float GetMaths(StatType statType)
+    {
+      return s_Singleton._skillStats[((int)statType) - 1]._OnMaths;
+    }
+
+    //
     public class Skill : IInfoable
     {
 
+      StatType _statType;
       string _name;
 
       float _xp, _xpVisual, _xpMax;
@@ -172,9 +184,11 @@ Damage: {getSafeFloat(skill._OnMaths)}");
       System.Func<int, float> _onMaths;
       public float _OnMaths { get { return _onMaths.Invoke(_level); } }
 
-      public Skill(string name, System.Func<int, float> onMaths, System.Func<Skill, int, float, float, string> onInfo)
+      public Skill(StatType statType, string name, System.Func<int, float> onMaths, System.Func<Skill, int, float, float, string> onInfo)
       {
+        _statType = statType;
         _name = name;
+
         _onMaths = onMaths;
         _onInfo = onInfo;
 
@@ -193,7 +207,7 @@ Damage: {getSafeFloat(skill._OnMaths)}");
         if (_xp > 0f)
         {
 
-          var xpAmount = 0f;
+          float xpAmount;
           if (_xp < _xpMax * 0.005f)
             xpAmount = _xp;
           else
@@ -202,7 +216,7 @@ Damage: {getSafeFloat(skill._OnMaths)}");
           _xp -= xpAmount;
           _xpVisual += xpAmount;
 
-          if (_xpVisual >= _xpMax)
+          if (System.Math.Round(_xpVisual, 2) >= System.Math.Round(_xpMax, 2))
           {
             _xpVisual -= _xpMax;
 

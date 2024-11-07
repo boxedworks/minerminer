@@ -17,9 +17,22 @@ namespace Controllers
     float _swingTimer, _swingTimerVisual;
 
     //
+    PickaxeStats _pickaxeStats;
+    public static PickaxeStats s_PickaxeStats { get { return s_Singleton._pickaxeStats; } }
+    public class PickaxeStats
+    {
+
+      public float Damage { get { return StatsController.GetMaths(StatsController.StatType.DAMAGE); } }
+      public float Speed { get { return StatsController.GetMaths(StatsController.StatType.SPEED); } }
+
+
+    }
+
+    //
     public PickaxeController()
     {
       s_Singleton = this;
+      _pickaxeStats = new();
 
       //
       _pickaxeModel = GameObject.Find("Pickaxe").transform;
@@ -36,13 +49,13 @@ namespace Controllers
       _pickaxeModel.localPosition = Vector3.Lerp(new Vector3(-0.7f, 0.2f, 0f), new Vector3(-2f, 1f, 0f), Easings.EaseInOutElastic(_swingTimerVisual));
 
       //
-      _swingTimer += Time.deltaTime * StatsController.s_Singleton._PickaxeSpeed;
+      _swingTimer += Time.deltaTime * s_PickaxeStats.Speed;
       if (_swingTimer >= 1f && !RockController.s_HasRock) { _swingTimer = 1f; return; }
       while (_swingTimer >= 1f)
       {
         _swingTimer -= 1f;
 
-        RockController.s_Singleton.Hit(StatsController.s_Singleton._PickaxeDamage);
+        RockController.s_Singleton.Hit(s_PickaxeStats.Damage);
       }
     }
 

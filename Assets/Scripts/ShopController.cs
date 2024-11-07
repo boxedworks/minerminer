@@ -28,8 +28,10 @@ namespace Controllers
 
       ROCK_0_UPGRADE_0,
       ROCK_1_UPGRADE_0,
+      ROCK_2_UPGRADE_0,
 
       ROCK_BUY_0,
+      ROCK_BUY_1,
     }
     class PurchaseInfo : IInfoable
     {
@@ -41,7 +43,7 @@ namespace Controllers
 
       //
       public string _Info { get { return InfoController.GetInfoString(_Title, _Description); } }
-      public RectTransform _Transform { get { return _MenuEntry.transform as RectTransform; } }
+      public RectTransform _Transform { get { return _MenuEntry == null ? null : _MenuEntry.transform as RectTransform; } }
     }
 
     Transform _menu;
@@ -78,14 +80,14 @@ namespace Controllers
 
       AddPurchase(PurchaseType.SKILLS, new PurchaseInfo()
       {
-        _Cost = 15,
+        _Cost = 10,
 
         _Title = "Skills",
         _Description = "Unlock the Skills tab."
       });
       AddPurchase(PurchaseType.FORGE, new PurchaseInfo()
       {
-        _Cost = 250,
+        _Cost = 75,
 
         _Title = "Forge",
         _Description = "Unlock the Forge for smelting."
@@ -109,25 +111,39 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_0_UPGRADE_0, new PurchaseInfo()
       {
-        _Cost = 50,
+        _Cost = 25,
 
         _Title = "Stone Upgrade",
         _Description = "Double the drops of the Stone rock."
       });
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_0, new PurchaseInfo()
       {
-        _Cost = 50,
+        _Cost = 200,
 
         _Title = "Copper Upgrade",
-        _Description = "Double the drops of the Copper rock."
+        _Description = "Extra 10% chance to find Copper in Copper rocks."
+      });
+      AddPurchase(PurchaseType.ROCK_2_UPGRADE_0, new PurchaseInfo()
+      {
+        _Cost = 400,
+
+        _Title = "Tin Upgrade",
+        _Description = "Extra 10% chance to find Tin in Tin rocks."
       });
 
       AddPurchase(PurchaseType.ROCK_BUY_0, new PurchaseInfo()
       {
-        _Cost = 25,
+        _Cost = 20,
 
         _Title = "Copper Rock",
         _Description = "Unlock the Copper rock."
+      });
+      AddPurchase(PurchaseType.ROCK_BUY_1, new PurchaseInfo()
+      {
+        _Cost = 250,
+
+        _Title = "Tin Rock",
+        _Description = "Unlock the Tin rock."
       });
 
       //
@@ -135,10 +151,10 @@ namespace Controllers
 
       //
       AddPurchaseToDisplay(PurchaseType.SKILLS);
-      AddPurchaseToDisplay(PurchaseType.ROCK_0_UPGRADE_0);
+      //AddPurchaseToDisplay(PurchaseType.ROCK_0_UPGRADE_0);
       AddPurchaseToDisplay(PurchaseType.ROCK_BUY_0);
       AddPurchaseToDisplay(PurchaseType.AUTO_ROCK);
-      AddPurchaseToDisplay(PurchaseType.FORGE);
+      //AddPurchaseToDisplay(PurchaseType.FORGE);
 
       UpdatePurchasesUi();
     }
@@ -180,6 +196,8 @@ namespace Controllers
       button.onClick.AddListener(() =>
       {
 
+        AudioController.PlayAudio("MenuSelect");
+
         //
         if (purchaseInfo._Cost > StatsController.s_Singleton._Gold)
           return;
@@ -211,15 +229,34 @@ namespace Controllers
 
         //
         case PurchaseType.ROCK_0_UPGRADE_0:
-          RockController.UpgradeRock(RockController.RockType.STONE);
+          //RockController.UpgradeRock(RockController.RockType.STONE);
           break;
         case PurchaseType.ROCK_1_UPGRADE_0:
-          RockController.UpgradeRock(RockController.RockType.COPPER);
+          RockController.SetRockDropTable(RockController.RockType.COPPER, new (InventoryController.ItemType, float)[]{
+            (InventoryController.ItemType.COPPER, 20f),
+            (InventoryController.ItemType.STONE, 80f)
+          });
+          break;
+        case PurchaseType.ROCK_2_UPGRADE_0:
+          RockController.SetRockDropTable(RockController.RockType.COPPER, new (InventoryController.ItemType, float)[]{
+            (InventoryController.ItemType.TIN, 20f),
+            (InventoryController.ItemType.STONE, 80f)
+          });
           break;
 
         case PurchaseType.ROCK_BUY_0:
           RockController.UnlockRock(RockController.RockType.COPPER);
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.FORGE);
           s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_1_UPGRADE_0);
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_BUY_1);
+          UpdatePurchasesUi();
+
+          break;
+        case PurchaseType.ROCK_BUY_1:
+          RockController.UnlockRock(RockController.RockType.TIN);
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_2_UPGRADE_0);
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.BRONZE_INGOT);
+          UpdatePurchasesUi();
 
           break;
       }
