@@ -14,18 +14,68 @@ namespace Controllers
     //
     Transform _pickaxeModel;
     public static Transform transform { get { return s_Singleton._pickaxeModel; } }
+    RectTransform _pickaxeUi;
+
     float _swingTimer, _swingTimerVisual;
 
     //
     PickaxeStats _pickaxeStats;
     public static PickaxeStats s_PickaxeStats { get { return s_Singleton._pickaxeStats; } }
-    public class PickaxeStats
+    public class PickaxeStats : IInfoable
     {
 
       public float Damage { get { return StatsController.GetMaths(StatsController.StatType.DAMAGE); } }
       public float Speed { get { return StatsController.GetMaths(StatsController.StatType.SPEED); } }
 
+      public int AmountDroppedOnHit { get { return 1; } }
+      int _amountDroppedOnBreak;
+      public int AmountDroppedOnBreak { get { return _amountDroppedOnBreak; } }
 
+      //
+      public string _Info
+      {
+        get
+        {
+          return InfoController.GetInfoString("Pickaxe", @$"Damage: {Damage}
+Speed:  {Speed * 100f}%
+
+Drop on hit:   {AmountDroppedOnHit}
+Drop on break: {AmountDroppedOnBreak}");
+        }
+      }
+      public RectTransform _Transform { get { return s_Singleton._pickaxeUi; } }
+
+      //
+      public PickaxeStats()
+      {
+        _amountDroppedOnBreak = 4;
+      }
+
+      //
+      public void SetDropOnBreak(int amount)
+      {
+        _amountDroppedOnBreak = amount;
+      }
+
+      //
+      [System.Serializable]
+      public class PickaxeSaveInfo
+      {
+        public int DropOnHit, DropOnBreak;
+      }
+      public static PickaxeSaveInfo GetSaveInfo()
+      {
+        var saveInfo = new PickaxeSaveInfo();
+
+        // saveInfo.DropOnHit = s_PickaxeStats.am;
+        saveInfo.DropOnBreak = s_PickaxeStats._amountDroppedOnBreak;
+
+        return saveInfo;
+      }
+      public static void SetSaveInfo(PickaxeSaveInfo saveInfo)
+      {
+        s_PickaxeStats.SetDropOnBreak(saveInfo.DropOnBreak);
+      }
     }
 
     //
@@ -36,6 +86,8 @@ namespace Controllers
 
       //
       _pickaxeModel = GameObject.Find("Pickaxe").transform;
+      _pickaxeUi = GameObject.Find("PicBox").transform as RectTransform;
+
       _swingTimer = 0f;
     }
 
@@ -49,13 +101,27 @@ namespace Controllers
       _pickaxeModel.localPosition = Vector3.Lerp(new Vector3(-0.7f, 0.2f, 0f), new Vector3(-2f, 1f, 0f), Easings.EaseInOutElastic(_swingTimerVisual));
 
       //
-      _swingTimer += Time.deltaTime * s_PickaxeStats.Speed;
+      _swingTimer += Time.deltaTime * s_PickaxeStats.Speed * 0.25f;
       if (_swingTimer >= 1f && !RockController.s_HasRock) { _swingTimer = 1f; return; }
       while (_swingTimer >= 1f)
       {
         _swingTimer -= 1f;
 
-        RockController.s_Singleton.Hit(s_PickaxeStats.Damage);
+        //
+        var damage = s_PickaxeStats.Damage;
+        var powerModifier = StatsController.GetMaths(StatsController.StatType.LUCK);
+        if (powerModifier > 0f)
+        {
+          var randomNumber = Random.Range(0f, 1f);
+          if (randomNumber <= powerModifier || powerModifier == 1f)
+          {
+            damage *= 2;
+
+            LogController.AppendLog("Power!");
+          }
+        }
+
+        RockController.s_Singleton.Hit(damage);
       }
     }
 

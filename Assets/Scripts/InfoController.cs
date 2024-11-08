@@ -25,27 +25,33 @@ namespace Controllers
     }
 
     //
-    IInfoable _defaultInfo;
+    IInfoable _defaultInfo, _lastInfo;
     public void Update()
     {
       var hooveredObj = GatherDescriptionObjectName(Input.mousePosition);
       if (hooveredObj == null)
       {
-        if (_defaultInfo != null)
+        if (_lastInfo != null && _lastInfo._Transform != null && _lastInfo._Transform.gameObject != null && _lastInfo._Transform.gameObject.activeInHierarchy)
+        {
+          SetInfoText(_lastInfo._Info);
+          SetInfoPointer(_lastInfo);
+        }
+        else if (_defaultInfo != null && _defaultInfo._Transform != null && _defaultInfo._Transform.gameObject != null && _defaultInfo._Transform.gameObject.activeInHierarchy)
         {
           SetInfoText(_defaultInfo._Info);
-
           SetInfoPointer(_defaultInfo);
-
         }
         else
+        {
           SetInfoText("");
+          SetInfoPointer(null);
+        }
       }
       else
       {
-        _defaultInfo = hooveredObj;
-        SetInfoText(hooveredObj._Info);
+        _lastInfo = hooveredObj;
 
+        SetInfoText(hooveredObj._Info);
         SetInfoPointer(hooveredObj);
       }
     }
@@ -53,7 +59,11 @@ namespace Controllers
     //
     void SetInfoPointer(IInfoable ofInfoable)
     {
-      if (ofInfoable._Transform == null) return;
+      if (ofInfoable == null || ofInfoable._Transform == null)
+      {
+        _mouseLineRenderer.SetPositions(new Vector3[] { new Vector3(1000f, 0f, 0f), new Vector3(1000f, 0f, 1f) });
+        return;
+      }
 
       var infoButtonPosition = InfoBoxMenuController.GetInfoButton().transform.position;
 
@@ -81,7 +91,9 @@ namespace Controllers
       var checkInfos = new List<IHasInfoables>()
       {
         MainBoxMenuController.s_Singleton,
-        MineBoxMenuController.s_Singleton
+        MineBoxMenuController.s_Singleton,
+
+        InfoBoxMenuController.s_Singleton,
       };
       var defaultInfo = MainBoxMenuController.s_Singleton._InfoData._DefaultInfo;
 
@@ -92,7 +104,7 @@ namespace Controllers
       //
       foreach (var checkInfo in checkInfos)
         foreach (var info in checkInfo._InfoData._Infos)
-          if (info._Transform.gameObject.activeSelf && RectTransformUtility.RectangleContainsScreenPoint(info._Transform, mousePos, Camera.main))
+          if (info._Transform != null && info._Transform.gameObject.activeInHierarchy && RectTransformUtility.RectangleContainsScreenPoint(info._Transform, mousePos, Camera.main))
             return info;
 
       return null;

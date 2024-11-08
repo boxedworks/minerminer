@@ -30,7 +30,7 @@ public class SimpleInfoable : IInfoable
   public string _Info { get { return _Description; } }
 
   public GameObject _GameObject;
-  public RectTransform _Transform { get { return _GameObject.transform as RectTransform; } }
+  public RectTransform _Transform { get { return _GameObject == null ? null : _GameObject.transform as RectTransform; } }
 }
 
 //

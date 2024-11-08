@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Packages;
+using System.Runtime.InteropServices;
 
 namespace Controllers
 {
@@ -12,7 +14,7 @@ namespace Controllers
     public static StatsController s_Singleton;
 
     //
-    Transform _menu;
+    Transform _menu, _prefab;
     bool _menuIsVisible { get { return MainBoxMenuController.s_Singleton.IsVisible(MainBoxMenuController.MenuType.SKILLS); } }
 
     //
@@ -35,7 +37,11 @@ namespace Controllers
       NONE,
 
       DAMAGE,
-      SPEED
+      SPEED,
+      LUCK,
+      POWER,
+
+      HEAT
     }
 
     //
@@ -71,8 +77,9 @@ namespace Controllers
 
       //
       _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.SKILLS).transform;
+      _prefab = _menu.GetChild(0);
+
       _skillStatSelectorUi = _menu.GetChild(0).GetChild(0);
-      _skillStatSelectorUi.SetAsLastSibling();
 
       string getSafeFloat(float inFloat)
       {
@@ -94,7 +101,7 @@ Damage: {getSafeFloat(skill._OnMaths)}");
 
         new Skill(StatType.SPEED, "Speed",
           (int level) => {
-            return (1f + level * 0.05f) * 0.25f;
+            return 1f + level * 0.05f;
           },
           (Skill skill, int level, float xp, float xpMax) => {
             return InfoController.GetInfoString("Speed", @$"Increase your pickaxe's speed.
@@ -104,8 +111,35 @@ Xp:    {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
 Speed: {getSafeFloat(skill._OnMaths * 100)}%");
         }),
 
+        new Skill(StatType.LUCK, "Luck",
+          (int level) => {
+            return level / 99f * 5f;
+          },
+          (Skill skill, int level, float xp, float xpMax) => {
+            return InfoController.GetInfoString("Luck", @$"Percent chance to get 1 extra item when damaging a rock.
+
+Level:  {level} / 99
+Xp:     {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
+Chance: {getSafeFloat(skill._OnMaths * 100)}%");
+        }),
+
+        new Skill(StatType.POWER, "Power",
+          (int level) => {
+            return level / 99f;
+          },
+          (Skill skill, int level, float xp, float xpMax) => {
+            return InfoController.GetInfoString("Power", @$"Percent chance to do 2x damage on hit.
+
+Level:  {level} / 99
+Xp:     {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
+Chance: {getSafeFloat(skill._OnMaths * 100)}%");
+        }),
+
       };
+
       SetSkillStatSelector(0);
+      ToggleStat(StatType.DAMAGE, true);
+      ToggleStat(StatType.SPEED, true);
     }
 
     public void AddXp(float xpAmount)
@@ -162,6 +196,12 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
     }
 
     //
+    public static void ToggleStat(StatType statType, bool toggle)
+    {
+      s_Singleton._skillStats[((int)statType) - 1].ToggleVisibility(toggle);
+    }
+
+    //
     public class Skill : IInfoable
     {
 
@@ -194,7 +234,10 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
 
         _xpMax = 10;
 
-        _uiComponents = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.SKILLS).transform.Find(_name);
+        _uiComponents = GameObject.Instantiate(s_Singleton._prefab.gameObject, s_Singleton._prefab.parent).transform;
+
+        GameObject.DestroyImmediate(_uiComponents.GetChild(0).gameObject);
+
         _uiText = _uiComponents.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
         _uiSlider = _uiComponents.GetChild(2).GetComponent<UnityEngine.UI.Slider>();
 
@@ -222,10 +265,18 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
 
             _level++;
             _xpMax += _level;
+
+            LogController.AppendLog($"Skill leveled: {_name} ({_level - 1} -> {_level})");
           }
 
           UpdateUi();
         }
+      }
+
+      //
+      public void ToggleVisibility(bool toggle)
+      {
+        _uiComponents.gameObject.SetActive(toggle);
       }
 
       //
@@ -240,6 +291,50 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
         _uiText.text = $"{_name} - {_level}/99";
         _uiSlider.value = _xpVisual / _xpMax;
       }
+
+      //
+      public SkillSaveInfo GetSkillInfo()
+      {
+        var info = new SkillSaveInfo();
+
+        info.SkillType = _statType;
+        info.Level = _level;
+        info.Xp = _xpVisual;
+        info.XpLeft = _xp;
+        info.XpMax = _xpMax;
+
+        return info;
+      }
+      public void SetSkillInfo(SkillSaveInfo skillInfo)
+      {
+        _level = skillInfo.Level;
+        _xpVisual = skillInfo.Xp;
+        _xpMax = skillInfo.XpLeft;
+        _xpMax = skillInfo.XpMax;
+
+        UpdateUi();
+      }
+    }
+
+    //
+    [System.Serializable]
+    public class SkillSaveInfo
+    {
+      public StatType SkillType;
+      public int Level;
+      public float Xp, XpLeft, XpMax;
+    }
+    public static List<SkillSaveInfo> GetSkills()
+    {
+      var returnList = new List<SkillSaveInfo>();
+      foreach (var skill in s_Singleton._skillStats)
+        returnList.Add(skill.GetSkillInfo());
+      return returnList;
+    }
+    public static void SetSkills(List<SkillSaveInfo> skillInfos)
+    {
+      foreach (var skillInfo in skillInfos)
+        s_Singleton._skillStats[((int)skillInfo.SkillType) - 1].SetSkillInfo(skillInfo);
     }
 
   }

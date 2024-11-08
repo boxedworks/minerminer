@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Packages;
+using System.Net.Security;
 
 namespace Controllers
 {
@@ -55,7 +57,7 @@ Sell Price: ${_SellValue}
 Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         }
       }
-      public RectTransform _Transform { get { return _MenuEntry.transform as RectTransform; } }
+      public RectTransform _Transform { get { return _MenuEntry == null ? null : _MenuEntry.transform as RectTransform; } }
     }
     Dictionary<ItemType, ItemInfo> _itemInfos;
 
@@ -230,8 +232,9 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         var itemInfo = _itemInfos[_selectedItem];
         var sellValueTotal = _sellAmount * itemInfo._SellValue;
 
-        StatsController.s_Singleton._Gold += sellValueTotal;
+        LogController.AppendLog($"Sold {_sellAmount} {GetItemName(_selectedItem)} for ${sellValueTotal}.");
 
+        StatsController.s_Singleton._Gold += sellValueTotal;
         RemoveItemAmount(_selectedItem, _sellAmount);
 
         _sellAmount = Mathf.Clamp(_sellAmount, 0, itemInfo._AmountHeld);
@@ -239,7 +242,11 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
 
         //
         if (!UpgradeController.HasUpgrade(UpgradeController.UpgradeType.SHOP))
+        {
           UpgradeController.UnlockUpgrade(UpgradeController.UpgradeType.SHOP);
+
+          LogController.AppendLog("Unlocked the Shop menu.");
+        }
       });
       _otherInfoables.Add(new SimpleInfoable()
       {
@@ -413,6 +420,45 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       var itemInfo = s_Singleton._itemInfos[itemType];
       return itemInfo._ParticleType;
     }
+
+    //
+    [System.Serializable]
+    public class InventoryInfo
+    {
+      public List<string> ItemList;
+      public List<int> AmountList;
+    }
+    public static InventoryInfo GetSaveInfo()
+    {
+      var saveInfo = new InventoryInfo();
+
+      saveInfo.ItemList = new();
+      saveInfo.AmountList = new();
+      foreach (var item in s_Singleton._itemInfos)
+      {
+        if (item.Value._InInventory)
+        {
+          saveInfo.ItemList.Add(item.Key.ToString());
+          saveInfo.AmountList.Add(item.Value._AmountHeld);
+        }
+      }
+
+      return saveInfo;
+    }
+    public static void SetSaveInfo(InventoryInfo saveInfo)
+    {
+
+      var index = -1;
+      foreach (var item in saveInfo.ItemList)
+      {
+        index++;
+
+        if (System.Enum.TryParse(item, true, out ItemType itemType))
+          s_Singleton.AddItemAmount(itemType, saveInfo.AmountList[index]);
+      }
+
+    }
+
 
   }
 

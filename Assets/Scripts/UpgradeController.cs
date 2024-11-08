@@ -130,6 +130,10 @@ namespace Controllers
     //
     public static void UnlockUpgrade(UpgradeType unlock)
     {
+      //
+      if (s_Singleton._unlockedUpgrades.Contains(unlock)) return;
+
+      //
       s_Singleton._unlockedUpgrades.Add(unlock);
 
       //
@@ -153,6 +157,25 @@ namespace Controllers
     public static bool HasUpgrade(UpgradeType upgrade)
     {
       return s_Singleton._unlockedUpgrades.Contains(upgrade);
+    }
+
+    //
+    public static List<string> GetUnlocks()
+    {
+
+      var returnList = new List<string>();
+      foreach (var unlock in s_Singleton._unlockedUpgrades)
+        returnList.Add(unlock.ToString());
+
+      return returnList;
+    }
+    public static void SetUnlocks(List<string> unlocks)
+    {
+      foreach (var unlockString in unlocks)
+      {
+        if (Enum.TryParse(unlockString, true, out UpgradeType unlockType))
+          UnlockUpgrade(unlockType);
+      }
     }
   }
 

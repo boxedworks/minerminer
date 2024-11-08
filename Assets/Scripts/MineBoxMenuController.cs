@@ -93,7 +93,7 @@ namespace Controllers
       return IsMenuActive((int)menuType);
     }
 
-  //
+    //
     protected override string GetButtonDescription(string buttonName)
     {
       switch (buttonName)

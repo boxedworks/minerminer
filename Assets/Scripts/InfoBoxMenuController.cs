@@ -5,7 +5,7 @@ namespace Controllers
 {
 
   //
-  public class InfoBoxMenuController : BoxMenuController
+  public class InfoBoxMenuController : BoxMenuController, IHasInfoables
   {
 
     //
@@ -16,7 +16,25 @@ namespace Controllers
 
       NONE,
 
-      INFO
+      INFO,
+      LOG
+    }
+
+    //
+    public InfoData _InfoData
+    {
+      get
+      {
+        InfoData returnData = new();
+        returnData._Infos = new();
+
+        //
+        foreach (var dependency in _dependencyInfos)
+          returnData._Infos.Add(dependency);
+
+        //
+        return returnData;
+      }
     }
 
     //
@@ -31,12 +49,14 @@ namespace Controllers
         MenuType.NONE.ToString(),
 
         MenuType.INFO.ToString(),
+        MenuType.LOG.ToString(),
       };
       SetUpMenus(GameObject.Find("BoxInfoButtons").transform.GetChild(0), menuOrderString);
 
       //
       SetMenuType((int)MenuType.INFO);
       SetMenuActive(MenuType.INFO, true, false);
+      SetMenuActive(MenuType.LOG, true, false);
     }
 
     //
@@ -61,7 +81,17 @@ namespace Controllers
     //
     protected override string GetButtonDescription(string buttonName)
     {
-      return "NOT_IMPL";
+      switch (buttonName)
+      {
+
+        case "LogButton":
+          return InfoController.GetInfoString("Log", "Details past events.");
+        case "InfoButton":
+          return InfoController.GetInfoString("Info", "Shows info on game objects.");
+
+        default:
+          return "NOT_IMPL";
+      }
     }
 
     public static GameObject GetInfoButton()

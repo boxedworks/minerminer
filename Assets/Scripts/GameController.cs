@@ -1,3 +1,4 @@
+using Packages;
 using UnityEngine;
 
 namespace Controllers
@@ -15,6 +16,7 @@ namespace Controllers
       new MineBoxMenuController();
       new InfoBoxMenuController();
       new InfoController();
+      new LogController();
       new StatsController();
       new InventoryController();
       new ShopController();
@@ -39,8 +41,16 @@ namespace Controllers
       UpgradeController.s_Singleton.Update();
 
       // Cheats
-      if (Input.GetKeyDown(KeyCode.Space))
-        StatsController.s_Singleton._Gold += 50;
+      {
+        if (Input.GetKeyDown(KeyCode.Space))
+          StatsController.s_Singleton._Gold += 50;
+      }
+
+      //
+      if (Input.GetKeyDown(KeyCode.S))
+        SaveController.Save();
+      if (Input.GetKeyDown(KeyCode.L))
+        SaveController.Load();
     }
   }
 

@@ -69,7 +69,10 @@ namespace Controllers
             desc += $"<b>Drop table</b>\n\n{breakProductString}";
           }
 
-          return InfoController.GetInfoString($"{_Title}", @$"Health: {_HealthMax}
+          //
+          var healthText = s_Singleton._rockMenu.gameObject.activeSelf ? $"Health: {_HealthMax}" : $"Health: {s_Singleton._health} / {_HealthMax}";
+
+          return InfoController.GetInfoString($"{_Title}", @$"{healthText}
 Xp:     {_XpGain}
 
 {desc}");
@@ -88,19 +91,28 @@ Xp:     {_XpGain}
         var returnData = new InfoData();
 
         var returnList = new List<IInfoable>();
+
+        // Rock menu visible
         if (_rockMenu.gameObject.activeSelf)
         {
           foreach (var rockInfo in _rocks)
             if (rockInfo.Value._MenuEntry != null)
               returnList.Add(rockInfo.Value);
         }
+
+        // Rock menu hidden
         else
+        {
           foreach (var otherInfo in _otherInfoables)
             returnList.Add(otherInfo);
 
-        //
-        if (_rockInfo != null)
-          returnList.Add(_rockInfo);
+          //
+          returnList.Add(PickaxeController.s_PickaxeStats);
+          if (_rockInfo != null)
+          {
+            returnList.Add(_rockInfo);
+          }
+        }
 
         //
         returnData._Infos = returnList;
@@ -125,8 +137,6 @@ Xp:     {_XpGain}
       _healthSlider = _dependencies.Find("RockHealth").GetComponent<Slider>();
       _rockMenu = _dependencies.Find("RockMenu");
       _rockMenu.gameObject.SetActive(false);
-
-      SetHealth(0f);
 
       //
       for (var i = 1; i < 10; i++)
@@ -184,6 +194,9 @@ Xp:     {_XpGain}
       });
 
       //
+      SetHealth(0f);
+
+      //
       SetRockType(RockType.STONE);
       ToggleRock(false);
     }
@@ -214,13 +227,28 @@ Xp:     {_XpGain}
       SetHealth(_health - damage);
       DamageTextController.s_Singleton.AddText(damage);
 
+      //
+      var baseDropAmount = 0;
+      var luckModifier = StatsController.GetMaths(StatsController.StatType.LUCK);
+      while (luckModifier > 0f)
+      {
+        var randomNumber = Random.Range(0f, 1f);
+        if (randomNumber <= luckModifier)
+        {
+          baseDropAmount++;
+
+          LogController.AppendLog("Luck!");
+        }
+
+        luckModifier -= 1f;
+      }
+
       // Break
       if (_health <= 0f)
       {
         StatsController.s_Singleton.AddXp(_rocks[_currentRock]._XpGain);
 
-        for (var i = 0; i < 5; i++)
-          AddItemAmount(GetRockDrop(_currentRock), 1);
+        DropFromDropTable(baseDropAmount + PickaxeController.s_PickaxeStats.AmountDroppedOnBreak);
 
         ToggleRock(false);
         if (_autoReplaceRock)
@@ -238,14 +266,42 @@ Xp:     {_XpGain}
       // Normal damage
       else
       {
-        for (var i = 0; i < 1; i++)
-          AddItemAmount(GetRockDrop(_currentRock), 1);
+        DropFromDropTable(baseDropAmount + PickaxeController.s_PickaxeStats.AmountDroppedOnHit);
       }
 
       // Pickaxe Fx
       ParticleController.PlayParticles(ParticleController.ParticleType.ROCK_HIT);
       if (MineBoxMenuController.s_Singleton.IsVisible(MineBoxMenuController.MenuType.MINE))
         AudioController.PlayAudio("PickaxeHit");
+    }
+
+    //
+    void DropFromDropTable(int amount)
+    {
+
+      Dictionary<InventoryController.ItemType, int> itemDrops = new();
+
+      for (var i = 0; i < amount; i++)
+      {
+        var drop = GetRockDrop(_currentRock);
+        if (!itemDrops.ContainsKey(drop))
+          itemDrops.Add(drop, 1);
+        else
+          itemDrops[drop]++;
+      }
+
+      var logString = "Collected ";
+      var logIter = 0;
+      foreach (var drop in itemDrops)
+      {
+        if (logIter++ != 0)
+          logString += ", ";
+
+        AddItemAmount(drop.Key, drop.Value);
+        logString += $"{drop.Value} {InventoryController.GetItemName(drop.Key)}";
+      }
+      logString += ".";
+      LogController.AppendLog(logString);
     }
 
     //
@@ -256,13 +312,17 @@ Xp:     {_XpGain}
 
       var rockInfo = _rocks[_currentRock];
       SetHealth(rockInfo._HealthMax);
-
-      SetRockHoverInfos();
     }
 
     //
     void SetRockHoverInfos()
     {
+      if (_currentRock == RockType.NONE)
+      {
+        _rockInfo = null;
+        return;
+      }
+
       var rockInfo = _rocks[_currentRock];
       _rockInfo = new SimpleInfoable()
       {
@@ -290,6 +350,8 @@ Xp:     {_XpGain}
         _healthSlider.value = 0f;
       else
         _healthSlider.value = _health / _rocks[_currentRock]._HealthMax;
+
+      SetRockHoverInfos();
     }
 
     //
@@ -306,9 +368,9 @@ Xp:     {_XpGain}
       }
       else
       {
-        _rockInfo = null;
-
         SetHealth(0f);
+
+        _rockInfo = null;
       }
     }
 
@@ -450,6 +512,37 @@ Xp:     {_XpGain}
 
       }
 
+    }
+
+    //
+    [System.Serializable]
+    public class RockSaveInfo
+    {
+      public RockType RockType;
+      public float CurrentHealth;
+
+      public bool RockVisible;
+    }
+    public static RockSaveInfo GetSaveInfo()
+    {
+      var saveInfo = new RockSaveInfo();
+
+      saveInfo.RockType = s_Singleton._currentRock;
+      saveInfo.CurrentHealth = s_Singleton._health;
+      saveInfo.RockVisible = s_HasRock;
+
+      return saveInfo;
+    }
+    public static void SetSaveInfo(RockSaveInfo saveInfo)
+    {
+      if (saveInfo.RockVisible)
+      {
+        s_Singleton.SetRockType(saveInfo.RockType);
+        s_Singleton.ToggleRock(true);
+        s_Singleton.SetHealth(saveInfo.CurrentHealth);
+      }
+      else
+        s_Singleton._currentRock = saveInfo.RockType;
     }
 
   }

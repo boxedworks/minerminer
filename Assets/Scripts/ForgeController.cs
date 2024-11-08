@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Net.Security;
 
 namespace Controllers
 {
@@ -22,7 +23,7 @@ namespace Controllers
     Image _input0Image, _input1Image, _output0Image;
     Button _setRecipeButton, _startButton, _output0Button;
 
-    bool _cooking;
+    bool _isCooking;
     int _currentOutputAmount;
 
     //
@@ -35,14 +36,14 @@ namespace Controllers
     }
 
     //
-    List<Recipe> _recipes;
+    Dictionary<RecipeType, Recipe> _recipes;
     Recipe _currentRecipe;
     class Recipe : IInfoable
     {
       public string _Title;
       public RecipeType _RecipeType;
 
-      public (InventoryController.ItemType InputType, int Amount)[] _Inputs, _Outputs;
+      public (InventoryController.ItemType ItemType, int Amount)[] _Inputs, _Outputs;
 
       public GameObject _MenuEntry;
 
@@ -53,9 +54,9 @@ namespace Controllers
         get
         {
 
-          if (InventoryController.s_Singleton.GetItemAmount(_Inputs[0].InputType) < _Inputs[0].Amount)
+          if (InventoryController.s_Singleton.GetItemAmount(_Inputs[0].ItemType) < _Inputs[0].Amount)
             return false;
-          if (_Inputs.Length > 1 && InventoryController.s_Singleton.GetItemAmount(_Inputs[1].InputType) < _Inputs[1].Amount)
+          if (_Inputs.Length > 1 && InventoryController.s_Singleton.GetItemAmount(_Inputs[1].ItemType) < _Inputs[1].Amount)
             return false;
 
           return true;
@@ -74,9 +75,9 @@ namespace Controllers
           var inputValue = 0;
           foreach (var item in _Inputs)
           {
-            var itemName = InventoryController.GetItemName(item.InputType);
+            var itemName = InventoryController.GetItemName(item.ItemType);
 
-            var itemValue = InventoryController.GetItemValue(item.InputType, item.Amount);
+            var itemValue = InventoryController.GetItemValue(item.ItemType, item.Amount);
             inputValue += itemValue;
 
             inputString += $"- {itemName} x{item.Amount}\n";
@@ -86,9 +87,9 @@ namespace Controllers
           var outputValue = 0;
           foreach (var item in _Outputs)
           {
-            var itemName = InventoryController.GetItemName(item.InputType);
+            var itemName = InventoryController.GetItemName(item.ItemType);
 
-            var itemValue = InventoryController.GetItemValue(item.InputType, item.Amount);
+            var itemValue = InventoryController.GetItemValue(item.ItemType, item.Amount);
             outputValue += itemValue;
 
             outputString += $"- {itemName} x{item.Amount}\n";
@@ -122,8 +123,8 @@ namespace Controllers
         if (_recipeMenu.gameObject.activeSelf)
         {
           foreach (var recipe in _recipes)
-            if (recipe._MenuEntry != null)
-              returnList.Add(recipe);
+            if (recipe.Value._MenuEntry != null)
+              returnList.Add(recipe.Value);
         }
         else
         {
@@ -204,7 +205,7 @@ namespace Controllers
       SetInput(1, InventoryController.ItemType.NONE, 0, false);
       SetOutput(InventoryController.ItemType.NONE, 0);
       for (var i = 0; i < 10; i++)
-        SetRecipe(i, null);
+        SetRecipeUI(i, null);
 
       UnlockRecipe(RecipeType.COPPER_INGOT);
     }
@@ -214,29 +215,22 @@ namespace Controllers
     {
 
       //
-      if (_cooking)
+      if (_isCooking)
         _forgeProgress += Time.deltaTime * _forgeSpeed * 0.05f;
       while (_forgeProgress >= 1f)
       {
         _forgeProgress -= 1f;
 
         //
-        _cooking = false;
+        _isCooking = false;
         _startButton.gameObject.SetActive(true);
 
         _currentOutputAmount += _currentRecipe._Outputs[0].Amount;
 
-        var recipeInput0 = _currentRecipe._Inputs[0];
-        SetInput(0, recipeInput0.InputType, recipeInput0.Amount, true);
-        if (_currentRecipe._Inputs.Length > 1)
-        {
-          var recipeInput1 = _currentRecipe._Inputs[0];
-          SetInput(1, recipeInput1.InputType, recipeInput1.Amount, true);
-        }
-
-        SetOutput(_currentRecipe._Outputs[0].InputType, _currentOutputAmount);
+        SetRecipeInputs(_currentRecipe, true);
       }
 
+      //
       _forgeProgressSlider.value = _forgeProgress;
     }
 
@@ -303,7 +297,7 @@ namespace Controllers
 
         InventoryController.s_Singleton.AddItemAmount(outputType, amount);
 
-        if (!_cooking)
+        if (!_isCooking)
           _setRecipeButton.gameObject.SetActive(true);
 
         AudioController.PlayAudio("MenuSelect");
@@ -317,7 +311,97 @@ namespace Controllers
     }
 
     //
-    void SetRecipe(int buttonIndex, Recipe recipe)
+    void SetRecipe(RecipeType recipeType)
+    {
+      SetRecipe(recipeType == RecipeType.NONE ? null : _recipes[recipeType]);
+    }
+    void SetRecipe(Recipe recipe)
+    {
+      _currentRecipe = recipe;
+
+      if (recipe == null)
+      {
+        SetInput(0, InventoryController.ItemType.NONE, 0, false);
+        SetInput(1, InventoryController.ItemType.NONE, 0, false);
+
+        _recipeMenu.gameObject.SetActive(false);
+        _startButton.gameObject.SetActive(false);
+
+        return;
+      }
+
+      //
+      var recipeInput0 = recipe._Inputs[0];
+      SetInput(0, recipeInput0.ItemType, recipeInput0.Amount, true);
+      if (recipe._Inputs.Length > 1)
+      {
+        var recipeInput1 = recipe._Inputs[1];
+        SetInput(1, recipeInput1.ItemType, recipeInput1.Amount, true);
+      }
+      else
+        SetInput(1, InventoryController.ItemType.NONE, 0, false);
+
+      _recipeMenu.gameObject.SetActive(false);
+
+      _startButton.gameObject.SetActive(true);
+      _startButton.onClick.RemoveAllListeners();
+      _startButton.onClick.AddListener(() =>
+      {
+        AudioController.PlayAudio("MenuSelect");
+
+        if (!_currentRecipe._IsCraftable)
+        {
+          LogController.AppendLog($"Not enough materials for {recipe._Title} recipe!");
+          return;
+        }
+
+        _startButton.gameObject.SetActive(false);
+        _setRecipeButton.gameObject.SetActive(false);
+
+        var recipeInput0 = _currentRecipe._Inputs[0];
+        InventoryController.s_Singleton.RemoveItemAmount(recipeInput0.ItemType, recipeInput0.Amount);
+        if (_currentRecipe._Inputs.Length > 1)
+        {
+          var recipeInput1 = _currentRecipe._Inputs[1];
+          InventoryController.s_Singleton.RemoveItemAmount(recipeInput1.ItemType, recipeInput1.Amount);
+        }
+
+        SetRecipeInputs(_currentRecipe, false);
+
+        _isCooking = true;
+
+        LogController.AppendLog($"Started forge with {recipe._Title} recipe.");
+      });
+
+    }
+
+    //
+    void SetRecipeInputs(Recipe recipe, bool transparent)
+    {
+      //
+      if (recipe == null)
+      {
+        SetInput(0, InventoryController.ItemType.NONE, 0, false);
+        SetInput(1, InventoryController.ItemType.NONE, 0, false);
+
+        return;
+      }
+
+      //
+      var recipeInput0 = recipe._Inputs[0];
+      SetInput(0, recipeInput0.ItemType, recipeInput0.Amount, transparent);
+
+      if (recipe._Inputs.Length > 1)
+      {
+        var recipeInput1 = recipe._Inputs[1];
+        SetInput(1, recipeInput1.ItemType, recipeInput1.Amount, transparent);
+      }
+      else
+        SetInput(1, InventoryController.ItemType.NONE, 0, false);
+    }
+
+    //
+    void SetRecipeUI(int buttonIndex, Recipe recipe)
     {
 
       var button = (buttonIndex < 5 ? _recipeMenu.GetChild(0).GetChild(buttonIndex) : _recipeMenu.GetChild(1).GetChild(buttonIndex - 5))
@@ -332,66 +416,21 @@ namespace Controllers
 
         button.onClick.AddListener(() =>
         {
-          _currentRecipe = null;
-          SetInput(0, InventoryController.ItemType.NONE, 0, false);
-          SetInput(1, InventoryController.ItemType.NONE, 0, false);
-
-          _recipeMenu.gameObject.SetActive(false);
-          _startButton.gameObject.SetActive(false);
+          SetRecipe(recipe);
 
           AudioController.PlayAudio("MenuSelect");
         });
       }
       else
       {
-        img.sprite = InventoryController.GetItemSprite(recipe._Outputs[0].InputType);
+        img.sprite = InventoryController.GetItemSprite(recipe._Outputs[0].ItemType);
         img.enabled = true;
 
         button.onClick.AddListener(() =>
         {
-          _currentRecipe = recipe;
+          SetRecipe(recipe);
 
-          var recipeInput0 = recipe._Inputs[0];
-          SetInput(0, recipeInput0.InputType, recipeInput0.Amount, true);
-          if (recipe._Inputs.Length > 1)
-          {
-            var recipeInput1 = recipe._Inputs[1];
-            SetInput(1, recipeInput1.InputType, recipeInput1.Amount, true);
-          }
-          else
-            SetInput(1, InventoryController.ItemType.NONE, 0, false);
-
-          _recipeMenu.gameObject.SetActive(false);
-
-          _startButton.gameObject.SetActive(true);
-          _startButton.onClick.RemoveAllListeners();
-          _startButton.onClick.AddListener(() =>
-          {
-            AudioController.PlayAudio("MenuSelect");
-
-
-            if (!_currentRecipe._IsCraftable)
-              return;
-
-            _startButton.gameObject.SetActive(false);
-            _setRecipeButton.gameObject.SetActive(false);
-
-            var recipeInput0 = _currentRecipe._Inputs[0];
-            SetInput(0, recipeInput0.InputType, recipeInput0.Amount, false);
-            InventoryController.s_Singleton.RemoveItemAmount(recipeInput0.InputType, recipeInput0.Amount);
-
-            if (_currentRecipe._Inputs.Length > 1)
-            {
-              var recipeInput1 = _currentRecipe._Inputs[1];
-              SetInput(1, recipeInput1.InputType, recipeInput1.Amount, false);
-              InventoryController.s_Singleton.RemoveItemAmount(recipeInput1.InputType, recipeInput1.Amount);
-            }
-            else
-              SetInput(1, InventoryController.ItemType.NONE, 0, false);
-
-
-            _cooking = true;
-          });
+          AudioController.PlayAudio("MenuSelect");
         });
 
         recipe._MenuEntry = button.transform.parent.gameObject;
@@ -420,8 +459,8 @@ namespace Controllers
               (InventoryController.ItemType.COPPER_INGOT, 1)
             },
           };
-          s_Singleton._recipes.Add(newRecipe);
-          s_Singleton.SetRecipe(0, newRecipe);
+          s_Singleton._recipes.Add(recipeType, newRecipe);
+          s_Singleton.SetRecipeUI(0, newRecipe);
 
           break;
 
@@ -441,13 +480,56 @@ namespace Controllers
               (InventoryController.ItemType.BRONZE_INGOT, 1)
             },
           };
-          s_Singleton._recipes.Add(newRecipe);
-          s_Singleton.SetRecipe(1, newRecipe);
+          s_Singleton._recipes.Add(recipeType, newRecipe);
+          s_Singleton.SetRecipeUI(1, newRecipe);
 
           break;
 
       }
 
+    }
+
+    //
+    [System.Serializable]
+    public class ForgeSaveInfo
+    {
+      public string CurrentRecipe;
+
+      public bool IsCooking;
+      public int OutputAmount;
+      public float ForgeProgress;
+    }
+    public static ForgeSaveInfo GetSaveInfo()
+    {
+      var saveInfo = new ForgeSaveInfo();
+
+      saveInfo.CurrentRecipe = s_Singleton._currentRecipe == null ? null : s_Singleton._currentRecipe._RecipeType.ToString();
+      saveInfo.IsCooking = s_Singleton._isCooking;
+      saveInfo.OutputAmount = s_Singleton._currentOutputAmount;
+      saveInfo.ForgeProgress = s_Singleton._forgeProgress;
+
+      return saveInfo;
+    }
+    public static void SetSaveInfo(ForgeSaveInfo saveInfo)
+    {
+      if (System.Enum.TryParse(saveInfo.CurrentRecipe, true, out RecipeType currentRecipeType))
+        s_Singleton.SetRecipe(currentRecipeType);
+
+      s_Singleton._isCooking = saveInfo.IsCooking;
+      if (s_Singleton._isCooking)
+      {
+        s_Singleton._startButton.gameObject.SetActive(false);
+        s_Singleton._setRecipeButton.gameObject.SetActive(false);
+      }
+
+      s_Singleton._currentOutputAmount = saveInfo.OutputAmount;
+      s_Singleton.SetRecipeInputs(s_Singleton._currentRecipe, !s_Singleton._isCooking);
+      if (s_Singleton._currentOutputAmount > 0)
+      {
+        s_Singleton.SetOutput(s_Singleton._currentRecipe._Outputs[0].ItemType, s_Singleton._currentOutputAmount);
+      }
+
+      s_Singleton._forgeProgress = saveInfo.ForgeProgress;
     }
 
   }
