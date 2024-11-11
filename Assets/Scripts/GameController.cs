@@ -9,6 +9,7 @@ namespace Controllers
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+      new SaveController();
       new EventController();
       new AudioController();
       new ParticleController();
@@ -17,20 +18,23 @@ namespace Controllers
       new InfoBoxMenuController();
       new InfoController();
       new LogController();
-      new StatsController();
+      new SkillController();
       new InventoryController();
       new ShopController();
       new PickaxeController();
       new ForgeController();
       new RockController();
       new DamageTextController();
-      new UpgradeController();
+      new UnlockController();
+
+      //
+      SaveController.Load();
     }
 
     // Update is called once per frame
     void Update()
     {
-      StatsController.s_Singleton.Update();
+      SkillController.s_Singleton.Update();
       PickaxeController.s_Singleton.Update();
       RockController.s_Singleton.Update();
       DamageTextController.s_Singleton.Update();
@@ -38,20 +42,34 @@ namespace Controllers
       AudioController.s_Singleton.Update();
       ForgeController.s_Singleton.Update();
       InfoController.s_Singleton.Update();
-      UpgradeController.s_Singleton.Update();
+      UnlockController.s_Singleton.Update();
 
       // Cheats
       {
         if (Input.GetKeyDown(KeyCode.Space))
-          StatsController.s_Singleton._Gold += 50;
+          SkillController.s_Singleton._Gold += 50;
       }
 
       //
       if (Input.GetKeyDown(KeyCode.S))
+      {
         SaveController.Save();
+        LogController.AppendLog("Saved.");
+      }
       if (Input.GetKeyDown(KeyCode.L))
+      {
         SaveController.Load();
+        LogController.AppendLog("Loaded.");
+      }
     }
+
+    //
+    public void OnApplicationQuit()
+    {
+      SaveController.Save();
+    }
+
+
   }
 
 }

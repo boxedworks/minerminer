@@ -83,7 +83,7 @@ Xp:     {_XpGain}
 
     //
     List<IInfoable> _otherInfoables;
-    IInfoable _rockInfo;
+    IInfoable _rockInfo, _autoRockInfo;
     public InfoData _InfoData
     {
       get
@@ -105,6 +105,7 @@ Xp:     {_XpGain}
         {
           foreach (var otherInfo in _otherInfoables)
             returnList.Add(otherInfo);
+          returnList.Add(_autoRockInfo);
 
           //
           returnList.Add(PickaxeController.s_PickaxeStats);
@@ -171,13 +172,25 @@ Xp:     {_XpGain}
         _toggleMineButton.transform.GetChild(0).gameObject.SetActive(!toggle);
         _toggleMineButton.transform.GetChild(1).gameObject.SetActive(toggle);
 
+        var toggleString = toggle ? "On" : "Off";
+        _autoRockInfo = new SimpleInfoable()
+        {
+          _GameObject = _toggleMineButton.gameObject,
+          _Description = InfoController.GetInfoString("Auto replace rock", @$"Click to toggle.
+
+Mode: {toggleString}")
+        };
+
         AudioController.PlayAudio("MenuSelect");
       });
-      _otherInfoables.Add(new SimpleInfoable()
+      _autoRockInfo = new SimpleInfoable()
       {
         _GameObject = _toggleMineButton.gameObject,
-        _Description = InfoController.GetInfoString("Auto replace rock", "On or off.")
-      });
+        _Description = InfoController.GetInfoString("Auto replace rock", @$"Click to toggle.
+
+Mode: Off")
+      };
+      ToggleAutoRock(false);
 
       //
       _stopMineButton = GameObject.Find("StopMineButton").GetComponent<Button>();
@@ -229,7 +242,7 @@ Xp:     {_XpGain}
 
       //
       var baseDropAmount = 0;
-      var luckModifier = StatsController.GetMaths(StatsController.StatType.LUCK);
+      var luckModifier = SkillController.GetMaths(SkillController.SkillType.LUCK);
       while (luckModifier > 0f)
       {
         var randomNumber = Random.Range(0f, 1f);
@@ -246,7 +259,7 @@ Xp:     {_XpGain}
       // Break
       if (_health <= 0f)
       {
-        StatsController.s_Singleton.AddXp(_rocks[_currentRock]._XpGain);
+        SkillController.s_Singleton.AddXp(_rocks[_currentRock]._XpGain);
 
         DropFromDropTable(baseDropAmount + PickaxeController.s_PickaxeStats.AmountDroppedOnBreak);
 
@@ -512,6 +525,16 @@ Xp:     {_XpGain}
 
       }
 
+    }
+
+    //
+    void ToggleAutoRock(bool toggle)
+    {
+      _toggleMineButton.gameObject.SetActive(toggle);
+    }
+    public static void UnlockAutoRock()
+    {
+      s_Singleton.ToggleAutoRock(true);
     }
 
     //

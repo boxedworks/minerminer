@@ -24,8 +24,8 @@ namespace Controllers
     public class PickaxeStats : IInfoable
     {
 
-      public float Damage { get { return StatsController.GetMaths(StatsController.StatType.DAMAGE); } }
-      public float Speed { get { return StatsController.GetMaths(StatsController.StatType.SPEED); } }
+      public float Damage { get { return SkillController.GetMaths(SkillController.SkillType.DAMAGE); } }
+      public float Speed { get { return SkillController.GetMaths(SkillController.SkillType.SPEED); } }
 
       public int AmountDroppedOnHit { get { return 1; } }
       int _amountDroppedOnBreak;
@@ -109,7 +109,7 @@ Drop on break: {AmountDroppedOnBreak}");
 
         //
         var damage = s_PickaxeStats.Damage;
-        var powerModifier = StatsController.GetMaths(StatsController.StatType.LUCK);
+        var powerModifier = SkillController.GetMaths(SkillController.SkillType.POWER);
         if (powerModifier > 0f)
         {
           var randomNumber = Random.Range(0f, 1f);

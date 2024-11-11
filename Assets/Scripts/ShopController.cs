@@ -132,7 +132,7 @@ namespace Controllers
         _Title = "Sharpen Pickaxe 1",
         _Description = "Increases items dropped on rock break: 4 -> 5.",
 
-        _PurchaseString = "Purchased the Sharpen Pickaxe - 1 upgrade."
+        _PurchaseString = "Purchased the Sharpen Pickaxe 1 upgrade."
       });
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_1, new PurchaseInfo()
       {
@@ -141,7 +141,7 @@ namespace Controllers
         _Title = "Sharpen Pickaxe 2",
         _Description = "Increases items dropped on rock break: 5 -> 6.",
 
-        _PurchaseString = "Purchased the Sharpen Pickaxe - 1 upgrade."
+        _PurchaseString = "Purchased the Sharpen Pickaxe 2 upgrade."
       });
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_2, new PurchaseInfo()
       {
@@ -150,7 +150,7 @@ namespace Controllers
         _Title = "Sharpen Pickaxe 3",
         _Description = "Increases items dropped on rock break: 6 -> 7.",
 
-        _PurchaseString = "Purchased the Sharpen Pickaxe - 1 upgrade."
+        _PurchaseString = "Purchased the Sharpen Pickaxe 3 upgrade."
       });
 
       AddPurchase(PurchaseType.ROCK_0_UPGRADE_0, new PurchaseInfo()
@@ -243,7 +243,7 @@ namespace Controllers
 
         var cost = purchaseInfo.Value._Cost;
         var buttonImg = purchaseInfo.Value._MenuEntry.transform.GetChild(2).GetComponent<Image>();
-        buttonImg.color = cost > StatsController.s_Singleton._Gold ? new Color(0.945098f, 0.3239185f, 0.3176471f) : new Color(0.3267443f, 0.9433962f, 0.3159488f);
+        buttonImg.color = cost > SkillController.s_Singleton._Gold ? new Color(0.945098f, 0.3239185f, 0.3176471f) : new Color(0.3267443f, 0.9433962f, 0.3159488f);
       }
 
     }
@@ -271,10 +271,10 @@ namespace Controllers
         AudioController.PlayAudio("MenuSelect");
 
         //
-        if (purchaseInfo._Cost > StatsController.s_Singleton._Gold)
+        if (purchaseInfo._Cost > SkillController.s_Singleton._Gold)
           return;
 
-        StatsController.s_Singleton._Gold -= purchaseInfo._Cost;
+        SkillController.s_Singleton._Gold -= purchaseInfo._Cost;
         OnPurchased(purchaseType);
       });
     }
@@ -300,23 +300,23 @@ namespace Controllers
 
         //
         case PurchaseType.SKILLS:
-          UpgradeController.UnlockUpgrade(UpgradeController.UpgradeType.SKILLS);
+          UnlockController.Unlock(UnlockController.UnlockType.SKILLS);
           s_Singleton.AddPurchaseToDisplay(PurchaseType.SKILL_LUCK);
           s_Singleton.AddPurchaseToDisplay(PurchaseType.SKILL_POWER);
 
           break;
         case PurchaseType.FORGE:
-          UpgradeController.UnlockUpgrade(UpgradeController.UpgradeType.FORGE);
+          UnlockController.Unlock(UnlockController.UnlockType.FORGE);
 
           break;
 
         //
         case PurchaseType.SKILL_LUCK:
-          StatsController.ToggleStat(StatsController.StatType.LUCK, true);
+          SkillController.ToggleSkill(SkillController.SkillType.LUCK, true);
 
           break;
         case PurchaseType.SKILL_POWER:
-          StatsController.ToggleStat(StatsController.StatType.POWER, true);
+          SkillController.ToggleSkill(SkillController.SkillType.POWER, true);
 
           break;
 
@@ -367,6 +367,12 @@ namespace Controllers
           RockController.UnlockRock(RockController.RockType.TIN);
           s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_2_UPGRADE_0);
           ForgeController.UnlockRecipe(ForgeController.RecipeType.BRONZE_INGOT);
+
+          break;
+
+        //
+        case PurchaseType.AUTO_ROCK:
+          RockController.UnlockAutoRock();
 
           break;
       }

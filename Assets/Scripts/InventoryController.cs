@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Packages;
 using System.Net.Security;
+using UnityEngine.UI;
 
 namespace Controllers
 {
@@ -136,7 +137,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.BRONZE_INGOT, new ItemInfo()
       {
         _Title = "Bronze Ingot",
-        _SellValue = 150
+        _SellValue = 200
       });
 
       // Sell interface
@@ -234,16 +235,16 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
 
         LogController.AppendLog($"Sold {_sellAmount} {GetItemName(_selectedItem)} for ${sellValueTotal}.");
 
-        StatsController.s_Singleton._Gold += sellValueTotal;
+        SkillController.s_Singleton._Gold += sellValueTotal;
         RemoveItemAmount(_selectedItem, _sellAmount);
 
         _sellAmount = Mathf.Clamp(_sellAmount, 0, itemInfo._AmountHeld);
         UpdateSellText();
 
         //
-        if (!UpgradeController.HasUpgrade(UpgradeController.UpgradeType.SHOP))
+        if (!UnlockController.HasUnlock(UnlockController.UnlockType.SHOP))
         {
-          UpgradeController.UnlockUpgrade(UpgradeController.UpgradeType.SHOP);
+          UnlockController.Unlock(UnlockController.UnlockType.SHOP);
 
           LogController.AppendLog("Unlocked the Shop menu.");
         }
@@ -387,6 +388,9 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       _itemInfos[itemType]._MenuEntry = newMenuEntry;
       _itemInfos[itemType]._Text = newMenuEntry.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
 
+      var image = newMenuEntry.transform.GetChild(2).GetComponent<Image>();
+      image.sprite = GetItemSprite(itemType);
+
       UpdateItemDisplay(itemType);
 
       newMenuEntry.gameObject.SetActive(true);
@@ -394,7 +398,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
     void UpdateItemDisplay(ItemType inventoryItemType)
     {
       var itemInfo = _itemInfos[inventoryItemType];
-      itemInfo._Text.text = string.Format("{0,-18}{1,-10}{2,6}", $"{itemInfo._Title}", $"{itemInfo._AmountHeld}", $"${itemInfo._SellValue}");
+      itemInfo._Text.text = string.Format("  {0,-16}{1,-10}{2,6}", $"{itemInfo._Title}", $"{itemInfo._AmountHeld}", $"${itemInfo._SellValue}");
 
       if (_selectedItem == inventoryItemType)
         UpdateSellText();

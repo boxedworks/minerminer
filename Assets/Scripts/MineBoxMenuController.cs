@@ -39,7 +39,7 @@ namespace Controllers
 
           //
           default:
-            returnData = StatsController.s_Singleton._InfoData;
+            returnData = SkillController.s_Singleton._InfoData;
             break;
         }
 

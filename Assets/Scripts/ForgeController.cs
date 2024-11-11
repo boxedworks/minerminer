@@ -228,6 +228,8 @@ namespace Controllers
         _currentOutputAmount += _currentRecipe._Outputs[0].Amount;
 
         SetRecipeInputs(_currentRecipe, true);
+
+        SetOutput(_currentRecipe._Outputs[0].ItemType, _currentOutputAmount);
       }
 
       //

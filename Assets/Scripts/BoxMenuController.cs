@@ -109,7 +109,7 @@ namespace Controllers
       if (toggle)
       {
         if (useNotify)
-          UpgradeController.NotifyUnlockButton(button, notifyText);
+          UnlockController.NotifyUnlockButton(button, notifyText);
         else
           button.SetActive(toggle);
       }

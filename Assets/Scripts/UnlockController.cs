@@ -1,15 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Packages;
 
 namespace Controllers
 {
 
-  public class UpgradeController
+  public class UnlockController
   {
 
     //
-    public static UpgradeController s_Singleton;
+    public static UnlockController s_Singleton;
 
     RectTransform _notificationUi, _unlockTarget;
     TMPro.TextMeshProUGUI _notifyText;
@@ -20,8 +21,8 @@ namespace Controllers
     Action _unlockAction;
 
     //
-    List<UpgradeType> _unlockedUpgrades;
-    public enum UpgradeType
+    List<UnlockType> _unlocks;
+    public enum UnlockType
     {
       NONE,
 
@@ -32,7 +33,7 @@ namespace Controllers
     }
 
     //
-    public UpgradeController()
+    public UnlockController()
     {
       s_Singleton = this;
 
@@ -44,7 +45,7 @@ namespace Controllers
       _unlockExplosionParticles = GameObject.Find("UnlockExplosion").GetComponent<ParticleSystem>();
 
       //
-      _unlockedUpgrades = new();
+      _unlocks = new();
     }
 
     //
@@ -113,6 +114,11 @@ namespace Controllers
     }
     public static void NotifyUnlockButton(GameObject button, string notificationText)
     {
+      //
+      if (SaveController.s_IsLoading)
+        return;
+
+      //
       s_Singleton._unlockTarget = button.transform as RectTransform;
       s_Singleton._unlockAction = () =>
       {
@@ -128,35 +134,35 @@ namespace Controllers
     }
 
     //
-    public static void UnlockUpgrade(UpgradeType unlock)
+    public static void Unlock(UnlockType unlock)
     {
       //
-      if (s_Singleton._unlockedUpgrades.Contains(unlock)) return;
+      if (s_Singleton._unlocks.Contains(unlock)) return;
 
       //
-      s_Singleton._unlockedUpgrades.Add(unlock);
+      s_Singleton._unlocks.Add(unlock);
 
       //
       switch (unlock)
       {
 
         //
-        case UpgradeType.SHOP:
+        case UnlockType.SHOP:
           MainBoxMenuController.s_Singleton.SetMenuActive(MainBoxMenuController.MenuType.SHOP, true, true, "Shop unlocked!");
           break;
-        case UpgradeType.SKILLS:
+        case UnlockType.SKILLS:
           MainBoxMenuController.s_Singleton.SetMenuActive(MainBoxMenuController.MenuType.SKILLS, true, true, "Skills unlocked!");
           break;
 
-        case UpgradeType.FORGE:
+        case UnlockType.FORGE:
           MineBoxMenuController.s_Singleton.SetMenuActive(MineBoxMenuController.MenuType.FORGE, true, true, "Forge unlocked!");
           break;
 
       }
     }
-    public static bool HasUpgrade(UpgradeType upgrade)
+    public static bool HasUnlock(UnlockType unlock)
     {
-      return s_Singleton._unlockedUpgrades.Contains(upgrade);
+      return s_Singleton._unlocks.Contains(unlock);
     }
 
     //
@@ -164,7 +170,7 @@ namespace Controllers
     {
 
       var returnList = new List<string>();
-      foreach (var unlock in s_Singleton._unlockedUpgrades)
+      foreach (var unlock in s_Singleton._unlocks)
         returnList.Add(unlock.ToString());
 
       return returnList;
@@ -173,8 +179,8 @@ namespace Controllers
     {
       foreach (var unlockString in unlocks)
       {
-        if (Enum.TryParse(unlockString, true, out UpgradeType unlockType))
-          UnlockUpgrade(unlockType);
+        if (Enum.TryParse(unlockString, true, out UnlockType unlockType))
+          Unlock(unlockType);
       }
     }
   }

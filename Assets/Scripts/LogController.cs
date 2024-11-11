@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Packages;
 
 namespace Controllers
 {
@@ -30,10 +31,15 @@ namespace Controllers
     public static void AppendLog(string text)
     {
 
+      //
+      if (SaveController.s_IsLoading)
+        return;
+
+      //
       var log = s_Singleton._log;
       log.Add(text);
 
-      if (log.Count > 19)
+      if (log.Count > 17)
         log.RemoveAt(0);
 
       var logString = string.Join("\n", log);

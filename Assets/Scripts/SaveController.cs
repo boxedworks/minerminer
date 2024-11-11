@@ -6,8 +6,20 @@ using System.IO;
 namespace Packages
 {
 
-  public static class SaveController
+  public class SaveController
   {
+
+    //
+    public static SaveController s_Singleton;
+
+    bool _isLoading;
+    public static bool s_IsLoading { get { return s_Singleton._isLoading; } }
+
+    //
+    public SaveController()
+    {
+      s_Singleton = this;
+    }
 
     //
     [System.Serializable]
@@ -19,16 +31,16 @@ namespace Packages
       {
 
         // Gold
-        Gold = StatsController.s_Singleton._Gold;
+        Gold = SkillController.s_Singleton._Gold;
 
         // Purchases
         Purchases = ShopController.GetPurchases();
 
         // Unlocks
-        Unlocks = UpgradeController.GetUnlocks();
+        Unlocks = UnlockController.GetUnlocks();
 
         // Skills
-        Skills = StatsController.GetSkills();
+        Skills = SkillController.GetSkills();
 
         // Pic / Rock
         PickaxeInfo = PickaxeController.PickaxeStats.GetSaveInfo();
@@ -48,7 +60,7 @@ namespace Packages
       public List<string> Purchases, Unlocks;
 
       //
-      public List<StatsController.SkillSaveInfo> Skills;
+      public List<SkillController.SkillSaveInfo> Skills;
 
       //
       public PickaxeController.PickaxeStats.PickaxeSaveInfo PickaxeInfo;
@@ -71,34 +83,50 @@ namespace Packages
 
       //
       var json = JsonUtility.ToJson(save);
-      File.WriteAllText("save.json", json);
+
+      //
+      if (Application.platform == RuntimePlatform.WebGLPlayer)
+        PlayerPrefs.SetString("json", json);
+
+      else
+        File.WriteAllText("save.json", json);
     }
 
     public static void Load()
     {
 
+      var json = "";
+      if (Application.platform == RuntimePlatform.WebGLPlayer)
+        json = PlayerPrefs.GetString("json", "");
+
+      else
+      {
+        if (File.Exists("save.json"))
+          json = File.ReadAllText("save.json");
+      }
+
       // Check for save
-      if (!File.Exists("save.json"))
+      if (json == null || json.Trim().Length == 0)
         return;
 
       // Load save
-      var json = File.ReadAllText("save.json");
       var saveData = JsonUtility.FromJson<SaveData>(json);
 
       // Load data
+      s_Singleton._isLoading = true;
       {
 
         // Gold
-        StatsController.s_Singleton._Gold = saveData.Gold;
+        SkillController.s_Singleton._Gold = saveData.Gold;
 
         // Purchases
         ShopController.SetPurchases(saveData.Purchases);
 
         // Unlocks
-        UpgradeController.SetUnlocks(saveData.Unlocks);
+        UnlockController.SetUnlocks(saveData.Unlocks);
 
         // Skills
-        StatsController.SetSkills(saveData.Skills);
+        SkillController.SetSkills(saveData.Skills);
 
         // Pic / Rock
         PickaxeController.PickaxeStats.SetSaveInfo(saveData.PickaxeInfo);
@@ -110,6 +138,7 @@ namespace Packages
         // Inventory
         InventoryController.SetSaveInfo(saveData.InventoryInfo);
       }
+      s_Singleton._isLoading = false;
     }
 
 

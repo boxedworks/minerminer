@@ -119,7 +119,8 @@ namespace Controllers
     //
     public static string GetInfoString(string title, string desc)
     {
-      return $@"<b><size=45>{title}</size></b>
+      return $@"<b><size=45>{title}
+======</size></b>
 
 {desc}
       ";

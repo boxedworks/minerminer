@@ -36,7 +36,7 @@ namespace Controllers
             returnData = ShopController.s_Singleton._InfoData;
             break;
           case MenuType.SKILLS:
-            returnData = StatsController.s_Singleton._InfoData;
+            returnData = SkillController.s_Singleton._InfoData;
             break;
           case MenuType.INVENTORY:
             returnData = InventoryController.s_Singleton._InfoData;
@@ -44,7 +44,7 @@ namespace Controllers
 
           //
           default:
-            returnData = StatsController.s_Singleton._InfoData;
+            returnData = SkillController.s_Singleton._InfoData;
             break;
         }
 
