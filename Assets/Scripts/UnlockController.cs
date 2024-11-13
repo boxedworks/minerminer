@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using Packages;
 
 namespace Controllers
 {
@@ -114,9 +113,6 @@ namespace Controllers
     }
     public static void NotifyUnlockButton(GameObject button, string notificationText)
     {
-      //
-      if (SaveController.s_IsLoading)
-        return;
 
       //
       s_Singleton._unlockTarget = button.transform as RectTransform;

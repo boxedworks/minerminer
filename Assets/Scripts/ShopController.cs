@@ -34,9 +34,11 @@ namespace Controllers
       ROCK_0_UPGRADE_0,
       ROCK_1_UPGRADE_0,
       ROCK_2_UPGRADE_0,
+      ROCK_3_UPGRADE_0,
 
       ROCK_BUY_0,
       ROCK_BUY_1,
+      ROCK_BUY_2,
 
       SKILL_LUCK,
       SKILL_POWER,
@@ -178,6 +180,15 @@ namespace Controllers
 
         _PurchaseString = "Purchased the Tin Rock Upgrade."
       });
+      AddPurchase(PurchaseType.ROCK_3_UPGRADE_0, new PurchaseInfo()
+      {
+        _Cost = 1500,
+
+        _Title = "Iron Upgrade",
+        _Description = "Extra 10% chance to find Iron in Iron rocks.",
+
+        _PurchaseString = "Purchased the Iron Rock Upgrade."
+      });
 
       AddPurchase(PurchaseType.ROCK_BUY_0, new PurchaseInfo()
       {
@@ -197,13 +208,24 @@ namespace Controllers
 
         _PurchaseString = "Unlocked the Tin Rock."
       });
+      AddPurchase(PurchaseType.ROCK_BUY_2, new PurchaseInfo()
+      {
+        _Cost = 1000,
+
+        _Title = "Iron Rock",
+        _Description = "Unlock the Iron rock.",
+
+        _PurchaseString = "Unlocked the Iron Rock."
+      });
 
       AddPurchase(PurchaseType.SKILL_LUCK, new PurchaseInfo()
       {
         _Cost = 250,
 
         _Title = "Skill - Luck",
-        _Description = "Unlock the Luck skill.",
+        _Description = @"Unlock the Luck skill.
+
+Luck - A chance to get extra items!",
 
         _PurchaseString = "Unlocked skill: Luck."
       });
@@ -212,7 +234,9 @@ namespace Controllers
         _Cost = 250,
 
         _Title = "Skill - Power",
-        _Description = "Unlock the Power skill.",
+        _Description = @"Unlock the Power skill.
+
+Power - A chance to do more damage!",
 
         _PurchaseString = "Unlocked skill: Power."
       });
@@ -259,7 +283,7 @@ namespace Controllers
       var text = newMenuEntry.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
 
       var purchaseInfo = _purchaseInfos[purchaseType];
-      text.text = string.Format("{0,-24} {1,5}", $"{purchaseInfo._Title}", $"${purchaseInfo._Cost}");
+      text.text = string.Format("{0,-42} {1,10}", $"{purchaseInfo._Title}", $"${purchaseInfo._Cost}");
 
       newMenuEntry.gameObject.SetActive(true);
 
@@ -272,19 +296,25 @@ namespace Controllers
 
         //
         if (purchaseInfo._Cost > SkillController.s_Singleton._Gold)
+        {
+
+          LogController.AppendLog($"<color=red>Insufficient gold to purchase </color>{purchaseInfo._Title}<color=red>!</color>");
+          LogController.ForceOpen();
+
           return;
+        }
 
         SkillController.s_Singleton._Gold -= purchaseInfo._Cost;
-        OnPurchased(purchaseType);
+        AudioController.PlayAudio("ShopBuy");
+
+        Purchase(purchaseType);
       });
     }
 
     //
-    static void OnPurchased(PurchaseType purchaseType)
+    static void Purchase(PurchaseType purchaseType)
     {
       var purchaseInfo = s_Singleton._purchaseInfos[purchaseType];
-
-      //
       if (purchaseInfo._IsPurchased)
         return;
 
@@ -344,13 +374,22 @@ namespace Controllers
         case PurchaseType.ROCK_1_UPGRADE_0:
           RockController.SetRockDropTable(RockController.RockType.COPPER, new (InventoryController.ItemType, float)[]{
             (InventoryController.ItemType.COPPER, 20f),
-            (InventoryController.ItemType.STONE, 80f)
+            (InventoryController.ItemType.STONE, 79f),
+            (InventoryController.ItemType.SAPPHIRE, 1f),
           });
 
           break;
         case PurchaseType.ROCK_2_UPGRADE_0:
-          RockController.SetRockDropTable(RockController.RockType.COPPER, new (InventoryController.ItemType, float)[]{
+          RockController.SetRockDropTable(RockController.RockType.TIN, new (InventoryController.ItemType, float)[]{
             (InventoryController.ItemType.TIN, 20f),
+            (InventoryController.ItemType.STONE, 79f),
+            (InventoryController.ItemType.RUBY, 1f),
+          });
+
+          break;
+        case PurchaseType.ROCK_3_UPGRADE_0:
+          RockController.SetRockDropTable(RockController.RockType.IRON, new (InventoryController.ItemType, float)[]{
+            (InventoryController.ItemType.IRON, 20f),
             (InventoryController.ItemType.STONE, 80f)
           });
 
@@ -366,7 +405,14 @@ namespace Controllers
         case PurchaseType.ROCK_BUY_1:
           RockController.UnlockRock(RockController.RockType.TIN);
           s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_2_UPGRADE_0);
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_BUY_2);
           ForgeController.UnlockRecipe(ForgeController.RecipeType.BRONZE_INGOT);
+
+          break;
+        case PurchaseType.ROCK_BUY_2:
+          RockController.UnlockRock(RockController.RockType.IRON);
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_3_UPGRADE_0);
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.IRON_INGOT);
 
           break;
 
@@ -400,7 +446,7 @@ namespace Controllers
       foreach (var purchaseString in purchases)
       {
         if (System.Enum.TryParse(purchaseString, true, out PurchaseType purchaseType))
-          OnPurchased(purchaseType);
+          Purchase(purchaseType);
       }
     }
 

@@ -15,7 +15,7 @@ namespace Controllers
     Dictionary<string, AudioObject> _audioObjects;
 
     Transform _audioContainer;
-    List<AudioSource> _audios;
+    List<(AudioSource AudioSource, float Volume)> _audios;
 
     //
     public AudioController()
@@ -37,12 +37,14 @@ namespace Controllers
     {
       for (var i = _audios.Count - 1; i >= 0; i--)
       {
-        var audio = _audios[i];
-        if (!audio.isPlaying)
+        var audioInfo = _audios[i];
+        if (!audioInfo.AudioSource.isPlaying)
         {
           _audios.RemoveAt(i);
 
-          GameObject.Destroy(audio.gameObject);
+          GameObject.Destroy(audioInfo.AudioSource.gameObject);
+        }else{
+          audioInfo.AudioSource.volume = audioInfo.Volume * (OptionsController.s_Volume / 5f);
         }
       }
     }
@@ -59,7 +61,7 @@ namespace Controllers
       audio.volume = audioObject.Volume;
       audio.pitch = Random.Range(audioObject.PitchMin, audioObject.PitchMax);
 
-      s_Singleton._audios.Add(audio);
+      s_Singleton._audios.Add((AudioSource: audio, Volume: audioObject.Volume));
       audio.Play();
 
       return audio;

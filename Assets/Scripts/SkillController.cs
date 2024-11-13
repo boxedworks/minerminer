@@ -1,7 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Packages;
-using System.Runtime.InteropServices;
 
 namespace Controllers
 {
@@ -18,14 +16,13 @@ namespace Controllers
     bool _menuIsVisible { get { return MainBoxMenuController.s_Singleton.IsVisible(MainBoxMenuController.MenuType.SKILLS); } }
 
     //
-    int _gold;
+    int _gold, _goldVisual;
     public int _Gold
     {
       get { return _gold; }
       set
       {
         _gold = value;
-        GameObject.Find("Money").transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = $"${_gold}";
 
         ShopController.UpdatePurchasesUi();
       }
@@ -187,6 +184,13 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
       {
         skill.Update();
       }
+
+      // Gold
+      if (_goldVisual != _gold)
+      {
+        _goldVisual += _goldVisual > _gold ? Mathf.FloorToInt((Mathf.Abs(_gold) - Mathf.Abs(_goldVisual)) * 0.02f) : Mathf.CeilToInt((Mathf.Abs(_gold) - Mathf.Abs(_goldVisual)) * 0.02f);// * (_goldVisual < _gold ? 1 : -1);
+        GameObject.Find("Money").transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = $"${_goldVisual}";
+      }
     }
 
     //
@@ -297,7 +301,7 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
       {
         var info = new SkillSaveInfo();
 
-        info.SkillType = _skillType;
+        info.SkillName = _skillType.ToString();
         info.Level = _level;
         info.Xp = _xpVisual;
         info.XpLeft = _xp;
@@ -320,7 +324,7 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
     [System.Serializable]
     public class SkillSaveInfo
     {
-      public SkillType SkillType;
+      public string SkillName;
       public int Level;
       public float Xp, XpLeft, XpMax;
     }
@@ -334,7 +338,32 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
     public static void SetSkills(List<SkillSaveInfo> skillInfos)
     {
       foreach (var skillInfo in skillInfos)
-        s_Singleton._skills[((int)skillInfo.SkillType) - 1].SetSkillInfo(skillInfo);
+      {
+        if (System.Enum.TryParse(skillInfo.SkillName, true, out SkillType skillType))
+          s_Singleton._skills[((int)skillType) - 1].SetSkillInfo(skillInfo);
+      }
+    }
+
+    //
+    [System.Serializable]
+    public class SaveInfo
+    {
+      public string ActiveSkill;
+    }
+    public static SaveInfo GetSaveInfo()
+    {
+      var saveInfo = new SaveInfo();
+
+      saveInfo.ActiveSkill = ((SkillType)s_Singleton._currentSkill + 1).ToString();
+
+      return saveInfo;
+    }
+    public static void SetSaveInfo(SaveInfo saveInfo)
+    {
+      if (System.Enum.TryParse(saveInfo.ActiveSkill, true, out SkillType skillType))
+      {
+        s_Singleton.SetSkillSelector(((int)skillType) - 1);
+      }
     }
 
   }

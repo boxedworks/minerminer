@@ -51,10 +51,10 @@ namespace Controllers
         MenuType.INFO.ToString(),
         MenuType.LOG.ToString(),
       };
-      SetUpMenus(GameObject.Find("BoxInfoButtons").transform.GetChild(0), menuOrderString);
+      SetUpMenus(GetChildrenAsList(GameObject.Find("BoxInfoButtons").transform.GetChild(0)), menuOrderString);
 
       //
-      SetMenuType((int)MenuType.INFO);
+      SetMenuType(MenuType.INFO);
       SetMenuActive(MenuType.INFO, true, false);
       SetMenuActive(MenuType.LOG, true, false);
     }
@@ -76,6 +76,11 @@ namespace Controllers
     public bool IsMenuActive(MenuType menuType)
     {
       return IsMenuActive((int)menuType);
+    }
+
+    public void SetMenuType(MenuType menuType)
+    {
+      SetMenuType((int)menuType);
     }
 
     //

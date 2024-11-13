@@ -68,10 +68,11 @@ namespace Controllers
         MenuType.MINE.ToString(),
         MenuType.FORGE.ToString(),
       };
-      SetUpMenus(GameObject.Find("BoxMineButtons").transform.GetChild(0), menuOrderString);
+      var buttons = GetChildrenAsList(GameObject.Find("BoxMineButtons").transform.GetChild(0));
+      SetUpMenus(buttons, menuOrderString);
 
       //
-      SetMenuType((int)MenuType.MINE);
+      SetMenuType(MenuType.MINE);
       SetMenuActive(MenuType.MINE, true, false);
     }
 
@@ -91,6 +92,11 @@ namespace Controllers
     public bool IsMenuActive(MenuType menuType)
     {
       return IsMenuActive((int)menuType);
+    }
+
+    public void SetMenuType(MenuType menuType)
+    {
+      SetMenuType((int)menuType);
     }
 
     //

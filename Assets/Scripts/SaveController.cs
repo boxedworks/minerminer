@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Controllers;
 using UnityEngine;
 using System.IO;
+using UnityEngine.SceneManagement;
 
-namespace Packages
+namespace Controllers
 {
 
   public class SaveController
@@ -41,6 +41,7 @@ namespace Packages
 
         // Skills
         Skills = SkillController.GetSkills();
+        SkillInfo = SkillController.GetSaveInfo();
 
         // Pic / Rock
         PickaxeInfo = PickaxeController.PickaxeStats.GetSaveInfo();
@@ -51,6 +52,9 @@ namespace Packages
 
         // Inventory
         InventoryInfo = InventoryController.GetSaveInfo();
+
+        // Options
+        OptionsInfo = OptionsController.GetSaveInfo();
       }
 
       //
@@ -61,16 +65,20 @@ namespace Packages
 
       //
       public List<SkillController.SkillSaveInfo> Skills;
+      public SkillController.SaveInfo SkillInfo;
 
       //
-      public PickaxeController.PickaxeStats.PickaxeSaveInfo PickaxeInfo;
-      public RockController.RockSaveInfo RockInfo;
+      public PickaxeController.PickaxeStats.SaveInfo PickaxeInfo;
+      public RockController.SaveInfo RockInfo;
 
       //
-      public ForgeController.ForgeSaveInfo ForgeInfo;
+      public ForgeController.SaveInfo ForgeInfo;
 
       //
-      public InventoryController.InventoryInfo InventoryInfo;
+      public InventoryController.SaveInfo InventoryInfo;
+
+      //
+      public OptionsController.SaveInfo OptionsInfo;
 
     }
 
@@ -82,7 +90,7 @@ namespace Packages
       var save = new SaveData();
 
       //
-      var json = JsonUtility.ToJson(save);
+      var json = JsonUtility.ToJson(save, true);
 
       //
       if (Application.platform == RuntimePlatform.WebGLPlayer)
@@ -127,6 +135,7 @@ namespace Packages
 
         // Skills
         SkillController.SetSkills(saveData.Skills);
+        SkillController.SetSaveInfo(saveData.SkillInfo);
 
         // Pic / Rock
         PickaxeController.PickaxeStats.SetSaveInfo(saveData.PickaxeInfo);
@@ -137,10 +146,37 @@ namespace Packages
 
         // Inventory
         InventoryController.SetSaveInfo(saveData.InventoryInfo);
+
+        // Options
+        OptionsController.SetSaveInfo(saveData.OptionsInfo);
       }
       s_Singleton._isLoading = false;
     }
 
+    //
+    public static void Delete()
+    {
+
+      // Keep options
+      var options = OptionsController.GetSaveInfo();
+
+      //
+      if (Application.platform == RuntimePlatform.WebGLPlayer)
+        PlayerPrefs.DeleteKey("json");
+
+      else
+      {
+        if (File.Exists("save.json"))
+          File.Delete("save.json");
+      }
+
+      //
+      OptionsController.SetSaveInfo(options);
+      Save();
+
+      //
+      SceneManager.LoadScene(0);
+    }
 
   }
 

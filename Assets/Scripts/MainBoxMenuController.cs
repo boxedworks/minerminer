@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Controllers
@@ -17,10 +16,11 @@ namespace Controllers
 
       NONE,
 
+      INVENTORY,
       SHOP,
       SKILLS,
-      INVENTORY,
 
+      OPTIONS,
     }
 
     //
@@ -39,6 +39,10 @@ namespace Controllers
             returnData = SkillController.s_Singleton._InfoData;
             break;
           case MenuType.INVENTORY:
+            returnData = InventoryController.s_Singleton._InfoData;
+            break;
+
+          case MenuType.OPTIONS:
             returnData = InventoryController.s_Singleton._InfoData;
             break;
 
@@ -66,15 +70,20 @@ namespace Controllers
       var menuOrderString = new string[]{
         MenuType.NONE.ToString(),
 
+        MenuType.INVENTORY.ToString(),
         MenuType.SHOP.ToString(),
         MenuType.SKILLS.ToString(),
-        MenuType.INVENTORY.ToString(),
+
+        MenuType.OPTIONS.ToString()
       };
-      SetUpMenus(GameObject.Find("BoxStatsButtons").transform.GetChild(0), menuOrderString);
+      var buttons = GetChildrenAsList(GameObject.Find("BoxStatsButtons").transform.GetChild(0));
+      buttons.Add(GameObject.Find("OptionsButton"));
+      SetUpMenus(buttons, menuOrderString);
 
       //
-      SetMenuType((int)MenuType.INVENTORY);
+      SetMenuType(MenuType.INVENTORY);
       SetMenuActive(MenuType.INVENTORY, true, false);
+      SetMenuActive(MenuType.OPTIONS, true, false);
     }
 
     public GameObject GetMenu(MenuType ofMenu)
@@ -95,6 +104,11 @@ namespace Controllers
       return IsMenuActive((int)menuType);
     }
 
+    public void SetMenuType(MenuType menuType)
+    {
+      SetMenuType((int)menuType);
+    }
+
     //
     protected override string GetButtonDescription(string buttonName)
     {
@@ -109,6 +123,9 @@ namespace Controllers
           return InfoController.GetInfoString("Skills", @"Check out your skills, what they do, and select 1 to level up.
 
 Gain experience by breaking rocks.");
+        case "OptionsButton":
+          return InfoController.GetInfoString("Options", "View game options.");
+
 
         default:
           return "NOT_IMPL";

@@ -59,20 +59,20 @@ Drop on break: {AmountDroppedOnBreak}");
 
       //
       [System.Serializable]
-      public class PickaxeSaveInfo
+      public class SaveInfo
       {
         public int DropOnHit, DropOnBreak;
       }
-      public static PickaxeSaveInfo GetSaveInfo()
+      public static SaveInfo GetSaveInfo()
       {
-        var saveInfo = new PickaxeSaveInfo();
+        var saveInfo = new SaveInfo();
 
         // saveInfo.DropOnHit = s_PickaxeStats.am;
         saveInfo.DropOnBreak = s_PickaxeStats._amountDroppedOnBreak;
 
         return saveInfo;
       }
-      public static void SetSaveInfo(PickaxeSaveInfo saveInfo)
+      public static void SetSaveInfo(SaveInfo saveInfo)
       {
         s_PickaxeStats.SetDropOnBreak(saveInfo.DropOnBreak);
       }

@@ -23,6 +23,14 @@ namespace Controllers
       ORE_0,
       ORE_1,
       ORE_2,
+
+      GEM_0,
+      GEM_1,
+      GEM_2,
+
+      FORGE_SMOKE,
+      FORGE_EMBERS,
+
     }
     Dictionary<ParticleType, ParticleSystem> _particles;
 
@@ -40,19 +48,40 @@ namespace Controllers
         { ParticleType.ORE_0, GameObject.Find("Ore0").GetComponent<ParticleSystem>() },
         { ParticleType.ORE_1, GameObject.Find("Ore1").GetComponent<ParticleSystem>() },
         { ParticleType.ORE_2, GameObject.Find("Ore2").GetComponent<ParticleSystem>() },
+
+        { ParticleType.GEM_0, GameObject.Find("Gem0").GetComponent<ParticleSystem>() },
+        { ParticleType.GEM_1, GameObject.Find("Gem1").GetComponent<ParticleSystem>() },
+        { ParticleType.GEM_2, GameObject.Find("Gem2").GetComponent<ParticleSystem>() },
+
+        { ParticleType.FORGE_SMOKE, GameObject.Find("ForgeSmoke").GetComponent<ParticleSystem>() },
+        { ParticleType.FORGE_EMBERS, GameObject.Find("ForgeEmbers").GetComponent<ParticleSystem>() },
       };
+    }
+
+    //
+    public static ParticleSystem GetParticles(ParticleType particleType)
+    {
+      return s_Singleton._particles[particleType];
     }
 
     //
     public static void PlayParticles(ParticleType particleType)
     {
-      s_Singleton._particles[particleType].Play();
+      GetParticles(particleType).Play();
     }
     public static void PlayParticles(ParticleType particleType, int count)
     {
-      s_Singleton._particles[particleType].Emit(count);
+      GetParticles(particleType).Emit(count);
     }
 
+    public static void StopParticles(ParticleType particleType)
+    {
+      GetParticles(particleType).Stop();
+    }
+    public static bool IsParticlesPlaying(ParticleType particleType)
+    {
+      return GetParticles(particleType).isPlaying;
+    }
   }
 
 }

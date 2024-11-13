@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Packages;
 
 namespace Controllers
 {
@@ -23,7 +22,7 @@ namespace Controllers
       _logText = _menu.Find("logText").GetComponent<TMPro.TextMeshProUGUI>();
 
       _log = new();
-      AppendLog("Welcome to minerminer :).");
+      AppendLog($"Welcome to {StringController.s_GAME_NAME} :).");
     }
 
 
@@ -44,6 +43,15 @@ namespace Controllers
 
       var logString = string.Join("\n", log);
       s_Singleton._logText.text = InfoController.GetInfoString("Log", logString);
+    }
+
+    //
+    public static void ForceOpen()
+    {
+      if (InfoBoxMenuController.s_Singleton.IsVisible(InfoBoxMenuController.MenuType.LOG))
+        return;
+
+      InfoBoxMenuController.s_Singleton.SetMenuType(InfoBoxMenuController.MenuType.LOG);
     }
 
   }

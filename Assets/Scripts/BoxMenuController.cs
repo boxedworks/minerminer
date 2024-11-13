@@ -9,11 +9,11 @@ namespace Controllers
   {
 
     //
-    Transform _buttonsContainer, _buttonSelectorUi;
+    List<GameObject> _buttons;
+    Transform _buttonSelectorUi;
     protected int _currentMenuIndex;
 
     protected Dictionary<int, GameObject> _menus;
-    Dictionary<int, int> _menuIndexes;
 
     protected Dictionary<int, List<GameObject>> _menuDependancies;
 
@@ -24,24 +24,22 @@ namespace Controllers
 
     protected List<IInfoable> _dependencyInfos;
 
-    public void SetUpMenus(Transform buttonsContainer, string[] enumOrder)
+    public void SetUpMenus(List<GameObject> buttons, string[] enumOrder)
     {
 
       //
-      _buttonsContainer = buttonsContainer;
+      _buttons = buttons;
       _menus = new();
-      _menuIndexes = new();
       _dependencyInfos = new();
-      for (var i = 0; i < _buttonsContainer.childCount; i++)
+      for (var i = 0; i < _buttons.Count; i++)
       {
-        var button = _buttonsContainer.GetChild(i).GetComponent<UnityEngine.UI.Button>();
+        var button = _buttons[i].GetComponent<UnityEngine.UI.Button>();
         if (i == 0)
           _buttonSelectorUi = button.transform.GetChild(0);
 
         var menuType = button.gameObject.name[0..(button.gameObject.name.Length - 6)];
         var menuIndex = System.Array.IndexOf(enumOrder, menuType.ToUpper());
 
-        _menuIndexes.Add(menuIndex, i);
         SetMenuActive(menuIndex, false, false);
 
         button.onClick.AddListener(() =>
@@ -73,7 +71,7 @@ namespace Controllers
     }
     protected GameObject GetMenuButton(int ofMenuIndex)
     {
-      return _buttonsContainer.GetChild(_menuIndexes[ofMenuIndex]).gameObject;
+      return _buttons[ofMenuIndex - 1];
     }
 
     //
@@ -105,6 +103,11 @@ namespace Controllers
 
     protected void SetMenuActive(int ofMenuIndex, bool toggle, bool useNotify, string notifyText = null)
     {
+      // Check loading game + notify
+      if (useNotify && SaveController.s_IsLoading)
+        useNotify = false;
+
+      //
       var button = GetMenuButton(ofMenuIndex);
       if (toggle)
       {
@@ -132,6 +135,15 @@ namespace Controllers
     //
     protected abstract string GetButtonDescription(string buttonName);
 
+
+    //
+    protected static List<GameObject> GetChildrenAsList(Transform parent)
+    {
+      var returnList = new List<GameObject>();
+      for (var i = 0; i < parent.childCount; i++)
+        returnList.Add(parent.GetChild(i).gameObject);
+      return returnList;
+    }
   }
 
 }

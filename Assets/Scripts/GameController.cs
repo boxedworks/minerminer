@@ -1,4 +1,3 @@
-using Packages;
 using UnityEngine;
 
 namespace Controllers
@@ -9,6 +8,9 @@ namespace Controllers
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+
+      //
+      new OptionsController();
       new SaveController();
       new EventController();
       new AudioController();
@@ -45,10 +47,12 @@ namespace Controllers
       UnlockController.s_Singleton.Update();
 
       // Cheats
+#if UNITY_EDITOR
       {
         if (Input.GetKeyDown(KeyCode.Space))
           SkillController.s_Singleton._Gold += 50;
       }
+#endif
 
       //
       if (Input.GetKeyDown(KeyCode.S))

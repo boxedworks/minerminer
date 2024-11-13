@@ -1,7 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Packages;
-using System.Net.Security;
 using UnityEngine.UI;
 
 namespace Controllers
@@ -20,9 +18,6 @@ namespace Controllers
     ItemType _selectedItem;
     bool _menuIsVisible { get { return MainBoxMenuController.s_Singleton.IsVisible(MainBoxMenuController.MenuType.INVENTORY); } }
 
-    TMPro.TextMeshProUGUI _sellText;
-    int _sellAmount;
-
     public enum ItemType
     {
       NONE,
@@ -33,6 +28,14 @@ namespace Controllers
 
       TIN,
       BRONZE_INGOT,
+
+      IRON,
+      IRON_INGOT,
+
+      EMERALD,
+      SAPPHIRE,
+      RUBY,
+
     }
     class ItemInfo : IInfoable
     {
@@ -94,8 +97,6 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.INVENTORY).transform;
       _prefab = _menu.GetChild(0).GetChild(0).gameObject;
       _itemSelectorUi = _menu.GetChild(0).GetChild(0).GetChild(0);
-      _sellText = _menu.GetChild(1).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>();
-      UpdateSellText();
 
       _selectedItem = ItemType.NONE;
 
@@ -140,119 +141,88 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         _SellValue = 200
       });
 
+      AddInventoryItemInfo(ItemType.IRON, new ItemInfo()
+      {
+        _Title = "Iron",
+        _SellValue = 25,
+
+        _ParticleType = ParticleController.ParticleType.ORE_2,
+      });
+      AddInventoryItemInfo(ItemType.IRON_INGOT, new ItemInfo()
+      {
+        _Title = "Iron Ingot",
+        _SellValue = 500
+      });
+
+      AddInventoryItemInfo(ItemType.EMERALD, new ItemInfo()
+      {
+        _Title = "Emerald",
+        _SellValue = 25,
+
+        _ParticleType = ParticleController.ParticleType.GEM_0
+      });
+      AddInventoryItemInfo(ItemType.SAPPHIRE, new ItemInfo()
+      {
+        _Title = "Sapphire",
+        _SellValue = 75,
+
+        _ParticleType = ParticleController.ParticleType.GEM_1
+
+      });
+      AddInventoryItemInfo(ItemType.RUBY, new ItemInfo()
+      {
+        _Title = "Ruby",
+        _SellValue = 250,
+
+        _ParticleType = ParticleController.ParticleType.GEM_2
+
+      });
+
       // Sell interface
       _otherInfoables = new();
-      var buttonSell1 = _menu.GetChild(1).GetChild(1).GetChild(0).GetComponent<UnityEngine.UI.Button>();
+      var buttonSell1 = _menu.GetChild(1).GetChild(1).GetChild(0).GetComponent<Button>();
       buttonSell1.onClick.AddListener(() =>
       {
         AudioController.PlayAudio("MenuSelect");
 
         if (_selectedItem == ItemType.NONE) return;
 
-        SetSaleAmount(_sellAmount + 1);
-        UpdateSellText();
+        SellItem(1);
       });
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = buttonSell1.gameObject,
-        _Description = InfoController.GetInfoString("Sell 1", "Add 1 item to sell.")
+        _Description = InfoController.GetInfoString("Sell 1", "Sell 1 of the selected item.")
       });
 
-      var buttonSell5 = _menu.GetChild(1).GetChild(1).GetChild(1).GetComponent<UnityEngine.UI.Button>();
+      var buttonSell5 = _menu.GetChild(1).GetChild(1).GetChild(1).GetComponent<Button>();
       buttonSell5.onClick.AddListener(() =>
       {
         AudioController.PlayAudio("MenuSelect");
 
         if (_selectedItem == ItemType.NONE) return;
 
-        SetSaleAmount(_sellAmount + 5);
-        UpdateSellText();
+        SellItem(5);
       });
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = buttonSell5.gameObject,
-        _Description = InfoController.GetInfoString("Sell 5", "Add 5 items to sell.")
+        _Description = InfoController.GetInfoString("Sell 5", "Sell 5 of the selected item.")
       });
 
-      var buttonSell10 = _menu.GetChild(1).GetChild(1).GetChild(2).GetComponent<UnityEngine.UI.Button>();
-      buttonSell10.onClick.AddListener(() =>
+      var buttonSellAll = _menu.GetChild(1).GetChild(1).GetChild(2).GetComponent<Button>();
+      buttonSellAll.onClick.AddListener(() =>
       {
         AudioController.PlayAudio("MenuSelect");
 
         if (_selectedItem == ItemType.NONE) return;
 
-        SetSaleAmount(_sellAmount + 10);
-        UpdateSellText();
+        SellItem(10000000);
       });
       _otherInfoables.Add(new SimpleInfoable()
       {
-        _GameObject = buttonSell10.gameObject,
-        _Description = InfoController.GetInfoString("Sell 10", "Add 10 items to sell.")
-      });
-
-      var buttonSell25 = _menu.GetChild(1).GetChild(1).GetChild(3).GetComponent<UnityEngine.UI.Button>();
-      buttonSell25.onClick.AddListener(() =>
-      {
-        AudioController.PlayAudio("MenuSelect");
-
-        if (_selectedItem == ItemType.NONE) return;
-
-        SetSaleAmount(_sellAmount + 25);
-        UpdateSellText();
-      });
-      _otherInfoables.Add(new SimpleInfoable()
-      {
-        _GameObject = buttonSell25.gameObject,
-        _Description = InfoController.GetInfoString("Sell 25", "Add 25 items to sell.")
-      });
-
-      var buttonClear = _menu.GetChild(1).GetChild(1).GetChild(4).GetComponent<UnityEngine.UI.Button>();
-      buttonClear.onClick.AddListener(() =>
-      {
-        AudioController.PlayAudio("MenuSelect");
-
-        if (_selectedItem == ItemType.NONE) return;
-
-        SetSaleAmount(0);
-        UpdateSellText();
-      });
-      _otherInfoables.Add(new SimpleInfoable()
-      {
-        _GameObject = buttonClear.gameObject,
-        _Description = InfoController.GetInfoString("Clear", "Set amount of items to sell to: 0.")
-      });
-
-      var buttonSell = _menu.GetChild(1).GetChild(1).GetChild(5).GetComponent<UnityEngine.UI.Button>();
-      buttonSell.onClick.AddListener(() =>
-      {
-        AudioController.PlayAudio("MenuSelect");
-
-        if (_selectedItem == ItemType.NONE) return;
-        if (_sellAmount == 0) return;
-
-        var itemInfo = _itemInfos[_selectedItem];
-        var sellValueTotal = _sellAmount * itemInfo._SellValue;
-
-        LogController.AppendLog($"Sold {_sellAmount} {GetItemName(_selectedItem)} for ${sellValueTotal}.");
-
-        SkillController.s_Singleton._Gold += sellValueTotal;
-        RemoveItemAmount(_selectedItem, _sellAmount);
-
-        _sellAmount = Mathf.Clamp(_sellAmount, 0, itemInfo._AmountHeld);
-        UpdateSellText();
-
-        //
-        if (!UnlockController.HasUnlock(UnlockController.UnlockType.SHOP))
-        {
-          UnlockController.Unlock(UnlockController.UnlockType.SHOP);
-
-          LogController.AppendLog("Unlocked the Shop menu.");
-        }
-      });
-      _otherInfoables.Add(new SimpleInfoable()
-      {
-        _GameObject = buttonSell.gameObject,
-        _Description = InfoController.GetInfoString("Sell", "Sell selected items.")
+        _GameObject = buttonSellAll.gameObject,
+        _Description = InfoController.GetInfoString("Sell All", "Sell all of the selected item.\n\nYou can also use middle mouse on an inventory item to do this.")
       });
 
     }
@@ -269,10 +239,20 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         {
           if (!inventoryItem.Value._InInventory) continue;
 
-          if (Input.GetMouseButtonDown(0))
+          if (Input.GetMouseButtonUp(0))
             if (RectTransformUtility.RectangleContainsScreenPoint(inventoryItem.Value._MenuEntry.transform as RectTransform, mousePos, Camera.main))
             {
               SelectItem(inventoryItem.Key);
+
+              AudioController.PlayAudio("MenuSelect");
+              break;
+            }
+
+          if (Input.GetMouseButtonUp(2))
+            if (RectTransformUtility.RectangleContainsScreenPoint(inventoryItem.Value._MenuEntry.transform as RectTransform, mousePos, Camera.main))
+            {
+              SelectItem(inventoryItem.Key);
+              SellItem(_itemInfos[inventoryItem.Key]._AmountHeld);
 
               AudioController.PlayAudio("MenuSelect");
               break;
@@ -283,6 +263,35 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
     }
 
     //
+    void SellItem(int tryAmount)
+    {
+      AudioController.PlayAudio("MenuSelect");
+
+      if (_selectedItem == ItemType.NONE) return;
+
+      var itemInfo = _itemInfos[_selectedItem];
+      var sellAmount = Mathf.Clamp(tryAmount, 0, itemInfo._AmountHeld);
+      if (sellAmount == 0) return;
+
+      var sellValueTotal = sellAmount * itemInfo._SellValue;
+
+      LogController.AppendLog($"Sold {sellAmount} {GetItemName(_selectedItem)} for ${sellValueTotal}.");
+
+      SkillController.s_Singleton._Gold += sellValueTotal;
+      AudioController.PlayAudio("SellItems");
+
+      RemoveItemAmount(_selectedItem, sellAmount);
+
+      //
+      if (!UnlockController.HasUnlock(UnlockController.UnlockType.SHOP))
+      {
+        UnlockController.Unlock(UnlockController.UnlockType.SHOP);
+
+        LogController.AppendLog("Unlocked the Shop menu.");
+      }
+    }
+
+    //
     void SelectItem(ItemType inventoryItemType)
     {
       _selectedItem = inventoryItemType;
@@ -290,39 +299,6 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       var itemInfo = _itemInfos[inventoryItemType];
       _itemSelectorUi.SetParent(itemInfo._MenuEntry.transform, false);
       _itemSelectorUi.SetAsFirstSibling();
-
-      // Set text
-      _sellAmount = 0;
-      UpdateSellText();
-    }
-
-    //
-    void UpdateSellText()
-    {
-
-      if (_selectedItem == ItemType.NONE)
-      {
-        _sellText.text = "Sell:";
-        return;
-      }
-
-      var itemInfo = _itemInfos[_selectedItem];
-
-      var sellAmount = _sellAmount;
-      var totalAmount = itemInfo._AmountHeld;
-
-      var sellValue = itemInfo._SellValue;
-      var totalSellPrice = sellAmount * sellValue;
-
-      _sellText.text = string.Format("Sell:{0,50}", $"{sellAmount} / {totalAmount} = ${totalSellPrice}");
-    }
-    void SetSaleAmount(int toAmount)
-    {
-      if (_selectedItem == ItemType.NONE)
-        return;
-
-      var itemInfo = _itemInfos[_selectedItem];
-      _sellAmount = Mathf.Clamp(toAmount, 0, itemInfo._AmountHeld);
     }
 
     //
@@ -373,9 +349,6 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       }
       else
         UpdateItemDisplay(itemType);
-
-      if (isCurrentItem)
-        UpdateSellText();
     }
 
     //
@@ -398,10 +371,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
     void UpdateItemDisplay(ItemType inventoryItemType)
     {
       var itemInfo = _itemInfos[inventoryItemType];
-      itemInfo._Text.text = string.Format("  {0,-16}{1,-10}{2,6}", $"{itemInfo._Title}", $"{itemInfo._AmountHeld}", $"${itemInfo._SellValue}");
-
-      if (_selectedItem == inventoryItemType)
-        UpdateSellText();
+      itemInfo._Text.text = string.Format("   {0,-34}{1,-10}{2,8}", $"{itemInfo._Title}", $"{itemInfo._AmountHeld}", $"${itemInfo._SellValue}");
     }
 
     //
@@ -427,14 +397,14 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
 
     //
     [System.Serializable]
-    public class InventoryInfo
+    public class SaveInfo
     {
       public List<string> ItemList;
       public List<int> AmountList;
     }
-    public static InventoryInfo GetSaveInfo()
+    public static SaveInfo GetSaveInfo()
     {
-      var saveInfo = new InventoryInfo();
+      var saveInfo = new SaveInfo();
 
       saveInfo.ItemList = new();
       saveInfo.AmountList = new();
@@ -449,7 +419,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
 
       return saveInfo;
     }
-    public static void SetSaveInfo(InventoryInfo saveInfo)
+    public static void SetSaveInfo(SaveInfo saveInfo)
     {
 
       var index = -1;
