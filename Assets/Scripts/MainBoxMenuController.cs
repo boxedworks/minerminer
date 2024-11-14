@@ -110,6 +110,19 @@ namespace Controllers
     }
 
     //
+    protected override void AfterMenuSwitch(int fromMenuIndex, int toMenuIndex) { AfterMenuSwitch((MenuType)fromMenuIndex, (MenuType)toMenuIndex); }
+    void AfterMenuSwitch(MenuType fromMenu, MenuType toMenu)
+    {
+      switch (toMenu)
+      {
+        case MenuType.OPTIONS:
+
+          OptionsController.OnSwitch(fromMenu);
+          break;
+      }
+    }
+
+    //
     protected override string GetButtonDescription(string buttonName)
     {
       switch (buttonName)

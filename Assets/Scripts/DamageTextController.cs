@@ -49,7 +49,7 @@ namespace Controllers
     }
 
     //
-    public void AddText(float damage)
+    public void ReportDamage(float damage)
     {
       var newText = GameObject.Instantiate(_prefab, _prefab.transform.parent).GetComponent<TMPro.TextMeshProUGUI>();
       newText.text = $"{damage}";

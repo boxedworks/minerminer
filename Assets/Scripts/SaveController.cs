@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using UnityEngine.SceneManagement;
+using System.Runtime.InteropServices;
 
 namespace Controllers
 {
@@ -72,7 +73,7 @@ namespace Controllers
       public RockController.SaveInfo RockInfo;
 
       //
-      public ForgeController.SaveInfo ForgeInfo;
+      public MachineController.SaveInfo ForgeInfo;
 
       //
       public InventoryController.SaveInfo InventoryInfo;
@@ -80,6 +81,24 @@ namespace Controllers
       //
       public OptionsController.SaveInfo OptionsInfo;
 
+    }
+
+    static string s_saveDirPath
+    {
+      get
+      {
+        if (Application.platform == RuntimePlatform.WebGLPlayer)
+          return "/idbfs/minerminer";
+
+        return $"{Application.persistentDataPath}";
+      }
+    }
+    static string s_saveFilePath
+    {
+      get
+      {
+        return $"{s_saveDirPath}/save.json";
+      }
     }
 
     //
@@ -94,23 +113,21 @@ namespace Controllers
 
       //
       if (Application.platform == RuntimePlatform.WebGLPlayer)
-        PlayerPrefs.SetString("json", json);
+        if (!Directory.Exists(s_saveDirPath))
+          Directory.CreateDirectory(s_saveDirPath);
+      File.WriteAllText(s_saveFilePath, json);
 
-      else
-        File.WriteAllText("save.json", json);
+      LogController.AppendLog("Game saved.");
     }
 
     public static void Load()
     {
 
       var json = "";
-      if (Application.platform == RuntimePlatform.WebGLPlayer)
-        json = PlayerPrefs.GetString("json", "");
-
-      else
+      if (File.Exists(s_saveFilePath))
       {
-        if (File.Exists("save.json"))
-          json = File.ReadAllText("save.json");
+        json = File.ReadAllText(s_saveFilePath);
+        LogController.AppendLog("Game loaded from save.");
       }
 
       // Check for save
@@ -161,14 +178,8 @@ namespace Controllers
       var options = OptionsController.GetSaveInfo();
 
       //
-      if (Application.platform == RuntimePlatform.WebGLPlayer)
-        PlayerPrefs.DeleteKey("json");
-
-      else
-      {
-        if (File.Exists("save.json"))
-          File.Delete("save.json");
-      }
+      if (File.Exists(s_saveFilePath))
+        File.Delete(s_saveFilePath);
 
       //
       OptionsController.SetSaveInfo(options);
@@ -177,6 +188,10 @@ namespace Controllers
       //
       SceneManager.LoadScene(0);
     }
+
+    //
+    [DllImport("__Internal")]
+    private static extern void JS_FileSystem_Sync();
 
   }
 

@@ -77,6 +77,7 @@ namespace Controllers
     //
     protected void SetMenuType(int toMenuIndex)
     {
+      var saveMenuIndex = _currentMenuIndex;
       if (_currentMenuIndex != 0)
         ToggleMenu(_currentMenuIndex, false);
       _currentMenuIndex = toMenuIndex;
@@ -84,6 +85,8 @@ namespace Controllers
 
       _buttonSelectorUi.SetParent(GetMenuButton(toMenuIndex).transform, false);
       _buttonSelectorUi.SetAsFirstSibling();
+
+      AfterMenuSwitch(saveMenuIndex, _currentMenuIndex);
     }
 
     //
@@ -131,6 +134,9 @@ namespace Controllers
         _menuDependancies.Add(ofMenuIndex, new());
       _menuDependancies[ofMenuIndex].Add(forDependancy);
     }
+
+    //
+    protected virtual void AfterMenuSwitch(int fromMenuIndex, int toMenuIndex) { }
 
     //
     protected abstract string GetButtonDescription(string buttonName);

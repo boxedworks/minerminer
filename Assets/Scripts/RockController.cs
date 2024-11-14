@@ -15,6 +15,9 @@ namespace Controllers
     public static RockController s_Singleton;
 
     //
+    public static float s_GemPercent = 0.5f;
+
+    //
     bool _hasRock;
     public static bool s_HasRock { get { return s_Singleton._hasRock; } }
     Button _addRockButton, _toggleMineButton, _stopMineButton;
@@ -60,7 +63,7 @@ namespace Controllers
           var breakProductString = "";
           foreach (var drop in _DropTable)
           {
-            breakProductString += $"- {InventoryController.GetItemName(drop.Item1)} ({drop.Item2}%)\n";
+            breakProductString += string.Format("- {0,-10} - {1,3}%\n", InventoryController.GetItemName(drop.Item1), drop.Item2);
           }
 
           //
@@ -239,7 +242,7 @@ Mode: Off")
 
       // Take damage
       SetHealth(_health - damage);
-      DamageTextController.s_Singleton.AddText(damage);
+      DamageTextController.s_Singleton.ReportDamage(damage);
 
       //
       var baseDropAmount = 0;
@@ -460,12 +463,23 @@ Mode: Off")
       return Resources.Load<ItemResourceInfo>($"Rocks/{rockType.ToString().ToLower()}").Sprite;
     }
 
-    public static void SetRockDropTable(RockType rockType, (InventoryController.ItemType, float)[] dropTable)
+    public static void SetRockDropTable(RockType rockType, (InventoryController.ItemType ItemType, float DropChance)[] dropTable)
     {
       s_Singleton._rocks[rockType]._DropTable = dropTable;
 
       if (rockType == s_Singleton._currentRock)
         s_Singleton.SetRockHoverInfos();
+    }
+
+    public static (InventoryController.ItemType ItemType, float DropChance)[] GenerateRockDropTable((InventoryController.ItemType ItemType, float DropChance)[] requiredDrops, InventoryController.ItemType baseItem)
+    {
+      var dropsAppended = new List<(InventoryController.ItemType ItemType, float DropChance)>(requiredDrops);
+      var percentRemaining = 100f;
+      foreach (var drop in dropsAppended)
+        percentRemaining -= drop.DropChance;
+      dropsAppended.Add((ItemType: baseItem, DropChance: percentRemaining));
+
+      return dropsAppended.ToArray();
     }
 
     static void AddRockType(RockType rockType, RockInfo rockInfo)
@@ -488,10 +502,9 @@ Mode: Off")
             _HealthMax = 5f,
             _XpGain = 5f,
 
-            _DropTable = new (InventoryController.ItemType, float)[] {
-              (InventoryController.ItemType.STONE, 99f),
-              (InventoryController.ItemType.EMERALD, 1f),
-            },
+            _DropTable = GenerateRockDropTable(new (InventoryController.ItemType, float)[] {
+              (InventoryController.ItemType.EMERALD, s_GemPercent),
+            }, InventoryController.ItemType.STONE),
           });
           s_Singleton.SetRockSelection(0, s_Singleton._rocks[rockType]);
 
@@ -506,11 +519,10 @@ Mode: Off")
             _HealthMax = 15f,
             _XpGain = 10f,
 
-            _DropTable = new (InventoryController.ItemType, float)[] {
+            _DropTable = GenerateRockDropTable(new (InventoryController.ItemType, float)[] {
               (InventoryController.ItemType.COPPER, 10f),
-              (InventoryController.ItemType.STONE, 89f),
-              (InventoryController.ItemType.SAPPHIRE, 1f),
-            },
+              (InventoryController.ItemType.SAPPHIRE, s_GemPercent),
+            }, InventoryController.ItemType.STONE),
           });
           s_Singleton.SetRockSelection(1, s_Singleton._rocks[rockType]);
 
@@ -525,11 +537,10 @@ Mode: Off")
             _HealthMax = 50f,
             _XpGain = 25f,
 
-            _DropTable = new (InventoryController.ItemType, float)[] {
+            _DropTable = GenerateRockDropTable(new (InventoryController.ItemType, float)[] {
               (InventoryController.ItemType.TIN, 10f),
-              (InventoryController.ItemType.STONE, 89f),
-              (InventoryController.ItemType.RUBY, 1f),
-            },
+              (InventoryController.ItemType.RUBY, s_GemPercent),
+            }, InventoryController.ItemType.STONE),
           });
           s_Singleton.SetRockSelection(2, s_Singleton._rocks[rockType]);
 
@@ -541,13 +552,13 @@ Mode: Off")
           AddRockType(rockType, new RockInfo()
           {
             _Title = "Iron",
-            _HealthMax = 250f,
+            _HealthMax = 200f,
             _XpGain = 75f,
 
-            _DropTable = new (InventoryController.ItemType, float)[] {
+            _DropTable = GenerateRockDropTable(new (InventoryController.ItemType, float)[] {
               (InventoryController.ItemType.IRON, 10f),
-              (InventoryController.ItemType.STONE, 90f)
-            },
+              (InventoryController.ItemType.CITRINE, s_GemPercent),
+            }, InventoryController.ItemType.STONE),
           });
           s_Singleton.SetRockSelection(3, s_Singleton._rocks[rockType]);
 
@@ -564,7 +575,8 @@ Mode: Off")
     }
     public static void UnlockAutoRock()
     {
-      s_Singleton.ToggleAutoRock(true);
+      //s_Singleton.ToggleAutoRock(true);
+      s_Singleton._autoReplaceRock = true;
     }
 
     //

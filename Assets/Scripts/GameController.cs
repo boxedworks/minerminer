@@ -5,9 +5,14 @@ namespace Controllers
 
   public class GameController : MonoBehaviour
   {
+
+    public static string s_GameVersion = "0.0.4";
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+
+      GameObject.Find("GameVersion").transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"Game version: {s_GameVersion}";
 
       //
       new OptionsController();
@@ -58,13 +63,12 @@ namespace Controllers
       if (Input.GetKeyDown(KeyCode.S))
       {
         SaveController.Save();
-        LogController.AppendLog("Saved.");
       }
-      if (Input.GetKeyDown(KeyCode.L))
+      /*if (Input.GetKeyDown(KeyCode.L))
       {
         SaveController.Load();
         LogController.AppendLog("Loaded.");
-      }
+      }*/
     }
 
     //

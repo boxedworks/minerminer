@@ -109,18 +109,22 @@ Drop on break: {AmountDroppedOnBreak}");
 
         //
         var damage = s_PickaxeStats.Damage;
+        var multiplier = 1;
         var powerModifier = SkillController.GetMaths(SkillController.SkillType.POWER);
-        if (powerModifier > 0f)
+        while (powerModifier > 0f)
         {
           var randomNumber = Random.Range(0f, 1f);
-          if (randomNumber <= powerModifier || powerModifier == 1f)
+          if (powerModifier >= 1 || randomNumber <= powerModifier)
           {
-            damage *= 2;
+            multiplier++;
 
             LogController.AppendLog("Power!");
           }
+
+          powerModifier -= 1f;
         }
 
+        damage *= multiplier;
         RockController.s_Singleton.Hit(damage);
       }
     }

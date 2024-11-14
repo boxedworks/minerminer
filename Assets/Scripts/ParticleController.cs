@@ -27,6 +27,7 @@ namespace Controllers
       GEM_0,
       GEM_1,
       GEM_2,
+      GEM_3,
 
       FORGE_SMOKE,
       FORGE_EMBERS,
@@ -52,6 +53,7 @@ namespace Controllers
         { ParticleType.GEM_0, GameObject.Find("Gem0").GetComponent<ParticleSystem>() },
         { ParticleType.GEM_1, GameObject.Find("Gem1").GetComponent<ParticleSystem>() },
         { ParticleType.GEM_2, GameObject.Find("Gem2").GetComponent<ParticleSystem>() },
+        { ParticleType.GEM_3, GameObject.Find("Gem3").GetComponent<ParticleSystem>() },
 
         { ParticleType.FORGE_SMOKE, GameObject.Find("ForgeSmoke").GetComponent<ParticleSystem>() },
         { ParticleType.FORGE_EMBERS, GameObject.Find("ForgeEmbers").GetComponent<ParticleSystem>() },

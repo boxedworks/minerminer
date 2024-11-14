@@ -8,6 +8,7 @@ namespace Controllers
 
     //
     SaveInfo _SaveInfo;
+    MainBoxMenuController.MenuType _lastMenu;
 
     TMPro.TextMeshProUGUI _volumeText;
     public static int s_Volume
@@ -70,13 +71,28 @@ namespace Controllers
     }
 
     //
+    public static void OnSwitch(MainBoxMenuController.MenuType menuType)
+    {
+      if (menuType == MainBoxMenuController.MenuType.OPTIONS)
+      {
+        MainBoxMenuController.s_Singleton.SetMenuType(s_Singleton._lastMenu);
+        return;
+      }
+      s_Singleton._lastMenu = menuType;
+    }
+
+    //
     [System.Serializable]
     public class SaveInfo
     {
       public int Volume;
+
+      public string Version;
     }
     public static SaveInfo GetSaveInfo()
     {
+      s_Singleton._SaveInfo.Version = GameController.s_GameVersion;
+
       return s_Singleton._SaveInfo;
     }
     public static void SetSaveInfo(SaveInfo saveInfo)

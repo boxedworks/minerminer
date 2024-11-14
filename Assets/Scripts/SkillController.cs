@@ -122,7 +122,7 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
 
         new Skill(SkillType.POWER, "Power",
           (int level) => {
-            return level / 99f;
+            return level / 99f * 5f;
           },
           (Skill skill, int level, float xp, float xpMax) => {
             return InfoController.GetInfoString("Power", @$"Percent chance to do 2x damage on hit.
@@ -251,7 +251,16 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
       //
       public void Update()
       {
-        if (_xp > 0f)
+        if (_level >= 99 && _xp > 0)
+        {
+          _xp = 0f;
+          _xpVisual = _xpMax;
+          _level = 99;
+
+          UpdateUi();
+        }
+
+        else if (_xp > 0f)
         {
 
           float xpAmount;
@@ -311,10 +320,15 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
       }
       public void SetSkillInfo(SkillSaveInfo skillInfo)
       {
-        _level = skillInfo.Level;
-        _xpVisual = skillInfo.Xp;
-        _xp = skillInfo.XpLeft;
-        _xpMax = skillInfo.XpMax;
+        _level = Mathf.Clamp(skillInfo.Level, 0, 99);
+        if (_level != 99)
+        {
+          _xpVisual = skillInfo.Xp;
+          _xp = skillInfo.XpLeft;
+          _xpMax = skillInfo.XpMax;
+        }
+        else
+          _xpVisual = _xpMax;
 
         UpdateUi();
       }

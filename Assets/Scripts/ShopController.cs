@@ -30,11 +30,12 @@ namespace Controllers
       PICKAXE_BREAK_UPGRADE_0,
       PICKAXE_BREAK_UPGRADE_1,
       PICKAXE_BREAK_UPGRADE_2,
+      PICKAXE_BREAK_UPGRADE_3,
 
       ROCK_0_UPGRADE_0,
-      ROCK_1_UPGRADE_0,
-      ROCK_2_UPGRADE_0,
-      ROCK_3_UPGRADE_0,
+      ROCK_1_UPGRADE_0, ROCK_1_UPGRADE_1, ROCK_1_UPGRADE_2,
+      ROCK_2_UPGRADE_0, ROCK_2_UPGRADE_1, ROCK_2_UPGRADE_2,
+      ROCK_3_UPGRADE_0, ROCK_3_UPGRADE_1, ROCK_3_UPGRADE_2,
 
       ROCK_BUY_0,
       ROCK_BUY_1,
@@ -112,7 +113,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.AUTO_ROCK, new PurchaseInfo()
       {
-        _Cost = 500,
+        _Cost = 250,
 
         _Title = "Auto Rock",
         _Description = "Automatically replace rocks when they are destroyed.",
@@ -154,40 +155,106 @@ namespace Controllers
 
         _PurchaseString = "Purchased the Sharpen Pickaxe 3 upgrade."
       });
+      AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_3, new PurchaseInfo()
+      {
+        _Cost = 1250,
+
+        _Title = "Sharpen Pickaxe 4",
+        _Description = "Increases items dropped on rock break: 7 -> 8.",
+
+        _PurchaseString = "Purchased the Sharpen Pickaxe 4 upgrade."
+      });
 
       AddPurchase(PurchaseType.ROCK_0_UPGRADE_0, new PurchaseInfo()
       {
         _Cost = 25,
 
-        _Title = "Stone Upgrade",
+        _Title = "Stone Upgrade 1",
         _Description = "Double the drops of the Stone rock."
       });
+
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_0, new PurchaseInfo()
+      {
+        _Cost = 50,
+
+        _Title = "Copper Upgrade 1",
+        _Description = "Extra 5% chance to find Copper in Copper rocks.",
+
+        _PurchaseString = "Purchased the Copper Rock Upgrade 1."
+      });
+      AddPurchase(PurchaseType.ROCK_1_UPGRADE_1, new PurchaseInfo()
+      {
+        _Cost = 125,
+
+        _Title = "Copper Upgrade 2",
+        _Description = "Extra 5% chance to find Copper in Copper rocks.",
+
+        _PurchaseString = "Purchased the Copper Rock Upgrade 2."
+      });
+      AddPurchase(PurchaseType.ROCK_1_UPGRADE_2, new PurchaseInfo()
       {
         _Cost = 200,
 
-        _Title = "Copper Upgrade",
-        _Description = "Extra 10% chance to find Copper in Copper rocks.",
+        _Title = "Copper Upgrade 3",
+        _Description = "Extra 5% chance to find Copper in Copper rocks.",
 
-        _PurchaseString = "Purchased the Copper Rock Upgrade."
+        _PurchaseString = "Purchased the Copper Rock Upgrade 3."
       });
+
       AddPurchase(PurchaseType.ROCK_2_UPGRADE_0, new PurchaseInfo()
       {
-        _Cost = 400,
+        _Cost = 250,
 
-        _Title = "Tin Upgrade",
-        _Description = "Extra 10% chance to find Tin in Tin rocks.",
+        _Title = "Tin Upgrade 1",
+        _Description = "Extra 5% chance to find Tin in Tin rocks.",
 
-        _PurchaseString = "Purchased the Tin Rock Upgrade."
+        _PurchaseString = "Purchased the Tin Rock Upgrade 1."
       });
+      AddPurchase(PurchaseType.ROCK_2_UPGRADE_1, new PurchaseInfo()
+      {
+        _Cost = 350,
+
+        _Title = "Tin Upgrade 2",
+        _Description = "Extra 5% chance to find Tin in Tin rocks.",
+
+        _PurchaseString = "Purchased the Tin Rock Upgrade 2."
+      });
+      AddPurchase(PurchaseType.ROCK_2_UPGRADE_2, new PurchaseInfo()
+      {
+        _Cost = 500,
+
+        _Title = "Tin Upgrade 3",
+        _Description = "Extra 5% chance to find Tin in Tin rocks.",
+
+        _PurchaseString = "Purchased the Tin Rock Upgrade 3."
+      });
+
       AddPurchase(PurchaseType.ROCK_3_UPGRADE_0, new PurchaseInfo()
+      {
+        _Cost = 1250,
+
+        _Title = "Iron Upgrade 1",
+        _Description = "Extra 5% chance to find Iron in Iron rocks.",
+
+        _PurchaseString = "Purchased the Iron Rock Upgrade 1."
+      });
+      AddPurchase(PurchaseType.ROCK_3_UPGRADE_1, new PurchaseInfo()
       {
         _Cost = 1500,
 
-        _Title = "Iron Upgrade",
-        _Description = "Extra 10% chance to find Iron in Iron rocks.",
+        _Title = "Iron Upgrade 2",
+        _Description = "Extra 5% chance to find Iron in Iron rocks.",
 
-        _PurchaseString = "Purchased the Iron Rock Upgrade."
+        _PurchaseString = "Purchased the Iron Rock Upgrade 2."
+      });
+      AddPurchase(PurchaseType.ROCK_3_UPGRADE_2, new PurchaseInfo()
+      {
+        _Cost = 1850,
+
+        _Title = "Iron Upgrade 3",
+        _Description = "Extra 5% chance to find Iron in Iron rocks.",
+
+        _PurchaseString = "Purchased the Iron Rock Upgrade 3."
       });
 
       AddPurchase(PurchaseType.ROCK_BUY_0, new PurchaseInfo()
@@ -363,6 +430,11 @@ Power - A chance to do more damage!",
           break;
         case PurchaseType.PICKAXE_BREAK_UPGRADE_2:
           PickaxeController.s_PickaxeStats.SetDropOnBreak(7);
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.PICKAXE_BREAK_UPGRADE_3);
+
+          break;
+        case PurchaseType.PICKAXE_BREAK_UPGRADE_3:
+          PickaxeController.s_PickaxeStats.SetDropOnBreak(8);
 
           break;
 
@@ -372,26 +444,74 @@ Power - A chance to do more damage!",
 
           break;
         case PurchaseType.ROCK_1_UPGRADE_0:
-          RockController.SetRockDropTable(RockController.RockType.COPPER, new (InventoryController.ItemType, float)[]{
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_1_UPGRADE_1);
+          RockController.SetRockDropTable(RockController.RockType.COPPER, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.COPPER, 15f),
+            (InventoryController.ItemType.SAPPHIRE, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
+
+          break;
+        case PurchaseType.ROCK_1_UPGRADE_1:
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_1_UPGRADE_2);
+          RockController.SetRockDropTable(RockController.RockType.COPPER, RockController.GenerateRockDropTable(new[]{
             (InventoryController.ItemType.COPPER, 20f),
-            (InventoryController.ItemType.STONE, 79f),
-            (InventoryController.ItemType.SAPPHIRE, 1f),
-          });
+            (InventoryController.ItemType.SAPPHIRE, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
 
           break;
+        case PurchaseType.ROCK_1_UPGRADE_2:
+          RockController.SetRockDropTable(RockController.RockType.COPPER, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.COPPER, 25f),
+            (InventoryController.ItemType.SAPPHIRE, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
+
+          break;
+
         case PurchaseType.ROCK_2_UPGRADE_0:
-          RockController.SetRockDropTable(RockController.RockType.TIN, new (InventoryController.ItemType, float)[]{
-            (InventoryController.ItemType.TIN, 20f),
-            (InventoryController.ItemType.STONE, 79f),
-            (InventoryController.ItemType.RUBY, 1f),
-          });
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_2_UPGRADE_1);
+          RockController.SetRockDropTable(RockController.RockType.TIN, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.TIN, 15f),
+            (InventoryController.ItemType.RUBY, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
 
           break;
+        case PurchaseType.ROCK_2_UPGRADE_1:
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_2_UPGRADE_2);
+          RockController.SetRockDropTable(RockController.RockType.TIN, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.TIN, 20f),
+            (InventoryController.ItemType.RUBY, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
+
+          break;
+        case PurchaseType.ROCK_2_UPGRADE_2:
+          RockController.SetRockDropTable(RockController.RockType.TIN, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.TIN, 25f),
+            (InventoryController.ItemType.RUBY, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
+
+          break;
+
         case PurchaseType.ROCK_3_UPGRADE_0:
-          RockController.SetRockDropTable(RockController.RockType.IRON, new (InventoryController.ItemType, float)[]{
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_3_UPGRADE_1);
+          RockController.SetRockDropTable(RockController.RockType.IRON, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.IRON, 15f),
+            (InventoryController.ItemType.CITRINE, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
+
+          break;
+        case PurchaseType.ROCK_3_UPGRADE_1:
+          s_Singleton.AddPurchaseToDisplay(PurchaseType.ROCK_3_UPGRADE_2);
+          RockController.SetRockDropTable(RockController.RockType.IRON, RockController.GenerateRockDropTable(new[]{
             (InventoryController.ItemType.IRON, 20f),
-            (InventoryController.ItemType.STONE, 80f)
-          });
+            (InventoryController.ItemType.CITRINE, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
+
+          break;
+        case PurchaseType.ROCK_3_UPGRADE_2:
+          RockController.SetRockDropTable(RockController.RockType.IRON, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.IRON, 25f),
+            (InventoryController.ItemType.CITRINE, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
 
           break;
 

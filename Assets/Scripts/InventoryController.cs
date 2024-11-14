@@ -35,6 +35,7 @@ namespace Controllers
       EMERALD,
       SAPPHIRE,
       RUBY,
+      CITRINE,
 
     }
     class ItemInfo : IInfoable
@@ -172,9 +173,17 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.RUBY, new ItemInfo()
       {
         _Title = "Ruby",
-        _SellValue = 250,
+        _SellValue = 150,
 
         _ParticleType = ParticleController.ParticleType.GEM_2
+
+      });
+      AddInventoryItemInfo(ItemType.CITRINE, new ItemInfo()
+      {
+        _Title = "Citrine",
+        _SellValue = 250,
+
+        _ParticleType = ParticleController.ParticleType.GEM_3
 
       });
 
@@ -184,8 +193,6 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       buttonSell1.onClick.AddListener(() =>
       {
         AudioController.PlayAudio("MenuSelect");
-
-        if (_selectedItem == ItemType.NONE) return;
 
         SellItem(1);
       });
@@ -200,8 +207,6 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       {
         AudioController.PlayAudio("MenuSelect");
 
-        if (_selectedItem == ItemType.NONE) return;
-
         SellItem(5);
       });
       _otherInfoables.Add(new SimpleInfoable()
@@ -214,8 +219,6 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       buttonSellAll.onClick.AddListener(() =>
       {
         AudioController.PlayAudio("MenuSelect");
-
-        if (_selectedItem == ItemType.NONE) return;
 
         SellItem(10000000);
       });
@@ -267,7 +270,13 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
     {
       AudioController.PlayAudio("MenuSelect");
 
-      if (_selectedItem == ItemType.NONE) return;
+      if (_selectedItem == ItemType.NONE)
+      {
+        LogController.AppendLog($"<color=red>No item selected to sell!</color>");
+        LogController.ForceOpen();
+
+        return;
+      }
 
       var itemInfo = _itemInfos[_selectedItem];
       var sellAmount = Mathf.Clamp(tryAmount, 0, itemInfo._AmountHeld);
@@ -310,6 +319,12 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
     //
     public void AddItemAmount(ItemType itemType, int amount)
     {
+      if (amount < 1)
+      {
+        Debug.LogWarning($"Trying to add {amount} {itemType} to inventory");
+        return;
+      }
+
       var itemInfo = _itemInfos[itemType];
 
       var addUi = itemInfo._AmountHeld == 0;
