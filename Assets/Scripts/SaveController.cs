@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
 using UnityEngine.SceneManagement;
-using System.Runtime.InteropServices;
+
+using System.IO;
+using System.Collections.Generic;
 
 namespace Controllers
 {
@@ -51,6 +51,9 @@ namespace Controllers
         // Forge
         ForgeInfo = ForgeController.GetSaveInfo();
 
+        // Hammer
+        HammerInfo = HammerController.GetSaveInfo();
+
         // Inventory
         InventoryInfo = InventoryController.GetSaveInfo();
 
@@ -73,7 +76,7 @@ namespace Controllers
       public RockController.SaveInfo RockInfo;
 
       //
-      public MachineController.SaveInfo ForgeInfo;
+      public MachineController.SaveInfo ForgeInfo, HammerInfo;
 
       //
       public InventoryController.SaveInfo InventoryInfo;
@@ -118,6 +121,7 @@ namespace Controllers
       File.WriteAllText(s_saveFilePath, json);
 
       LogController.AppendLog("Game saved.");
+      LogController.ForceOpen();
     }
 
     public static void Load()
@@ -161,6 +165,9 @@ namespace Controllers
         // Forge
         ForgeController.SetSaveInfo(saveData.ForgeInfo);
 
+        // Hammer
+        HammerController.SetSaveInfo(saveData.HammerInfo);
+
         // Inventory
         InventoryController.SetSaveInfo(saveData.InventoryInfo);
 
@@ -188,11 +195,6 @@ namespace Controllers
       //
       SceneManager.LoadScene(0);
     }
-
-    //
-    [DllImport("__Internal")]
-    private static extern void JS_FileSystem_Sync();
-
   }
 
 }

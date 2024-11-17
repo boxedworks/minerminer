@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using System.Security.Principal;
 
 namespace Controllers
 {
@@ -46,7 +47,31 @@ namespace Controllers
     }
     class PurchaseInfo : IInfoable
     {
-      public int _Cost;
+      public (InventoryController.ItemType ItemType, int Amount)[] _Costs;
+      public bool _CanPurchase
+      {
+        get
+        {
+          foreach (var costInfo in _Costs)
+          {
+
+            // Check gold
+            if (costInfo.ItemType == InventoryController.ItemType.NONE)
+            {
+              if (SkillController.s_Singleton._Gold < costInfo.Amount)
+                return false;
+
+              continue;
+            }
+
+            // Check item amount
+            if (InventoryController.GetItemAmount(costInfo.ItemType) < costInfo.Amount)
+              return false;
+          }
+
+          return true;
+        }
+      }
 
       public string _Title, _Description, _PurchaseString;
 
@@ -55,7 +80,26 @@ namespace Controllers
       public GameObject _MenuEntry;
 
       //
-      public string _Info { get { return InfoController.GetInfoString(_Title, _Description); } }
+      public string _Info
+      {
+        get
+        {
+
+          var costString = "";
+          foreach (var costInfo in _Costs)
+          {
+
+            if (costInfo.ItemType == InventoryController.ItemType.NONE)
+            {
+              costString += $"- ${costInfo.Amount}\n";
+              continue;
+            }
+            costString += $"- {costInfo.Amount} {InventoryController.GetItemName(costInfo.ItemType)}\n";
+          }
+
+          return InfoController.GetInfoString(_Title, $"{_Description}\n\n\n<b>= Cost:</b>\n=n{costString}");
+        }
+      }
       public RectTransform _Transform { get { return _MenuEntry == null ? null : _MenuEntry.transform as RectTransform; } }
     }
 
@@ -94,7 +138,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.SKILLS, new PurchaseInfo()
       {
-        _Cost = 10,
+        _Costs = GetSimpleCost(10),
 
         _Title = "Skills",
         _Description = "Unlock the Skills tab.",
@@ -103,7 +147,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.FORGE, new PurchaseInfo()
       {
-        _Cost = 75,
+        _Costs = GetSimpleCost(75),
 
         _Title = "Forge",
         _Description = "Unlock the Forge for smelting.",
@@ -113,7 +157,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.AUTO_ROCK, new PurchaseInfo()
       {
-        _Cost = 250,
+        _Costs = GetSimpleCost(250),
 
         _Title = "Auto Rock",
         _Description = "Automatically replace rocks when they are destroyed.",
@@ -123,14 +167,14 @@ namespace Controllers
 
       AddPurchase(PurchaseType.PICKAXE_UPGRADE_0, new PurchaseInfo()
       {
-        _Cost = 1000,
+        _Costs = GetSimpleCost(1000),
 
         _Title = "Iron Pickaxe",
         _Description = "Base pickaxe damage: 1 -> 2."
       });
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_0, new PurchaseInfo()
       {
-        _Cost = 35,
+        _Costs = GetSimpleCost(35),
 
         _Title = "Sharpen Pickaxe 1",
         _Description = "Increases items dropped on rock break: 4 -> 5.",
@@ -139,7 +183,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_1, new PurchaseInfo()
       {
-        _Cost = 150,
+        _Costs = GetSimpleCost(150),
 
         _Title = "Sharpen Pickaxe 2",
         _Description = "Increases items dropped on rock break: 5 -> 6.",
@@ -148,7 +192,10 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_2, new PurchaseInfo()
       {
-        _Cost = 500,
+        _Costs = new[]{
+          (InventoryController.ItemType.NONE, 500),
+          (InventoryController.ItemType.COPPER_INGOT, 1)
+        },
 
         _Title = "Sharpen Pickaxe 3",
         _Description = "Increases items dropped on rock break: 6 -> 7.",
@@ -157,7 +204,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_3, new PurchaseInfo()
       {
-        _Cost = 1250,
+        _Costs = GetSimpleCost(1250),
 
         _Title = "Sharpen Pickaxe 4",
         _Description = "Increases items dropped on rock break: 7 -> 8.",
@@ -167,7 +214,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_0_UPGRADE_0, new PurchaseInfo()
       {
-        _Cost = 25,
+        _Costs = GetSimpleCost(25),
 
         _Title = "Stone Upgrade 1",
         _Description = "Double the drops of the Stone rock."
@@ -175,7 +222,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_0, new PurchaseInfo()
       {
-        _Cost = 50,
+        _Costs = GetSimpleCost(50),
 
         _Title = "Copper Upgrade 1",
         _Description = "Extra 5% chance to find Copper in Copper rocks.",
@@ -184,7 +231,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_1, new PurchaseInfo()
       {
-        _Cost = 125,
+        _Costs = GetSimpleCost(125),
 
         _Title = "Copper Upgrade 2",
         _Description = "Extra 5% chance to find Copper in Copper rocks.",
@@ -193,7 +240,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_2, new PurchaseInfo()
       {
-        _Cost = 200,
+        _Costs = GetSimpleCost(200),
 
         _Title = "Copper Upgrade 3",
         _Description = "Extra 5% chance to find Copper in Copper rocks.",
@@ -203,7 +250,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_2_UPGRADE_0, new PurchaseInfo()
       {
-        _Cost = 250,
+        _Costs = GetSimpleCost(250),
 
         _Title = "Tin Upgrade 1",
         _Description = "Extra 5% chance to find Tin in Tin rocks.",
@@ -212,7 +259,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_2_UPGRADE_1, new PurchaseInfo()
       {
-        _Cost = 350,
+        _Costs = GetSimpleCost(350),
 
         _Title = "Tin Upgrade 2",
         _Description = "Extra 5% chance to find Tin in Tin rocks.",
@@ -221,7 +268,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_2_UPGRADE_2, new PurchaseInfo()
       {
-        _Cost = 500,
+        _Costs = GetSimpleCost(500),
 
         _Title = "Tin Upgrade 3",
         _Description = "Extra 5% chance to find Tin in Tin rocks.",
@@ -231,7 +278,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_3_UPGRADE_0, new PurchaseInfo()
       {
-        _Cost = 1250,
+        _Costs = GetSimpleCost(1250),
 
         _Title = "Iron Upgrade 1",
         _Description = "Extra 5% chance to find Iron in Iron rocks.",
@@ -240,7 +287,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_3_UPGRADE_1, new PurchaseInfo()
       {
-        _Cost = 1500,
+        _Costs = GetSimpleCost(1500),
 
         _Title = "Iron Upgrade 2",
         _Description = "Extra 5% chance to find Iron in Iron rocks.",
@@ -249,7 +296,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_3_UPGRADE_2, new PurchaseInfo()
       {
-        _Cost = 1850,
+        _Costs = GetSimpleCost(1850),
 
         _Title = "Iron Upgrade 3",
         _Description = "Extra 5% chance to find Iron in Iron rocks.",
@@ -259,7 +306,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_BUY_0, new PurchaseInfo()
       {
-        _Cost = 20,
+        _Costs = GetSimpleCost(20),
 
         _Title = "Copper Rock",
         _Description = "Unlock the Copper rock.",
@@ -268,7 +315,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_BUY_1, new PurchaseInfo()
       {
-        _Cost = 250,
+        _Costs = GetSimpleCost(250),
 
         _Title = "Tin Rock",
         _Description = "Unlock the Tin rock.",
@@ -277,7 +324,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_BUY_2, new PurchaseInfo()
       {
-        _Cost = 1000,
+        _Costs = GetSimpleCost(1000),
 
         _Title = "Iron Rock",
         _Description = "Unlock the Iron rock.",
@@ -287,7 +334,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.SKILL_LUCK, new PurchaseInfo()
       {
-        _Cost = 250,
+        _Costs = GetSimpleCost(250),
 
         _Title = "Skill - Luck",
         _Description = @"Unlock the Luck skill.
@@ -298,7 +345,7 @@ Luck - A chance to get extra items!",
       });
       AddPurchase(PurchaseType.SKILL_POWER, new PurchaseInfo()
       {
-        _Cost = 250,
+        _Costs = GetSimpleCost(250),
 
         _Title = "Skill - Power",
         _Description = @"Unlock the Power skill.
@@ -332,9 +379,9 @@ Power - A chance to do more damage!",
       {
         if (purchaseInfo.Value._MenuEntry == null) continue;
 
-        var cost = purchaseInfo.Value._Cost;
+        var cost = purchaseInfo.Value._Costs;
         var buttonImg = purchaseInfo.Value._MenuEntry.transform.GetChild(2).GetComponent<Image>();
-        buttonImg.color = cost > SkillController.s_Singleton._Gold ? new Color(0.945098f, 0.3239185f, 0.3176471f) : new Color(0.3267443f, 0.9433962f, 0.3159488f);
+        buttonImg.color = !purchaseInfo.Value._CanPurchase ? new Color(0.945098f, 0.3239185f, 0.3176471f) : new Color(0.3267443f, 0.9433962f, 0.3159488f);
       }
 
     }
@@ -350,9 +397,34 @@ Power - A chance to do more damage!",
       var text = newMenuEntry.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
 
       var purchaseInfo = _purchaseInfos[purchaseType];
-      text.text = string.Format("{0,-42} {1,10}", $"{purchaseInfo._Title}", $"${purchaseInfo._Cost}");
+      text.text = string.Format("{0,-42}", $"{purchaseInfo._Title}");
 
       newMenuEntry.gameObject.SetActive(true);
+
+      // Create cost displays
+      var costContainer = newMenuEntry.transform.GetChild(3);
+      var costPrefab = costContainer.GetChild(1).gameObject;
+      foreach (var costInfo in purchaseInfo._Costs)
+      {
+
+        if (costInfo.ItemType == InventoryController.ItemType.NONE)
+        {
+          var goldText = costContainer.GetChild(0).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>();
+          goldText.text = $"${costInfo.Amount}";
+
+          goldText.transform.parent.gameObject.SetActive(true);
+
+          continue;
+        }
+
+        //
+        var newCost = GameObject.Instantiate(costPrefab, costPrefab.transform.parent);
+
+        newCost.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = $"{costInfo.Amount}";
+        newCost.transform.GetChild(1).GetComponent<Image>().sprite = InventoryController.GetItemSprite(costInfo.ItemType);
+
+        newCost.gameObject.SetActive(true);
+      }
 
       // Set button
       var button = newMenuEntry.transform.GetChild(2).GetComponent<Button>();
@@ -362,16 +434,30 @@ Power - A chance to do more damage!",
         AudioController.PlayAudio("MenuSelect");
 
         //
-        if (purchaseInfo._Cost > SkillController.s_Singleton._Gold)
+        if (!purchaseInfo._CanPurchase)
         {
 
-          LogController.AppendLog($"<color=red>Insufficient gold to purchase </color>{purchaseInfo._Title}<color=red>!</color>");
+          LogController.AppendLog($"<color=red>Cannot purchase </color>{purchaseInfo._Title}<color=red>!</color>");
           LogController.ForceOpen();
 
           return;
         }
 
-        SkillController.s_Singleton._Gold -= purchaseInfo._Cost;
+        foreach (var costInfo in purchaseInfo._Costs)
+        {
+
+          //
+          if (costInfo.ItemType == InventoryController.ItemType.NONE)
+          {
+            SkillController.s_Singleton._Gold -= costInfo.Amount;
+
+            continue;
+          }
+
+          //
+          InventoryController.s_Singleton.RemoveItemAmount(costInfo.ItemType, costInfo.Amount);
+        }
+
         AudioController.PlayAudio("ShopBuy");
 
         Purchase(purchaseType);
@@ -568,6 +654,11 @@ Power - A chance to do more damage!",
         if (System.Enum.TryParse(purchaseString, true, out PurchaseType purchaseType))
           Purchase(purchaseType);
       }
+    }
+
+    static (InventoryController.ItemType, int)[] GetSimpleCost(int goldAmount)
+    {
+      return new[] { (InventoryController.ItemType.NONE, goldAmount) };
     }
 
   }

@@ -37,6 +37,8 @@ namespace Controllers
       RUBY,
       CITRINE,
 
+      STONE_DUST,
+
     }
     class ItemInfo : IInfoable
     {
@@ -115,6 +117,11 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
 
         _ParticleType = ParticleController.ParticleType.ORE_0,
       });
+      AddInventoryItemInfo(ItemType.STONE_DUST, new ItemInfo()
+      {
+        _Title = "Stone Dust",
+        _SellValue = 2
+      });
 
       AddInventoryItemInfo(ItemType.COPPER, new ItemInfo()
       {
@@ -152,7 +159,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.IRON_INGOT, new ItemInfo()
       {
         _Title = "Iron Ingot",
-        _SellValue = 500
+        _SellValue = 750
       });
 
       AddInventoryItemInfo(ItemType.EMERALD, new ItemInfo()
@@ -311,9 +318,9 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
     }
 
     //
-    public int GetItemAmount(ItemType itemType)
+    public static int GetItemAmount(ItemType itemType)
     {
-      return _itemInfos[itemType]._AmountHeld;
+      return s_Singleton._itemInfos[itemType]._AmountHeld;
     }
 
     //

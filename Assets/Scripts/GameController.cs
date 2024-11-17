@@ -30,6 +30,7 @@ namespace Controllers
       new ShopController();
       new PickaxeController();
       new ForgeController();
+      new HammerController();
       new RockController();
       new DamageTextController();
       new UnlockController();
@@ -48,6 +49,7 @@ namespace Controllers
       InventoryController.s_Singleton.Update();
       AudioController.s_Singleton.Update();
       ForgeController.s_Singleton.Update();
+      HammerController.s_Singleton.Update();
       InfoController.s_Singleton.Update();
       UnlockController.s_Singleton.Update();
 

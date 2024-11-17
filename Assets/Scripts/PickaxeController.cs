@@ -13,7 +13,6 @@ namespace Controllers
 
     //
     Transform _pickaxeModel;
-    public static Transform transform { get { return s_Singleton._pickaxeModel; } }
     RectTransform _pickaxeUi;
 
     float _swingTimer, _swingTimerVisual;

@@ -18,6 +18,7 @@ namespace Controllers
 
       MINE,
       FORGE,
+      HAMMER,
 
     }
 
@@ -35,6 +36,9 @@ namespace Controllers
             break;
           case MenuType.FORGE:
             returnData = ForgeController.s_Singleton._InfoData;
+            break;
+          case MenuType.HAMMER:
+            returnData = HammerController.s_Singleton._InfoData;
             break;
 
           //
@@ -60,6 +64,7 @@ namespace Controllers
       //
       SetMenuDependancy((int)MenuType.MINE, GameObject.Find("MineDependancies"));
       SetMenuDependancy((int)MenuType.FORGE, GameObject.Find("ForgeDependancies"));
+      SetMenuDependancy((int)MenuType.HAMMER, GameObject.Find("HammerDependancies"));
 
       //
       var menuOrderString = new string[]{
@@ -67,6 +72,7 @@ namespace Controllers
 
         MenuType.MINE.ToString(),
         MenuType.FORGE.ToString(),
+        MenuType.HAMMER.ToString(),
       };
       var buttons = GetChildrenAsList(GameObject.Find("BoxMineButtons").transform.GetChild(0));
       SetUpMenus(buttons, menuOrderString);
@@ -74,6 +80,7 @@ namespace Controllers
       //
       SetMenuType(MenuType.MINE);
       SetMenuActive(MenuType.MINE, true, false);
+      SetMenuActive(MenuType.HAMMER, true, false);
     }
 
     public GameObject GetMenu(MenuType ofMenu)
@@ -109,6 +116,8 @@ namespace Controllers
           return InfoController.GetInfoString("Mine", "Mine rocks to get resources.");
         case "ForgeButton":
           return InfoController.GetInfoString("Forge", "Use resources to create more resources.");
+        case "HammerButton":
+          return InfoController.GetInfoString("Hammer", "Use resources to create more resources.");
 
         default:
           return "NOT_IMPL";

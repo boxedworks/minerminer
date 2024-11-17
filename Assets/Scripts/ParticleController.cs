@@ -32,6 +32,8 @@ namespace Controllers
       FORGE_SMOKE,
       FORGE_EMBERS,
 
+      HAMMER_SPARKS,
+
     }
     Dictionary<ParticleType, ParticleSystem> _particles;
 
@@ -57,6 +59,8 @@ namespace Controllers
 
         { ParticleType.FORGE_SMOKE, GameObject.Find("ForgeSmoke").GetComponent<ParticleSystem>() },
         { ParticleType.FORGE_EMBERS, GameObject.Find("ForgeEmbers").GetComponent<ParticleSystem>() },
+
+        { ParticleType.HAMMER_SPARKS, GameObject.Find("HammerSparks").GetComponent<ParticleSystem>() },
       };
     }
 

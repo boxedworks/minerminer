@@ -1,7 +1,8 @@
 
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
+using System.Collections.Generic;
 
 namespace Controllers
 {
@@ -13,6 +14,9 @@ namespace Controllers
     public bool _IsCooking { get { return _isCooking; } }
     float _cookProgress, _forgeSpeed;
 
+    public bool _CookOverTime;
+    bool _isLooping;
+
     //
     Dictionary<int, Recipe> _recipes;
     Recipe _currentRecipe;
@@ -23,7 +27,7 @@ namespace Controllers
 
     //
     List<Button> _recipeButtons;
-    Button _startButton, _setRecipeButton;
+    Button _startButton, _setRecipeButton, _startLoopButton, _stopLoopButton;
     GameObject _recipeMenu;
     Slider _cookProgressSlider;
 
@@ -87,6 +91,8 @@ namespace Controllers
       _cookProgress = 0f;
       _forgeSpeed = 1f;
 
+      _CookOverTime = true;
+
       // Buttons
       _otherInfoables = new();
       _setRecipeButton.onClick.AddListener(() =>
@@ -98,14 +104,14 @@ namespace Controllers
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = _setRecipeButton.gameObject,
-        _Description = InfoController.GetInfoString("Select Recipe", "Select the recipe for the forge.")
+        _Description = InfoController.GetInfoString("Select Recipe", "Select the a recipe to use.")
       });
 
       _startButton.gameObject.SetActive(false);
       _otherInfoables.Add(new SimpleInfoable()
       {
         _GameObject = _startButton.gameObject,
-        _Description = InfoController.GetInfoString("Start Forge", "Start crafting the recipe.")
+        _Description = InfoController.GetInfoString("Start", "Start crafting the recipe.")
       });
 
       //
@@ -126,15 +132,20 @@ namespace Controllers
     public void Update()
     {
       //
-      if (_isCooking)
-        _cookProgress += Time.deltaTime * _forgeSpeed * 0.05f;
+      if (_CookOverTime)
+        if (_isCooking)
+          _cookProgress += Time.deltaTime * _forgeSpeed * 0.05f;
       while (_cookProgress >= 1f)
       {
         _cookProgress -= 1f;
 
         //
-        _isCooking = false;
-        _startButton.gameObject.SetActive(true);
+        var continueCooking = _isLooping && _currentRecipe._IsCraftable;
+        if (!continueCooking)
+        {
+          _isCooking = false;
+          _startButton.gameObject.SetActive(true);
+        }
 
         //
         for (var i = 0; i < _outputNodes.Length; i++)
@@ -144,12 +155,51 @@ namespace Controllers
           if (i < _currentRecipe._Outputs.Length)
             node._Amount += _currentRecipe._Outputs[i].Amount;
         }
-        SetRecipeInputs(_currentRecipe, true);
+        if (!continueCooking)
+          SetRecipeInputs(_currentRecipe, true);
         SetRecipeOutputs(_currentRecipe);
       }
 
       //
       _cookProgressSlider.value = _cookProgress;
+    }
+
+    //
+    public void RegisterLoopButtons(Button startLoopButton, Button stopLoopButton)
+    {
+      _startLoopButton = startLoopButton;
+      _startLoopButton.onClick.AddListener(() =>
+      {
+        ToggleLoop(true);
+
+        AudioController.PlayAudio("MenuSelect");
+      });
+      _otherInfoables.Add(new SimpleInfoable()
+      {
+        _GameObject = _startLoopButton.gameObject,
+        _Description = InfoController.GetInfoString("Loop", "Click to keep crafting this recipe automatically.\n\nMode: Off")
+      });
+
+      _stopLoopButton = stopLoopButton;
+      _stopLoopButton.onClick.AddListener(() =>
+      {
+        ToggleLoop(false);
+
+        AudioController.PlayAudio("MenuSelect");
+      });
+      _otherInfoables.Add(new SimpleInfoable()
+      {
+        _GameObject = _stopLoopButton.gameObject,
+        _Description = InfoController.GetInfoString("Loop", "Click to stop crafting this recipe automatically.\n\nMode: On")
+      });
+      _stopLoopButton.gameObject.SetActive(false);
+    }
+    void ToggleLoop(bool toggle)
+    {
+      _isLooping = toggle;
+
+      _startLoopButton?.gameObject.SetActive(!toggle);
+      _stopLoopButton?.gameObject.SetActive(toggle);
     }
 
     //
@@ -169,6 +219,12 @@ namespace Controllers
         _Outputs = outputs
       });
       UpdateRecipesUi();
+    }
+
+    //
+    public void InstantCook()
+    {
+      _cookProgress = 1f;
     }
 
     //
@@ -258,7 +314,7 @@ namespace Controllers
 
         if (!_currentRecipe._IsCraftable)
         {
-          LogController.AppendLog($"<color=red>Insufficient materials to forge </color>{recipe._Title}<color=red> recipe!</color>");
+          LogController.AppendLog($"<color=red>Insufficient materials for </color>{recipe._Title}<color=red> recipe!</color>");
           LogController.ForceOpen();
           return;
         }
@@ -347,9 +403,9 @@ namespace Controllers
         get
         {
 
-          if (InventoryController.s_Singleton.GetItemAmount(_Inputs[0].ItemType) < _Inputs[0].Amount)
+          if (InventoryController.GetItemAmount(_Inputs[0].ItemType) < _Inputs[0].Amount)
             return false;
-          if (_Inputs.Length > 1 && InventoryController.s_Singleton.GetItemAmount(_Inputs[1].ItemType) < _Inputs[1].Amount)
+          if (_Inputs.Length > 1 && InventoryController.GetItemAmount(_Inputs[1].ItemType) < _Inputs[1].Amount)
             return false;
 
           return true;
@@ -514,7 +570,7 @@ namespace Controllers
     {
       public string CurrentRecipeTitle;
 
-      public bool IsCooking;
+      public bool IsCooking, IsLooping;
       public float CookProgress;
       public List<int> OutputAmounts;
     }
@@ -523,6 +579,7 @@ namespace Controllers
       var saveInfo = new SaveInfo();
 
       saveInfo.IsCooking = _isCooking;
+      saveInfo.IsLooping = _isLooping;
       if (_currentRecipe != null)
       {
         saveInfo.CurrentRecipeTitle = _currentRecipe._Title;
@@ -557,6 +614,10 @@ namespace Controllers
       }
       _cookProgress = saveInfo.CookProgress;
 
+      _isLooping = saveInfo.IsLooping;
+      if (_isLooping)
+        ToggleLoop(_isLooping);
+
       if (_currentRecipe != null)
       {
 
@@ -566,6 +627,9 @@ namespace Controllers
           {
             var node = _outputNodes[i];
             node._Amount = outputAmounts[i];
+
+            if (node._Amount > 0)
+              _setRecipeButton.gameObject.SetActive(false);
           }
 
         SetRecipeInputs(_currentRecipe, !_isCooking);

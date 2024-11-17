@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 namespace Controllers
 {
@@ -50,7 +49,7 @@ namespace Controllers
       public string _Title;
 
       public float _Health, _HealthMax, _XpGain;
-      public (InventoryController.ItemType, float)[] _DropTable;
+      public (InventoryController.ItemType ItemType, float DropChance)[] _DropTable;
 
       public GameObject _MenuEntry;
 
@@ -502,7 +501,7 @@ Mode: Off")
             _HealthMax = 5f,
             _XpGain = 5f,
 
-            _DropTable = GenerateRockDropTable(new (InventoryController.ItemType, float)[] {
+            _DropTable = GenerateRockDropTable(new[] {
               (InventoryController.ItemType.EMERALD, s_GemPercent),
             }, InventoryController.ItemType.STONE),
           });
@@ -519,7 +518,7 @@ Mode: Off")
             _HealthMax = 15f,
             _XpGain = 10f,
 
-            _DropTable = GenerateRockDropTable(new (InventoryController.ItemType, float)[] {
+            _DropTable = GenerateRockDropTable(new[] {
               (InventoryController.ItemType.COPPER, 10f),
               (InventoryController.ItemType.SAPPHIRE, s_GemPercent),
             }, InventoryController.ItemType.STONE),
@@ -537,7 +536,7 @@ Mode: Off")
             _HealthMax = 50f,
             _XpGain = 25f,
 
-            _DropTable = GenerateRockDropTable(new (InventoryController.ItemType, float)[] {
+            _DropTable = GenerateRockDropTable(new[] {
               (InventoryController.ItemType.TIN, 10f),
               (InventoryController.ItemType.RUBY, s_GemPercent),
             }, InventoryController.ItemType.STONE),
@@ -555,7 +554,7 @@ Mode: Off")
             _HealthMax = 200f,
             _XpGain = 75f,
 
-            _DropTable = GenerateRockDropTable(new (InventoryController.ItemType, float)[] {
+            _DropTable = GenerateRockDropTable(new[] {
               (InventoryController.ItemType.IRON, 10f),
               (InventoryController.ItemType.CITRINE, s_GemPercent),
             }, InventoryController.ItemType.STONE),

@@ -204,7 +204,7 @@ namespace Controllers
             (int)recipeType,
             "Iron Ingot",
             new (InventoryController.ItemType, int)[]{
-              (InventoryController.ItemType.STONE, 50),
+              (InventoryController.ItemType.STONE_DUST, 100),
               (InventoryController.ItemType.IRON, 10),
             },
             new (InventoryController.ItemType, int)[]{
