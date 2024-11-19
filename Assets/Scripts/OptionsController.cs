@@ -81,6 +81,11 @@ namespace Controllers
       s_Singleton._lastMenu = menuType;
     }
 
+    public static void PressMenuButton()
+    {
+      OnSwitch(MainBoxMenuController.MenuType.OPTIONS);
+    }
+
     //
     [System.Serializable]
     public class SaveInfo

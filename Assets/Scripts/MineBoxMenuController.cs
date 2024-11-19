@@ -80,7 +80,6 @@ namespace Controllers
       //
       SetMenuType(MenuType.MINE);
       SetMenuActive(MenuType.MINE, true, false);
-      SetMenuActive(MenuType.HAMMER, true, false);
     }
 
     public GameObject GetMenu(MenuType ofMenu)
@@ -113,11 +112,11 @@ namespace Controllers
       {
 
         case "MineButton":
-          return InfoController.GetInfoString("Mine", "Mine rocks to get resources.");
+          return InfoController.GetInfoString("Mine [M]", "Mine rocks to get resources.");
         case "ForgeButton":
-          return InfoController.GetInfoString("Forge", "Use resources to create more resources.");
+          return InfoController.GetInfoString("Forge [F]", "Use resources to create more resources.");
         case "HammerButton":
-          return InfoController.GetInfoString("Hammer", "Use resources to create more resources.");
+          return InfoController.GetInfoString("Hammer [H]", "Use resources to create more resources.");
 
         default:
           return "NOT_IMPL";

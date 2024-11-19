@@ -23,11 +23,14 @@ namespace Controllers
       ORE_0,
       ORE_1,
       ORE_2,
+      ORE_3,
+      ORE_4,
 
       GEM_0,
       GEM_1,
       GEM_2,
       GEM_3,
+      GEM_4,
 
       FORGE_SMOKE,
       FORGE_EMBERS,
@@ -51,11 +54,14 @@ namespace Controllers
         { ParticleType.ORE_0, GameObject.Find("Ore0").GetComponent<ParticleSystem>() },
         { ParticleType.ORE_1, GameObject.Find("Ore1").GetComponent<ParticleSystem>() },
         { ParticleType.ORE_2, GameObject.Find("Ore2").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_3, GameObject.Find("Ore3").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_4, GameObject.Find("Ore4").GetComponent<ParticleSystem>() },
 
         { ParticleType.GEM_0, GameObject.Find("Gem0").GetComponent<ParticleSystem>() },
         { ParticleType.GEM_1, GameObject.Find("Gem1").GetComponent<ParticleSystem>() },
         { ParticleType.GEM_2, GameObject.Find("Gem2").GetComponent<ParticleSystem>() },
         { ParticleType.GEM_3, GameObject.Find("Gem3").GetComponent<ParticleSystem>() },
+        { ParticleType.GEM_4, GameObject.Find("Gem4").GetComponent<ParticleSystem>() },
 
         { ParticleType.FORGE_SMOKE, GameObject.Find("ForgeSmoke").GetComponent<ParticleSystem>() },
         { ParticleType.FORGE_EMBERS, GameObject.Find("ForgeEmbers").GetComponent<ParticleSystem>() },

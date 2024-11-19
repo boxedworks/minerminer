@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Controllers
 {
@@ -24,6 +25,7 @@ namespace Controllers
     }
 
     //
+    IInfoable _discordButtonInfo;
     public InfoData _InfoData
     {
       get
@@ -57,6 +59,9 @@ namespace Controllers
           returnData._Infos.Add(dependency);
 
         //
+        returnData._Infos.Add(_discordButtonInfo);
+
+        //
         return returnData;
       }
     }
@@ -65,6 +70,18 @@ namespace Controllers
     public MainBoxMenuController()
     {
       s_Singleton = this;
+
+      //
+      var discordButton = GameObject.Find("DiscordButton").GetComponent<Button>();
+      discordButton.onClick.AddListener(() =>
+      {
+        Application.OpenURL("https://discord.gg/dzjj5gTyZc");
+      });
+      _discordButtonInfo = new SimpleInfoable()
+      {
+        _GameObject = discordButton.gameObject,
+        _Description = InfoController.GetInfoString("Open Discord", $"Join the discord channel for {StringController.s_GAME_NAME}!")
+      };
 
       //
       var menuOrderString = new string[]{
@@ -129,15 +146,15 @@ namespace Controllers
       {
 
         case "InventoryButton":
-          return InfoController.GetInfoString("Inventory", "Browse and sell your items.");
+          return InfoController.GetInfoString("Inventory [I]", "Browse and sell your items.");
         case "ShopButton":
-          return InfoController.GetInfoString("Shop", "Purchase upgrades with your money.");
+          return InfoController.GetInfoString("Upgrades [U]", "Purchase upgrades with money and items.");
         case "SkillsButton":
-          return InfoController.GetInfoString("Skills", @"Check out your skills, what they do, and select 1 to level up.
+          return InfoController.GetInfoString("Skills [S]", @"Check out your skills, what they do, and select 1 to level up.
 
 Gain experience by breaking rocks.");
         case "OptionsButton":
-          return InfoController.GetInfoString("Options", "View game options.");
+          return InfoController.GetInfoString("Options [Esc]", "View game options.");
 
 
         default:

@@ -53,11 +53,12 @@ namespace Controllers
       var setRecipeButton = _dependencies.GetChild(3).GetChild(0).GetComponent<Button>();
       var startLoopButton = _dependencies.GetChild(3).GetChild(2).GetComponent<Button>();
       var stopLoopButton = _dependencies.GetChild(3).GetChild(3).GetComponent<Button>();
+      var setRecipesButton = _dependencies.GetChild(3).GetChild(4).GetComponent<Button>();
       var progressSlider = _dependencies.Find("HammerHealth").GetComponent<Slider>();
       var recipeMenu = _dependencies.Find("RecipeMenu").gameObject;
 
       List<Button> recipeButtons = new();
-      var buttonContainer = recipeMenu.transform;
+      var buttonContainer = recipeMenu.transform.GetChild(0);
       for (var i = 0; i < 10; i++)
       {
         var button = (i < 5 ? buttonContainer.GetChild(0).GetChild(i) : buttonContainer.GetChild(1).GetChild(i - 5))
@@ -78,6 +79,7 @@ namespace Controllers
         recipeButtons,
         startButton,
         setRecipeButton,
+        setRecipesButton,
         recipeMenu,
         progressSlider,
 
@@ -85,6 +87,7 @@ namespace Controllers
         outputNodes
       );
       _hammerController.RegisterLoopButtons(startLoopButton, stopLoopButton);
+      _hammerController.EnableLoopButtons();
       _hammerController._CookOverTime = false;
       UnlockRecipe(RecipeType.STONE_DUST);
 
@@ -104,7 +107,7 @@ namespace Controllers
       _hammerModel.localPosition = Vector3.Lerp(new Vector3(0f, 0.5f, 0f), new Vector3(0f, 1.5f, 0f), _swingTimerVisual);
 
       //
-      _swingTimer += Time.deltaTime * 1 * 0.25f;
+      _swingTimer += Time.deltaTime * 1f * 0.25f * GameController.s_GameSpeedMod;
       if (_swingTimer >= 1f && !_hammerController._IsCooking) { _swingTimer = 1f; return; }
       while (_swingTimer >= 1f)
       {
@@ -135,10 +138,10 @@ namespace Controllers
             (int)recipeType,
             "Stone Dust",
             new (InventoryController.ItemType, int)[]{
-              (InventoryController.ItemType.STONE, 5)
+              (InventoryController.ItemType.STONE, 25)
             },
             new (InventoryController.ItemType, int)[]{
-              (InventoryController.ItemType.STONE_DUST, 10)
+              (InventoryController.ItemType.STONE_DUST, 5)
             }
           );
 

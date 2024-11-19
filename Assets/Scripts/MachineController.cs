@@ -12,7 +12,8 @@ namespace Controllers
 
     bool _isCooking;
     public bool _IsCooking { get { return _isCooking; } }
-    float _cookProgress, _forgeSpeed;
+    float _cookProgress;
+    float _cookSpeed { get { return 1f * GameController.s_GameSpeedMod; } }
 
     public bool _CookOverTime;
     bool _isLooping;
@@ -27,12 +28,13 @@ namespace Controllers
 
     //
     List<Button> _recipeButtons;
-    Button _startButton, _setRecipeButton, _startLoopButton, _stopLoopButton;
+    Button _startButton, _setRecipeButton, _startLoopButton, _stopLoopButton, _showRecipesButton;
     GameObject _recipeMenu;
     Slider _cookProgressSlider;
 
     //
     List<IInfoable> _otherInfoables;
+    IInfoable _exitRecipesInfo;
     public InfoData _InfoData
     {
       get
@@ -45,6 +47,7 @@ namespace Controllers
           foreach (var recipe in _recipes)
             if (recipe.Value._MenuEntry != null)
               returnList.Add(recipe.Value);
+          returnList.Add(_exitRecipesInfo);
         }
         else
         {
@@ -67,6 +70,7 @@ namespace Controllers
       List<Button> recipeButtons,
       Button startButton,
       Button setRecipeButton,
+      Button showRecipesButton,
       GameObject recipeMenu,
       Slider progressSlider,
 
@@ -77,6 +81,7 @@ namespace Controllers
       _recipeButtons = recipeButtons;
       _startButton = startButton;
       _setRecipeButton = setRecipeButton;
+      _showRecipesButton = showRecipesButton;
       _recipeMenu = recipeMenu;
       _cookProgressSlider = progressSlider;
 
@@ -89,7 +94,6 @@ namespace Controllers
       _recipes = new();
 
       _cookProgress = 0f;
-      _forgeSpeed = 1f;
 
       _CookOverTime = true;
 
@@ -97,7 +101,7 @@ namespace Controllers
       _otherInfoables = new();
       _setRecipeButton.onClick.AddListener(() =>
       {
-        _recipeMenu.gameObject.SetActive(true);
+        _recipeMenu.SetActive(true);
 
         AudioController.PlayAudio("MenuSelect");
       });
@@ -113,6 +117,33 @@ namespace Controllers
         _GameObject = _startButton.gameObject,
         _Description = InfoController.GetInfoString("Start", "Start crafting the recipe.")
       });
+
+      _showRecipesButton.gameObject.SetActive(false);
+      _showRecipesButton.onClick.AddListener(() =>
+      {
+        _recipeMenu.SetActive(!_recipeMenu.activeSelf);
+
+        AudioController.PlayAudio("MenuSelect");
+      });
+      _otherInfoables.Add(new SimpleInfoable()
+      {
+        _GameObject = _showRecipesButton.gameObject,
+        _Description = InfoController.GetInfoString("View Recipes", "View available recipes.")
+      });
+
+      // Exit recipe button
+      var exitRecipeButton = recipeMenu.transform.GetChild(1).GetComponent<Button>();
+      exitRecipeButton.onClick.AddListener(() =>
+      {
+        _recipeMenu.SetActive(false);
+
+        AudioController.PlayAudio("MenuSelect");
+      });
+      _exitRecipesInfo = new SimpleInfoable()
+      {
+        _GameObject = exitRecipeButton.gameObject,
+        _Description = InfoController.GetInfoString("Close Recipes", "Close recipe menu.")
+      };
 
       //
       foreach (var node in _inputNodes)
@@ -134,7 +165,7 @@ namespace Controllers
       //
       if (_CookOverTime)
         if (_isCooking)
-          _cookProgress += Time.deltaTime * _forgeSpeed * 0.05f;
+          _cookProgress += Time.deltaTime * _cookSpeed * 0.05f;
       while (_cookProgress >= 1f)
       {
         _cookProgress -= 1f;
@@ -145,6 +176,12 @@ namespace Controllers
         {
           _isCooking = false;
           _startButton.gameObject.SetActive(true);
+          _showRecipesButton.gameObject.SetActive(false);
+        }
+        else
+        {
+          foreach (var node in _currentRecipe._Inputs)
+            InventoryController.s_Singleton.RemoveItemAmount(node.ItemType, node.Amount);
         }
 
         //
@@ -179,6 +216,7 @@ namespace Controllers
         _GameObject = _startLoopButton.gameObject,
         _Description = InfoController.GetInfoString("Loop", "Click to keep crafting this recipe automatically.\n\nMode: Off")
       });
+      _startLoopButton.gameObject.SetActive(false);
 
       _stopLoopButton = stopLoopButton;
       _stopLoopButton.onClick.AddListener(() =>
@@ -247,7 +285,24 @@ namespace Controllers
           img.enabled = false;
           button.onClick.AddListener(() =>
           {
-            SetRecipe(null);
+
+            var hasOutputs = false;
+            foreach (var node in _outputNodes)
+              if (node._Amount > 0)
+              {
+                hasOutputs = true;
+                break;
+              }
+
+            if (hasOutputs)
+              LogController.AppendLog("<color=red>Cannot set new recipe until outputs removed!</color>");
+            else
+            {
+              if (!_isCooking)
+                SetRecipe(null);
+              else
+                LogController.AppendLog("<color=red>Cannot remove recipe when already started!</color>");
+            }
 
             AudioController.PlayAudio("MenuSelect");
           });
@@ -261,7 +316,23 @@ namespace Controllers
 
           button.onClick.AddListener(() =>
           {
-            SetRecipe(recipe);
+            var hasOutputs = false;
+            foreach (var node in _outputNodes)
+              if (node._Amount > 0)
+              {
+                hasOutputs = true;
+                break;
+              }
+
+            if (hasOutputs)
+              LogController.AppendLog("<color=red>Cannot set new recipe until outputs removed!</color>");
+            else
+            {
+              if (!_isCooking)
+                SetRecipe(recipe);
+              else
+                LogController.AppendLog("<color=red>Cannot select new recipe when already started!</color>");
+            }
 
             AudioController.PlayAudio("MenuSelect");
           });
@@ -289,6 +360,7 @@ namespace Controllers
 
         _recipeMenu.gameObject.SetActive(false);
         _startButton.gameObject.SetActive(false);
+        _showRecipesButton.gameObject.SetActive(true);
 
         return;
       }
@@ -307,6 +379,8 @@ namespace Controllers
       _recipeMenu.gameObject.SetActive(false);
 
       _startButton.gameObject.SetActive(true);
+      _showRecipesButton.gameObject.SetActive(false);
+
       _startButton.onClick.RemoveAllListeners();
       _startButton.onClick.AddListener(() =>
       {
@@ -315,21 +389,15 @@ namespace Controllers
         if (!_currentRecipe._IsCraftable)
         {
           LogController.AppendLog($"<color=red>Insufficient materials for </color>{recipe._Title}<color=red> recipe!</color>");
-          LogController.ForceOpen();
           return;
         }
 
         _startButton.gameObject.SetActive(false);
+        _showRecipesButton.gameObject.SetActive(true);
         _setRecipeButton.gameObject.SetActive(false);
 
-        var recipeInput0 = _currentRecipe._Inputs[0];
-        InventoryController.s_Singleton.RemoveItemAmount(recipeInput0.ItemType, recipeInput0.Amount);
-        if (_currentRecipe._Inputs.Length > 1)
-        {
-          var recipeInput1 = _currentRecipe._Inputs[1];
-          InventoryController.s_Singleton.RemoveItemAmount(recipeInput1.ItemType, recipeInput1.Amount);
-        }
-
+        foreach (var node in _currentRecipe._Inputs)
+          InventoryController.s_Singleton.RemoveItemAmount(node.ItemType, node.Amount);
         SetRecipeInputs(_currentRecipe, false);
 
         _isCooking = true;
@@ -565,6 +633,12 @@ namespace Controllers
     }
 
     //
+    public void EnableLoopButtons()
+    {
+      _startLoopButton.gameObject.SetActive(true);
+    }
+
+    //
     [System.Serializable]
     public class SaveInfo
     {
@@ -610,6 +684,7 @@ namespace Controllers
       if (_isCooking)
       {
         _startButton.gameObject.SetActive(false);
+        _showRecipesButton.gameObject.SetActive(true);
         _setRecipeButton.gameObject.SetActive(false);
       }
       _cookProgress = saveInfo.CookProgress;

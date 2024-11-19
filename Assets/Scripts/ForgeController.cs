@@ -22,6 +22,7 @@ namespace Controllers
       COPPER_INGOT,
       BRONZE_INGOT,
       IRON_INGOT,
+      STEEL_INGOT,
     }
 
     //
@@ -51,12 +52,15 @@ namespace Controllers
 
       // Create machine
       var startButton = _dependencies.GetChild(3).GetChild(1).GetComponent<Button>();
+      var viewRecipesButton = _dependencies.GetChild(3).GetChild(2).GetComponent<Button>();
       var setRecipeButton = _dependencies.GetChild(3).GetChild(0).GetComponent<Button>();
+      var startLoopButton = _dependencies.GetChild(3).GetChild(3).GetComponent<Button>();
+      var stopLoopButton = _dependencies.GetChild(3).GetChild(4).GetComponent<Button>();
       var progressSlider = _dependencies.Find("ForgeHealth").GetComponent<Slider>();
       var recipeMenu = _dependencies.Find("RecipeMenu").gameObject;
 
       List<Button> recipeButtons = new();
-      var buttonContainer = recipeMenu.transform;
+      var buttonContainer = recipeMenu.transform.GetChild(0);
       for (var i = 0; i < 10; i++)
       {
         var button = (i < 5 ? buttonContainer.GetChild(0).GetChild(i) : buttonContainer.GetChild(1).GetChild(i - 5))
@@ -77,12 +81,14 @@ namespace Controllers
         recipeButtons,
         startButton,
         setRecipeButton,
+        viewRecipesButton,
         recipeMenu,
         progressSlider,
 
         inputNodes,
         outputNodes
       );
+      _forgeController.RegisterLoopButtons(startLoopButton, stopLoopButton);
       UnlockRecipe(RecipeType.COPPER_INGOT);
     }
 
@@ -199,13 +205,12 @@ namespace Controllers
         //
         case RecipeType.IRON_INGOT:
 
-
           s_Singleton._forgeController.UnlockRecipe(
             (int)recipeType,
             "Iron Ingot",
             new (InventoryController.ItemType, int)[]{
-              (InventoryController.ItemType.STONE_DUST, 100),
-              (InventoryController.ItemType.IRON, 10),
+              (InventoryController.ItemType.STONE_DUST, 75),
+              (InventoryController.ItemType.IRON, 25),
             },
             new (InventoryController.ItemType, int)[]{
               (InventoryController.ItemType.IRON_INGOT, 1)
@@ -214,8 +219,31 @@ namespace Controllers
 
           break;
 
+        //
+        case RecipeType.STEEL_INGOT:
+
+          s_Singleton._forgeController.UnlockRecipe(
+            (int)recipeType,
+            "Steel Ingot",
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.IRON_INGOT, 1),
+              (InventoryController.ItemType.COAL, 25),
+            },
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.STEEL_INGOT, 1)
+            }
+          );
+
+          break;
+
       }
 
+    }
+
+    //
+    public static void UnlockAutoForge()
+    {
+      s_Singleton._forgeController.EnableLoopButtons();
     }
 
     //

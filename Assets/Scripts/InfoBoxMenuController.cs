@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-
+/*
 namespace Controllers
 {
 
@@ -104,4 +104,4 @@ namespace Controllers
       return s_Singleton.GetMenuButton((int)MenuType.INFO);
     }
   }
-}
+}*/

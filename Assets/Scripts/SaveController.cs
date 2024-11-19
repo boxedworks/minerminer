@@ -120,8 +120,7 @@ namespace Controllers
           Directory.CreateDirectory(s_saveDirPath);
       File.WriteAllText(s_saveFilePath, json);
 
-      LogController.AppendLog("Game saved.");
-      LogController.ForceOpen();
+      LogController.AppendLog("<color=purple>Game saved.</color>");
     }
 
     public static void Load()
@@ -131,7 +130,7 @@ namespace Controllers
       if (File.Exists(s_saveFilePath))
       {
         json = File.ReadAllText(s_saveFilePath);
-        LogController.AppendLog("Game loaded from save.");
+        LogController.AppendLog("<color=purple>Game loaded from save.</color>");
       }
 
       // Check for save
@@ -182,15 +181,15 @@ namespace Controllers
     {
 
       // Keep options
-      var options = OptionsController.GetSaveInfo();
+      //var options = OptionsController.GetSaveInfo();
 
       //
       if (File.Exists(s_saveFilePath))
         File.Delete(s_saveFilePath);
 
       //
-      OptionsController.SetSaveInfo(options);
-      Save();
+      //OptionsController.SetSaveInfo(options);
+      //Save();
 
       //
       SceneManager.LoadScene(0);

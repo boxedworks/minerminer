@@ -29,6 +29,7 @@ namespace Controllers
       SKILLS,
 
       FORGE,
+      HAMMER,
     }
 
     //
@@ -81,7 +82,7 @@ namespace Controllers
       }
 
       //
-      _notificationUi.anchoredPosition = new Vector3(2082.4f, Mathf.Lerp(116f, 17.3f, _notificationTimer), 0f);
+      _notificationUi.anchoredPosition = new Vector3(1815f, Mathf.Lerp(116f, 17.3f, _notificationTimer), 0f);
 
       //
       if (_particlesNotifying)
@@ -152,6 +153,9 @@ namespace Controllers
 
         case UnlockType.FORGE:
           MineBoxMenuController.s_Singleton.SetMenuActive(MineBoxMenuController.MenuType.FORGE, true, true, "Forge unlocked!");
+          break;
+        case UnlockType.HAMMER:
+          MineBoxMenuController.s_Singleton.SetMenuActive(MineBoxMenuController.MenuType.HAMMER, true, true, "Hammer unlocked!");
           break;
 
       }

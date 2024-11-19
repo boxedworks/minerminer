@@ -32,10 +32,14 @@ namespace Controllers
       IRON,
       IRON_INGOT,
 
+      COAL,
+      STEEL_INGOT,
+
       EMERALD,
       SAPPHIRE,
       RUBY,
       CITRINE,
+      DIAMOND,
 
       STONE_DUST,
 
@@ -120,7 +124,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.STONE_DUST, new ItemInfo()
       {
         _Title = "Stone Dust",
-        _SellValue = 2
+        _SellValue = 10
       });
 
       AddInventoryItemInfo(ItemType.COPPER, new ItemInfo()
@@ -152,14 +156,27 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.IRON, new ItemInfo()
       {
         _Title = "Iron",
-        _SellValue = 25,
+        _SellValue = 15,
 
-        _ParticleType = ParticleController.ParticleType.ORE_2,
+        _ParticleType = ParticleController.ParticleType.ORE_3,
       });
       AddInventoryItemInfo(ItemType.IRON_INGOT, new ItemInfo()
       {
         _Title = "Iron Ingot",
-        _SellValue = 750
+        _SellValue = 2000
+      });
+
+      AddInventoryItemInfo(ItemType.COAL, new ItemInfo()
+      {
+        _Title = "Coal",
+        _SellValue = 35,
+
+        _ParticleType = ParticleController.ParticleType.ORE_4,
+      });
+      AddInventoryItemInfo(ItemType.STEEL_INGOT, new ItemInfo()
+      {
+        _Title = "Steel Ingot",
+        _SellValue = 5000
       });
 
       AddInventoryItemInfo(ItemType.EMERALD, new ItemInfo()
@@ -191,6 +208,14 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         _SellValue = 250,
 
         _ParticleType = ParticleController.ParticleType.GEM_3
+
+      });
+      AddInventoryItemInfo(ItemType.DIAMOND, new ItemInfo()
+      {
+        _Title = "Diamond",
+        _SellValue = 450,
+
+        _ParticleType = ParticleController.ParticleType.GEM_4
 
       });
 
@@ -280,7 +305,6 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       if (_selectedItem == ItemType.NONE)
       {
         LogController.AppendLog($"<color=red>No item selected to sell!</color>");
-        LogController.ForceOpen();
 
         return;
       }
@@ -348,6 +372,9 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       {
         UpdateItemDisplay(itemType);
       }
+
+      //
+      ShopController.UpdatePurchasesUi();
     }
     public void RemoveItemAmount(ItemType itemType, int amount)
     {
@@ -371,6 +398,9 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       }
       else
         UpdateItemDisplay(itemType);
+
+      //
+      ShopController.UpdatePurchasesUi();
     }
 
     //

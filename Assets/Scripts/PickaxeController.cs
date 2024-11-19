@@ -24,7 +24,7 @@ namespace Controllers
     {
 
       public float Damage { get { return SkillController.GetMaths(SkillController.SkillType.DAMAGE); } }
-      public float Speed { get { return SkillController.GetMaths(SkillController.SkillType.SPEED); } }
+      public float Speed { get { return SkillController.GetMaths(SkillController.SkillType.SPEED) * GameController.s_GameSpeedMod; } }
 
       public int AmountDroppedOnHit { get { return 1; } }
       int _amountDroppedOnBreak;

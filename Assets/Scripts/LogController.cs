@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Controllers
 {
@@ -12,13 +13,13 @@ namespace Controllers
     Transform _menu;
     TMPro.TextMeshProUGUI _logText;
 
-    List<string> _log;
+    Queue<string> _log;
 
     public LogController()
     {
       s_Singleton = this;
 
-      _menu = InfoBoxMenuController.s_Singleton.GetMenu(InfoBoxMenuController.MenuType.LOG).transform;
+      _menu = GameObject.Find("logMenu").transform;//InfoBoxMenuController.s_Singleton.GetMenu(InfoBoxMenuController.MenuType.LOG).transform;
       _logText = _menu.Find("logText").GetComponent<TMPro.TextMeshProUGUI>();
 
       _log = new();
@@ -36,22 +37,15 @@ namespace Controllers
 
       //
       var log = s_Singleton._log;
-      log.Add(text);
+      log.Enqueue(text);
 
-      if (log.Count > 17)
-        log.RemoveAt(0);
+      if (log.Count > 21)
+        log.Dequeue();
 
-      var logString = string.Join("\n", log);
-      s_Singleton._logText.text = InfoController.GetInfoString("Log", logString);
-    }
-
-    //
-    public static void ForceOpen()
-    {
-      if (InfoBoxMenuController.s_Singleton.IsVisible(InfoBoxMenuController.MenuType.LOG))
-        return;
-
-      InfoBoxMenuController.s_Singleton.SetMenuType(InfoBoxMenuController.MenuType.LOG);
+      var logList = log.ToList();
+      logList.Reverse();
+      var logString = string.Join("\n", logList);
+      s_Singleton._logText.text = logString;
     }
 
   }

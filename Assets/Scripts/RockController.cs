@@ -21,6 +21,8 @@ namespace Controllers
     public static bool s_HasRock { get { return s_Singleton._hasRock; } }
     Button _addRockButton, _toggleMineButton, _stopMineButton;
 
+    Transform _tutorialArrow;
+
     //
     Transform _menu, _menuUi, _dependencies, _rockModel, _rockMenu;
     public static Transform transform { get { return s_Singleton._rockModel; } }
@@ -42,6 +44,7 @@ namespace Controllers
       COPPER,
       TIN,
       IRON,
+      COAL,
     }
     public class RockInfo : IInfoable
     {
@@ -62,7 +65,7 @@ namespace Controllers
           var breakProductString = "";
           foreach (var drop in _DropTable)
           {
-            breakProductString += string.Format("- {0,-10} - {1,3}%\n", InventoryController.GetItemName(drop.Item1), drop.Item2);
+            breakProductString += string.Format("- {0,-10} - {1,4}%\n", InventoryController.GetItemName(drop.Item1), drop.Item2);
           }
 
           //
@@ -156,7 +159,13 @@ Xp:     {_XpGain}
       _addRockButton.onClick.AddListener(() =>
       {
         //ToggleRock(true);
-        _rockMenu.gameObject.SetActive(true);
+        if (!_rocks.ContainsKey(RockType.COPPER))
+          GetRockMenuButton(0).onClick?.Invoke();
+        else
+          _rockMenu.gameObject.SetActive(true);
+
+        if (_tutorialArrow != null)
+          GameObject.Destroy(_tutorialArrow.gameObject);
 
         AudioController.PlayAudio("MenuSelect");
       });
@@ -215,6 +224,10 @@ Mode: Off")
       //
       SetRockType(RockType.STONE);
       ToggleRock(false);
+
+
+      //
+      _tutorialArrow = _dependencies.Find("TutArrow");
     }
 
     //
@@ -229,6 +242,12 @@ Mode: Off")
       else
         _rockModel.localPosition = _rockPosition;
 
+      if (_tutorialArrow != null)
+      {
+        var pos = _tutorialArrow.localPosition;
+        pos.y = Mathf.Lerp(400f, 450f, (Mathf.Sin(Time.time * 4f) + 1f) / 2f);
+        _tutorialArrow.localPosition = pos;
+      }
     }
 
     //
@@ -411,11 +430,15 @@ Mode: Off")
     }
 
     //
+    Button GetRockMenuButton(int index)
+    {
+      return (index < 5 ? _rockMenu.GetChild(0).GetChild(index) : _rockMenu.GetChild(1).GetChild(index - 5))
+        .GetChild(0).GetComponent<Button>();
+    }
     void SetRockSelection(int buttonIndex, RockInfo rockInfo)
     {
 
-      var button = (buttonIndex < 5 ? _rockMenu.GetChild(0).GetChild(buttonIndex) : _rockMenu.GetChild(1).GetChild(buttonIndex - 5))
-        .GetChild(0).GetComponent<Button>();
+      var button = GetRockMenuButton(buttonIndex);
       var img = button.transform.GetChild(1).GetComponent<Image>();
 
       button.onClick.RemoveAllListeners();
@@ -551,8 +574,8 @@ Mode: Off")
           AddRockType(rockType, new RockInfo()
           {
             _Title = "Iron",
-            _HealthMax = 200f,
-            _XpGain = 75f,
+            _HealthMax = 125f,
+            _XpGain = 65f,
 
             _DropTable = GenerateRockDropTable(new[] {
               (InventoryController.ItemType.IRON, 10f),
@@ -563,6 +586,23 @@ Mode: Off")
 
           break;
 
+        //
+        case RockType.COAL:
+
+          AddRockType(rockType, new RockInfo()
+          {
+            _Title = "Coal",
+            _HealthMax = 300f,
+            _XpGain = 150f,
+
+            _DropTable = GenerateRockDropTable(new[] {
+              (InventoryController.ItemType.COAL, 10f),
+              (InventoryController.ItemType.DIAMOND, s_GemPercent),
+            }, InventoryController.ItemType.STONE),
+          });
+          s_Singleton.SetRockSelection(4, s_Singleton._rocks[rockType]);
+
+          break;
       }
 
     }
@@ -586,6 +626,8 @@ Mode: Off")
       public float CurrentHealth;
 
       public bool RockVisible;
+
+      public bool TutorialComplete;
     }
     public static SaveInfo GetSaveInfo()
     {
@@ -594,6 +636,8 @@ Mode: Off")
       saveInfo.RockType = s_Singleton._currentRock;
       saveInfo.CurrentHealth = s_Singleton._health;
       saveInfo.RockVisible = s_HasRock;
+
+      saveInfo.TutorialComplete = s_Singleton._tutorialArrow == null;
 
       return saveInfo;
     }
@@ -607,6 +651,9 @@ Mode: Off")
       }
       else
         s_Singleton._currentRock = saveInfo.RockType;
+
+      if (saveInfo.TutorialComplete)
+        GameObject.Destroy(s_Singleton._tutorialArrow.gameObject);
     }
 
   }

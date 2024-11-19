@@ -11,6 +11,7 @@ namespace Controllers
     public static InfoController s_Singleton;
 
     //
+    GameObject _menu;
     TMPro.TextMeshProUGUI _infoText;
     LineRenderer _mouseLineRenderer;
 
@@ -20,7 +21,8 @@ namespace Controllers
       s_Singleton = this;
 
       //
-      _infoText = InfoBoxMenuController.s_Singleton.GetMenu(InfoBoxMenuController.MenuType.INFO).transform.Find("InfoText").GetComponent<TMPro.TextMeshProUGUI>();
+      _menu = GameObject.Find("infoMenu");
+      _infoText = _menu.transform.Find("InfoText").GetComponent<TMPro.TextMeshProUGUI>();//InfoBoxMenuController.s_Singleton.GetMenu(InfoBoxMenuController.MenuType.INFO).transform.Find("InfoText").GetComponent<TMPro.TextMeshProUGUI>();
       _mouseLineRenderer = GameObject.Find("MouseInfo").GetComponent<LineRenderer>();
     }
 
@@ -31,7 +33,9 @@ namespace Controllers
       var hooveredObj = GatherDescriptionObjectName(Input.mousePosition);
       if (hooveredObj == null)
       {
-        if (_lastInfo != null && _lastInfo._Transform != null && _lastInfo._Transform.gameObject != null && _lastInfo._Transform.gameObject.activeInHierarchy)
+        _menu.SetActive(false);
+
+        /*if (_lastInfo != null && _lastInfo._Transform != null && _lastInfo._Transform.gameObject != null && _lastInfo._Transform.gameObject.activeInHierarchy)
         {
           SetInfoText(_lastInfo._Info);
           SetInfoPointer(_lastInfo);
@@ -45,7 +49,7 @@ namespace Controllers
         {
           SetInfoText("");
           SetInfoPointer(null);
-        }
+        }*/
       }
       else
       {
@@ -53,6 +57,8 @@ namespace Controllers
 
         SetInfoText(hooveredObj._Info);
         SetInfoPointer(hooveredObj);
+
+        _menu.SetActive(true);
       }
     }
 
@@ -65,7 +71,7 @@ namespace Controllers
         return;
       }
 
-      var infoButtonPosition = InfoBoxMenuController.GetInfoButton().transform.position;
+      /*var infoButtonPosition = InfoBoxMenuController.GetInfoButton().transform.position;
 
       var hoverLocalPos = ofInfoable._Transform.rect.center;
       if (infoButtonPosition.x > ofInfoable._Transform.position.x)
@@ -81,7 +87,7 @@ namespace Controllers
 
       infoButtonPosition.z = 0f;
       hoverPosition.z = 0f;
-      _mouseLineRenderer.SetPositions(new Vector3[] { infoButtonPosition, hoverPosition });
+      _mouseLineRenderer.SetPositions(new Vector3[] { infoButtonPosition, hoverPosition });*/
     }
 
     //
@@ -93,7 +99,7 @@ namespace Controllers
         MainBoxMenuController.s_Singleton,
         MineBoxMenuController.s_Singleton,
 
-        InfoBoxMenuController.s_Singleton,
+        //InfoBoxMenuController.s_Singleton,
       };
       var defaultInfo = MainBoxMenuController.s_Singleton._InfoData._DefaultInfo;
 
@@ -125,6 +131,7 @@ namespace Controllers
 {desc}
       ";
     }
+
   }
 
 }

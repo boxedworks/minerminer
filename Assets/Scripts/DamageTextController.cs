@@ -27,6 +27,7 @@ namespace Controllers
     //
     public void Update()
     {
+      var textLiveTime = 3f;
       for (var i = _texts.Count - 1; i >= 0; i--)
       {
 
@@ -35,12 +36,12 @@ namespace Controllers
         var textAliveTime = Time.time - textData.Item2;
 
         var textColor = text.color;
-        textColor.a = 1f - textAliveTime;
+        textColor.a = 1f - (textAliveTime / textLiveTime);
         text.color = textColor;
 
-        (text.transform as RectTransform).position += new Vector3(0f, 1f, 0f) * Time.deltaTime;
+        (text.transform as RectTransform).position += new Vector3(0f, 0.3f, 0f) * Time.deltaTime;
 
-        if (textAliveTime > 1f)
+        if (textAliveTime > textLiveTime)
         {
           GameObject.Destroy(text.gameObject);
           _texts.RemoveAt(i);
