@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
@@ -18,11 +19,25 @@ namespace Controllers
     ItemType _selectedItem;
     bool _menuIsVisible { get { return MainBoxMenuController.s_Singleton.IsVisible(MainBoxMenuController.MenuType.INVENTORY); } }
 
+    int _inventoryPage;
+    TMPro.TextMeshProUGUI _pageText;
+    int _totalInventoryPages
+    {
+      get
+      {
+        return s_Singleton._itemInfos
+          .Where((i) => { return i.Value._InInventory; })
+          .Count() / 10;
+      }
+    }
+
     public enum ItemType
     {
       NONE,
 
       STONE,
+      STONE_CHUNK,
+
       COPPER,
       COPPER_INGOT,
 
@@ -42,6 +57,7 @@ namespace Controllers
       DIAMOND,
 
       STONE_DUST,
+      GEM_DUST_0,
 
     }
     class ItemInfo : IInfoable
@@ -121,10 +137,17 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
 
         _ParticleType = ParticleController.ParticleType.ORE_0,
       });
+      AddInventoryItemInfo(ItemType.STONE_CHUNK, new ItemInfo()
+      {
+        _Title = "Stone Chunk",
+        _SellValue = 65,
+
+        _ParticleType = ParticleController.ParticleType.ORE_5,
+      });
       AddInventoryItemInfo(ItemType.STONE_DUST, new ItemInfo()
       {
         _Title = "Stone Dust",
-        _SellValue = 10
+        _SellValue = 5
       });
 
       AddInventoryItemInfo(ItemType.COPPER, new ItemInfo()
@@ -137,7 +160,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.COPPER_INGOT, new ItemInfo()
       {
         _Title = "Copper Ingot",
-        _SellValue = 50
+        _SellValue = 65
       });
 
       AddInventoryItemInfo(ItemType.TIN, new ItemInfo()
@@ -163,7 +186,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.IRON_INGOT, new ItemInfo()
       {
         _Title = "Iron Ingot",
-        _SellValue = 2000
+        _SellValue = 750
       });
 
       AddInventoryItemInfo(ItemType.COAL, new ItemInfo()
@@ -176,20 +199,20 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.STEEL_INGOT, new ItemInfo()
       {
         _Title = "Steel Ingot",
-        _SellValue = 5000
+        _SellValue = 4500
       });
 
       AddInventoryItemInfo(ItemType.EMERALD, new ItemInfo()
       {
         _Title = "Emerald",
-        _SellValue = 25,
+        _SellValue = 20,
 
         _ParticleType = ParticleController.ParticleType.GEM_0
       });
       AddInventoryItemInfo(ItemType.SAPPHIRE, new ItemInfo()
       {
         _Title = "Sapphire",
-        _SellValue = 75,
+        _SellValue = 50,
 
         _ParticleType = ParticleController.ParticleType.GEM_1
 
@@ -217,6 +240,12 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
 
         _ParticleType = ParticleController.ParticleType.GEM_4
 
+      });
+
+      AddInventoryItemInfo(ItemType.GEM_DUST_0, new ItemInfo()
+      {
+        _Title = "Citrine Dust",
+        _SellValue = 1750,
       });
 
       // Sell interface
@@ -260,6 +289,33 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         _Description = InfoController.GetInfoString("Sell All", "Sell all of the selected item.\n\nYou can also use middle mouse on an inventory item to do this.")
       });
 
+      // Page buttons
+      _pageText = _menu.GetChild(1).GetChild(2).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>();
+      var buttonPageLeft = _menu.GetChild(1).GetChild(2).GetChild(1).GetComponent<Button>();
+      buttonPageLeft.onClick.AddListener(() =>
+      {
+        AudioController.PlayAudio("MenuSelect");
+
+        PageLeft();
+      });
+      _otherInfoables.Add(new SimpleInfoable()
+      {
+        _GameObject = buttonPageLeft.gameObject,
+        _Description = InfoController.GetInfoString("Page left [<]", "")
+      });
+
+      var buttonPageRight = _menu.GetChild(1).GetChild(2).GetChild(2).GetComponent<Button>();
+      buttonPageRight.onClick.AddListener(() =>
+      {
+        AudioController.PlayAudio("MenuSelect");
+
+        PageRight();
+      });
+      _otherInfoables.Add(new SimpleInfoable()
+      {
+        _GameObject = buttonPageRight.gameObject,
+        _Description = InfoController.GetInfoString("Page right [>]", "")
+      });
     }
 
     //
@@ -272,7 +328,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         var mousePos = Input.mousePosition;
         foreach (var inventoryItem in _itemInfos)
         {
-          if (!inventoryItem.Value._InInventory) continue;
+          if (inventoryItem.Value._MenuEntry == null) continue;
 
           if (Input.GetMouseButtonUp(0))
             if (RectTransformUtility.RectangleContainsScreenPoint(inventoryItem.Value._MenuEntry.transform as RectTransform, mousePos, Camera.main))
@@ -363,15 +419,13 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
 
       if (addUi)
       {
-        AddItemToDisplay(itemType);
+        UpdateInventoryDisplay();
 
         if (_selectedItem == ItemType.NONE)
           SelectItem(itemType);
       }
       else
-      {
         UpdateItemDisplay(itemType);
-      }
 
       //
       ShopController.UpdatePurchasesUi();
@@ -394,7 +448,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
           _itemSelectorUi.SetAsFirstSibling();
         }
 
-        GameObject.DestroyImmediate(itemInfo._MenuEntry);
+        UpdateInventoryDisplay();
       }
       else
         UpdateItemDisplay(itemType);
@@ -404,26 +458,105 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
     }
 
     //
-    void AddItemToDisplay(ItemType itemType)
+    void UpdateInventoryDisplay()
     {
 
-      var newMenuEntry = GameObject.Instantiate(_prefab, _prefab.transform.parent);
-      if (_selectedItem == ItemType.NONE)
-        GameObject.DestroyImmediate(newMenuEntry.transform.GetChild(0).gameObject);
-      _itemInfos[itemType]._MenuEntry = newMenuEntry;
-      _itemInfos[itemType]._Text = newMenuEntry.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
+      var itemsPerPage = 10;
 
-      var image = newMenuEntry.transform.GetChild(2).GetComponent<Image>();
-      image.sprite = GetItemSprite(itemType);
+      // Clean up old
+      foreach (var itemInfo in _itemInfos)
+        itemInfo.Value._MenuEntry = null;
+      var prefabContainer = _prefab.transform.parent;
+      for (var i = prefabContainer.childCount - 1; i > 1; i--)
+        prefabContainer.GetChild(i).gameObject.SetActive(false);
 
-      UpdateItemDisplay(itemType);
+      // Update current page
+      var selectedItemFound = false;
+      var itemIndex = 0;
+      var menuIndex = 0;
+      foreach (var itemInfo in _itemInfos)
+      {
+        if (!itemInfo.Value._InInventory) continue;
+        if (itemIndex++ < itemsPerPage * _inventoryPage) continue;
 
-      newMenuEntry.gameObject.SetActive(true);
+        GameObject menuEntry;
+        if (menuIndex < prefabContainer.childCount - 2)
+          menuEntry = prefabContainer.GetChild(menuIndex + 2).gameObject;
+        else
+        {
+          menuEntry = GameObject.Instantiate(_prefab, prefabContainer);
+          if (_selectedItem == ItemType.NONE)
+            GameObject.DestroyImmediate(menuEntry.transform.GetChild(0).gameObject);
+        }
+
+        if (_selectedItem == itemInfo.Key)
+        {
+          selectedItemFound = true;
+
+          _itemSelectorUi.SetParent(menuEntry.transform, false);
+          _itemSelectorUi.SetAsFirstSibling();
+        }
+
+        var offset = 0;
+        if (menuEntry.transform.GetChild(0).gameObject == _itemSelectorUi.gameObject)
+          offset = 1;
+
+        itemInfo.Value._MenuEntry = menuEntry;
+        itemInfo.Value._Text = menuEntry.transform.GetChild(offset + 1).GetComponent<TMPro.TextMeshProUGUI>();
+
+        var image = menuEntry.transform.GetChild(offset + 2).GetComponent<Image>();
+        image.sprite = GetItemSprite(itemInfo.Key);
+
+        UpdateItemDisplay(itemInfo.Key);
+
+        menuEntry.SetActive(true);
+
+        if (++menuIndex == itemsPerPage) break;
+      }
+
+      // Make sure not on empty page
+      if (menuIndex == 0 && _inventoryPage > 0)
+        PageLeft();
+
+      // Check selected item not on this page
+      if (!selectedItemFound)
+      {
+        _itemSelectorUi.SetParent(_prefab.transform, false);
+        _itemSelectorUi.SetAsFirstSibling();
+      }
     }
+
     void UpdateItemDisplay(ItemType inventoryItemType)
     {
       var itemInfo = _itemInfos[inventoryItemType];
+      if (itemInfo._MenuEntry == null) return;
       itemInfo._Text.text = string.Format("   {0,-34}{1,-10}{2,8}", $"{itemInfo._Title}", $"{itemInfo._AmountHeld}", $"${itemInfo._SellValue}");
+    }
+
+    //
+    public static void PageLeft()
+    {
+      if (s_Singleton._inventoryPage <= 0)
+        return;
+
+      s_Singleton._inventoryPage--;
+      s_Singleton.UpdateInventoryDisplay();
+
+      s_Singleton.UpdatePageText();
+    }
+    public static void PageRight()
+    {
+      if (s_Singleton._inventoryPage >= s_Singleton._totalInventoryPages)
+        return;
+
+      s_Singleton._inventoryPage++;
+      s_Singleton.UpdateInventoryDisplay();
+
+      s_Singleton.UpdatePageText();
+    }
+    void UpdatePageText()
+    {
+      _pageText.text = $"{_inventoryPage + 1}/{_totalInventoryPages + 1}";
     }
 
     //
@@ -483,6 +616,8 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
           s_Singleton.AddItemAmount(itemType, saveInfo.AmountList[index]);
       }
 
+      //
+      s_Singleton.UpdatePageText();
     }
 
 

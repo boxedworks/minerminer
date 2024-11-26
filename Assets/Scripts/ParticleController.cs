@@ -25,6 +25,7 @@ namespace Controllers
       ORE_2,
       ORE_3,
       ORE_4,
+      ORE_5,
 
       GEM_0,
       GEM_1,
@@ -56,6 +57,7 @@ namespace Controllers
         { ParticleType.ORE_2, GameObject.Find("Ore2").GetComponent<ParticleSystem>() },
         { ParticleType.ORE_3, GameObject.Find("Ore3").GetComponent<ParticleSystem>() },
         { ParticleType.ORE_4, GameObject.Find("Ore4").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_5, GameObject.Find("Ore5").GetComponent<ParticleSystem>() },
 
         { ParticleType.GEM_0, GameObject.Find("Gem0").GetComponent<ParticleSystem>() },
         { ParticleType.GEM_1, GameObject.Find("Gem1").GetComponent<ParticleSystem>() },

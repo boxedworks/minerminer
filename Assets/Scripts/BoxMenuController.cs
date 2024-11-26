@@ -77,6 +77,11 @@ namespace Controllers
     //
     protected void SetMenuType(int toMenuIndex)
     {
+      if (toMenuIndex == _currentMenuIndex) return;
+
+      var button = GetMenuButton(toMenuIndex);
+      if (!button.gameObject.activeSelf) return;
+
       var saveMenuIndex = _currentMenuIndex;
       if (_currentMenuIndex != 0)
         ToggleMenu(_currentMenuIndex, false);

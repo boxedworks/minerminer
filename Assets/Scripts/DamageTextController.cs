@@ -50,10 +50,15 @@ namespace Controllers
     }
 
     //
-    public void ReportDamage(float damage)
+    public void ReportDamage(float damage, int numCrits)
     {
+      var numCritsText = "";
+      if (numCrits > 0)
+        for (var i = 0; i < numCrits; i++)
+          numCritsText += "!";
+
       var newText = GameObject.Instantiate(_prefab, _prefab.transform.parent).GetComponent<TMPro.TextMeshProUGUI>();
-      newText.text = $"{damage}";
+      newText.text = $"{damage}{numCritsText}";
       //(newText.transform as RectTransform).position = RockController.transform.position;
 
       _texts.Add((newText, Time.time));

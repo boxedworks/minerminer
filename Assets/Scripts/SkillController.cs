@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using NUnit.Framework.Constraints;
 
 namespace Controllers
 {
@@ -10,6 +11,10 @@ namespace Controllers
 
     //
     public static SkillController s_Singleton;
+
+    //
+    public static float s_XpMultiplier { get { return s_Singleton._xpMultiplier; } set { s_Singleton._xpMultiplier = value; } }
+    float _xpMultiplier;
 
     //
     Transform _menu, _prefab;
@@ -25,6 +30,17 @@ namespace Controllers
         _gold = value;
 
         ShopController.UpdatePurchasesUi();
+      }
+    }
+
+    int _totalLevel
+    {
+      get
+      {
+        var total = 0;
+        foreach (var skill in _skills)
+          total += skill._Level;
+        return total;
       }
     }
 
@@ -45,6 +61,8 @@ namespace Controllers
     List<Skill> _skills;
     int _currentSkill;
     Transform _skillSelectorUi;
+
+    TMPro.TextMeshProUGUI _totalLevelText;
 
     //
     public InfoData _InfoData
@@ -70,11 +88,16 @@ namespace Controllers
       s_Singleton = this;
 
       //
+      _xpMultiplier = 1f;
+
+      //
       _Gold = 0;
 
       //
       _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.SKILLS).transform;
       _prefab = _menu.GetChild(0);
+
+      _totalLevelText = _menu.GetChild(1).GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
 
       _skillSelectorUi = _menu.GetChild(0).GetChild(0);
 
@@ -193,6 +216,14 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
       }
     }
 
+    void UpdateTotalLevel()
+    {
+      var totalLevel = _totalLevel;
+      _totalLevelText.text = $"Total level: {totalLevel}";
+
+      PrestiegeController.OnTotalLevelUpdate(totalLevel);
+    }
+
     //
     public static float GetMaths(SkillType skillType)
     {
@@ -280,6 +311,8 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
             _xpMax += _level;
 
             LogController.AppendLog($"Skill leveled: {_name} ({_level - 1} -> {_level})");
+
+            s_Singleton.UpdateTotalLevel();
           }
 
           UpdateUi();
@@ -356,6 +389,8 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
         if (System.Enum.TryParse(skillInfo.SkillName, true, out SkillType skillType))
           s_Singleton._skills[((int)skillType) - 1].SetSkillInfo(skillInfo);
       }
+
+      s_Singleton.UpdateTotalLevel();
     }
 
     //

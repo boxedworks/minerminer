@@ -116,8 +116,6 @@ Drop on break: {AmountDroppedOnBreak}");
           if (powerModifier >= 1 || randomNumber <= powerModifier)
           {
             multiplier++;
-
-            LogController.AppendLog("Power!");
           }
 
           powerModifier -= 1f;
@@ -125,6 +123,7 @@ Drop on break: {AmountDroppedOnBreak}");
 
         damage *= multiplier;
         RockController.s_Singleton.Hit(damage);
+        DamageTextController.s_Singleton.ReportDamage(damage, multiplier - 1);
       }
     }
 

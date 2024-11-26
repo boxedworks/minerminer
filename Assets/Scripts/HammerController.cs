@@ -20,6 +20,7 @@ namespace Controllers
       NONE,
 
       STONE_DUST,
+      GEM_DUST_0
     }
 
     //
@@ -89,7 +90,9 @@ namespace Controllers
       _hammerController.RegisterLoopButtons(startLoopButton, stopLoopButton);
       _hammerController.EnableLoopButtons();
       _hammerController._CookOverTime = false;
+
       UnlockRecipe(RecipeType.STONE_DUST);
+      UnlockRecipe(RecipeType.GEM_DUST_0);
 
       //
       _hammerModel = _menu.Find("Hammer").transform;
@@ -104,7 +107,7 @@ namespace Controllers
 
       //
       _swingTimerVisual += (_swingTimer - _swingTimerVisual) * Time.deltaTime * (_swingTimer < _swingTimerVisual ? 50f : 10f);
-      _hammerModel.localPosition = Vector3.Lerp(new Vector3(0f, 0.5f, 0f), new Vector3(0f, 1.5f, 0f), _swingTimerVisual);
+      _hammerModel.localPosition = Vector3.Lerp(new Vector3(0f, 0.5f, 100f), new Vector3(0f, 1.5f, 100f), _swingTimerVisual);
 
       //
       _swingTimer += Time.deltaTime * 1f * 0.25f * GameController.s_GameSpeedMod;
@@ -138,10 +141,27 @@ namespace Controllers
             (int)recipeType,
             "Stone Dust",
             new (InventoryController.ItemType, int)[]{
-              (InventoryController.ItemType.STONE, 25)
+              (InventoryController.ItemType.STONE, 15)
             },
             new (InventoryController.ItemType, int)[]{
               (InventoryController.ItemType.STONE_DUST, 5)
+            }
+          );
+
+          break;
+
+        //
+        case RecipeType.GEM_DUST_0:
+
+          s_Singleton._hammerController.UnlockRecipe(
+            (int)recipeType,
+            "Citrine Dust",
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.CITRINE, 2),
+              (InventoryController.ItemType.DIAMOND, 1),
+            },
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.GEM_DUST_0, 1)
             }
           );
 

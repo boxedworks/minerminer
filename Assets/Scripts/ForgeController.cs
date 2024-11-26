@@ -89,7 +89,9 @@ namespace Controllers
         outputNodes
       );
       _forgeController.RegisterLoopButtons(startLoopButton, stopLoopButton);
+
       UnlockRecipe(RecipeType.COPPER_INGOT);
+      UnlockRecipe(RecipeType.BRONZE_INGOT);
     }
 
     //
@@ -209,8 +211,8 @@ namespace Controllers
             (int)recipeType,
             "Iron Ingot",
             new (InventoryController.ItemType, int)[]{
-              (InventoryController.ItemType.STONE_DUST, 75),
-              (InventoryController.ItemType.IRON, 25),
+              (InventoryController.ItemType.STONE_DUST, 25),
+              (InventoryController.ItemType.IRON, 15),
             },
             new (InventoryController.ItemType, int)[]{
               (InventoryController.ItemType.IRON_INGOT, 1)
@@ -226,7 +228,7 @@ namespace Controllers
             (int)recipeType,
             "Steel Ingot",
             new (InventoryController.ItemType, int)[]{
-              (InventoryController.ItemType.IRON_INGOT, 1),
+              (InventoryController.ItemType.IRON_INGOT, 2),
               (InventoryController.ItemType.COAL, 25),
             },
             new (InventoryController.ItemType, int)[]{

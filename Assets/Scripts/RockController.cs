@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using System.Collections.Generic;
+using System.Text;
 
 namespace Controllers
 {
@@ -45,13 +46,18 @@ namespace Controllers
       TIN,
       IRON,
       COAL,
+
+      BOULDER,
     }
     public class RockInfo : IInfoable
     {
       public RockType _RockType;
       public string _Title;
 
-      public float _Health, _HealthMax, _XpGain;
+      float _xpGain;
+      public float _XpGain { get { return _xpGain * SkillController.s_XpMultiplier; } set { _xpGain = value; } }
+
+      public float _Health, _HealthMax;
       public (InventoryController.ItemType ItemType, float DropChance)[] _DropTable;
 
       public GameObject _MenuEntry;
@@ -65,7 +71,7 @@ namespace Controllers
           var breakProductString = "";
           foreach (var drop in _DropTable)
           {
-            breakProductString += string.Format("- {0,-10} - {1,4}%\n", InventoryController.GetItemName(drop.Item1), drop.Item2);
+            breakProductString += string.Format("- {0,-12} - {1,4}%\n", InventoryController.GetItemName(drop.Item1), drop.Item2);
           }
 
           //
@@ -260,22 +266,19 @@ Mode: Off")
 
       // Take damage
       SetHealth(_health - damage);
-      DamageTextController.s_Singleton.ReportDamage(damage);
 
       //
-      var baseDropAmount = 0;
-      var luckModifier = SkillController.GetMaths(SkillController.SkillType.LUCK);
-      while (luckModifier > 0f)
+      var luckDropModifier = 0;
+      var luckChance = SkillController.GetMaths(SkillController.SkillType.LUCK);
+      while (luckChance > 0f)
       {
         var randomNumber = Random.Range(0f, 1f);
-        if (randomNumber <= luckModifier)
+        if (randomNumber <= luckChance)
         {
-          baseDropAmount++;
-
-          LogController.AppendLog("Luck!");
+          luckDropModifier++;
         }
 
-        luckModifier -= 1f;
+        luckChance -= 1f;
       }
 
       // Break
@@ -283,7 +286,7 @@ Mode: Off")
       {
         SkillController.s_Singleton.AddXp(_rocks[_currentRock]._XpGain);
 
-        DropFromDropTable(baseDropAmount + PickaxeController.s_PickaxeStats.AmountDroppedOnBreak);
+        DropFromDropTable(luckDropModifier + PickaxeController.s_PickaxeStats.AmountDroppedOnBreak, luckDropModifier);
 
         ToggleRock(false);
         if (_autoReplaceRock)
@@ -301,7 +304,7 @@ Mode: Off")
       // Normal damage
       else
       {
-        DropFromDropTable(baseDropAmount + PickaxeController.s_PickaxeStats.AmountDroppedOnHit);
+        DropFromDropTable(luckDropModifier + PickaxeController.s_PickaxeStats.AmountDroppedOnHit, luckDropModifier);
       }
 
       // Pickaxe Fx
@@ -311,7 +314,7 @@ Mode: Off")
     }
 
     //
-    void DropFromDropTable(int amount)
+    void DropFromDropTable(int amount, int luckModifier)
     {
 
       Dictionary<InventoryController.ItemType, int> itemDrops = new();
@@ -334,6 +337,13 @@ Mode: Off")
 
         AddItemAmount(drop.Key, drop.Value);
         logString += $"{drop.Value} {InventoryController.GetItemName(drop.Key)}";
+      }
+      if (luckModifier > 0)
+      {
+        var stringBuilder = new StringBuilder(logString);
+        for (var i = 0; i < luckModifier; i++)
+          stringBuilder[8 - i] = '*';
+        logString = stringBuilder.ToString();
       }
       logString += ".";
       LogController.AppendLog(logString);
@@ -529,6 +539,27 @@ Mode: Off")
             }, InventoryController.ItemType.STONE),
           });
           s_Singleton.SetRockSelection(0, s_Singleton._rocks[rockType]);
+
+          break;
+
+        //
+        case RockType.BOULDER:
+
+          AddRockType(rockType, new RockInfo()
+          {
+            _Title = "Boulder",
+            _HealthMax = 1000f,
+            _XpGain = 750f,
+
+            _DropTable = GenerateRockDropTable(new[] {
+              (InventoryController.ItemType.STONE_CHUNK, 5f),
+              (InventoryController.ItemType.EMERALD, s_GemPercent),
+            }, InventoryController.ItemType.STONE),
+          });
+          s_Singleton.SetRockSelection(0, s_Singleton._rocks[rockType]);
+
+          if (s_Singleton._currentRock == RockType.STONE)
+            s_Singleton.SetRockType(rockType);
 
           break;
 

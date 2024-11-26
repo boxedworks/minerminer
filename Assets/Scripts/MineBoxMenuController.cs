@@ -78,8 +78,8 @@ namespace Controllers
       SetUpMenus(buttons, menuOrderString);
 
       //
-      SetMenuType(MenuType.MINE);
       SetMenuActive(MenuType.MINE, true, false);
+      SetMenuType(MenuType.MINE);
     }
 
     public GameObject GetMenu(MenuType ofMenu)

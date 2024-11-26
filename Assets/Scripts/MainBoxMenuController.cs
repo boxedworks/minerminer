@@ -21,11 +21,12 @@ namespace Controllers
       SHOP,
       SKILLS,
 
+      PRESTIEGE,
+
       OPTIONS,
     }
 
     //
-    IInfoable _discordButtonInfo;
     public InfoData _InfoData
     {
       get
@@ -44,6 +45,10 @@ namespace Controllers
             returnData = InventoryController.s_Singleton._InfoData;
             break;
 
+          case MenuType.PRESTIEGE:
+            returnData = PrestiegeController.s_Singleton._InfoData;
+            break;
+
           case MenuType.OPTIONS:
             returnData = InventoryController.s_Singleton._InfoData;
             break;
@@ -59,9 +64,6 @@ namespace Controllers
           returnData._Infos.Add(dependency);
 
         //
-        returnData._Infos.Add(_discordButtonInfo);
-
-        //
         return returnData;
       }
     }
@@ -72,18 +74,6 @@ namespace Controllers
       s_Singleton = this;
 
       //
-      var discordButton = GameObject.Find("DiscordButton").GetComponent<Button>();
-      discordButton.onClick.AddListener(() =>
-      {
-        Application.OpenURL("https://discord.gg/dzjj5gTyZc");
-      });
-      _discordButtonInfo = new SimpleInfoable()
-      {
-        _GameObject = discordButton.gameObject,
-        _Description = InfoController.GetInfoString("Open Discord", $"Join the discord channel for {StringController.s_GAME_NAME}!")
-      };
-
-      //
       var menuOrderString = new string[]{
         MenuType.NONE.ToString(),
 
@@ -91,16 +81,59 @@ namespace Controllers
         MenuType.SHOP.ToString(),
         MenuType.SKILLS.ToString(),
 
+        MenuType.PRESTIEGE.ToString(),
+
         MenuType.OPTIONS.ToString()
       };
       var buttons = GetChildrenAsList(GameObject.Find("BoxStatsButtons").transform.GetChild(0));
-      buttons.Add(GameObject.Find("OptionsButton"));
+      var optionsButton = GameObject.Find("OptionsButton");
+      buttons.Add(optionsButton);
       SetUpMenus(buttons, menuOrderString);
 
       //
-      SetMenuType(MenuType.INVENTORY);
+      var discordButton = GameObject.Find("DiscordButton").GetComponent<Button>();
+      discordButton.onClick.AddListener(() =>
+      {
+        Application.OpenURL("https://discord.gg/dzjj5gTyZc");
+
+        AudioController.PlayAudio("MenuSelect");
+      });
+      _dependencyInfos.Add(new SimpleInfoable()
+      {
+        _GameObject = discordButton.gameObject,
+        _Description = InfoController.GetInfoString("Open Discord", $"Join the discord channel for {StringController.s_GAME_NAME}!")
+      });
+
+      //
+      var saveButton = GameObject.Find("SaveButton").GetComponent<Button>();
+      saveButton.onClick.AddListener(() =>
+      {
+        SaveController.Save();
+
+        AudioController.PlayAudio("MenuSelect");
+      });
+      _dependencyInfos.Add(new SimpleInfoable()
+      {
+        _GameObject = saveButton.gameObject,
+        _Description = InfoController.GetInfoString("Save [Insert]", $"Save your game progress.")
+      });
+
+      //
+      var optionsButton_ = optionsButton.GetComponent<Button>();
+      optionsButton_.onClick.RemoveAllListeners();
+      optionsButton_.onClick.AddListener(() =>
+      {
+        if (IsVisible(MenuType.OPTIONS))
+          OptionsController.PressMenuButton();
+        else
+          SetMenuType(MenuType.OPTIONS);
+        AudioController.PlayAudio("MenuSelect");
+      });
+
+      //
       SetMenuActive(MenuType.INVENTORY, true, false);
       SetMenuActive(MenuType.OPTIONS, true, false);
+      SetMenuType(MenuType.INVENTORY);
     }
 
     public GameObject GetMenu(MenuType ofMenu)
@@ -153,6 +186,10 @@ namespace Controllers
           return InfoController.GetInfoString("Skills [S]", @"Check out your skills, what they do, and select 1 to level up.
 
 Gain experience by breaking rocks.");
+
+        case "PrestiegeButton":
+          return InfoController.GetInfoString("Prestiege [P]", "Gain prestiege levels by restarting the game with modifiers!");
+
         case "OptionsButton":
           return InfoController.GetInfoString("Options [Esc]", "View game options.");
 

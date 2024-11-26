@@ -392,6 +392,12 @@ namespace Controllers
           return;
         }
 
+        if (_recipeMenu.gameObject.activeSelf)
+        {
+          LogController.AppendLog($"<color=red>Cannot start recipe with recipe menu open.</color>");
+          return;
+        }
+
         _startButton.gameObject.SetActive(false);
         _showRecipesButton.gameObject.SetActive(true);
         _setRecipeButton.gameObject.SetActive(false);

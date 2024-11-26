@@ -43,7 +43,9 @@ namespace Controllers
           _audios.RemoveAt(i);
 
           GameObject.Destroy(audioInfo.AudioSource.gameObject);
-        }else{
+        }
+        else
+        {
           audioInfo.AudioSource.volume = audioInfo.Volume * (OptionsController.s_Volume / 5f);
         }
       }

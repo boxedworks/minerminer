@@ -36,15 +36,17 @@ namespace Controllers
       PICKAXE_BREAK_UPGRADE_2,
       PICKAXE_BREAK_UPGRADE_3,
 
-      ROCK_0_UPGRADE_0,
       ROCK_1_UPGRADE_0, ROCK_1_UPGRADE_1, ROCK_1_UPGRADE_2,
       ROCK_2_UPGRADE_0, ROCK_2_UPGRADE_1, ROCK_2_UPGRADE_2,
       ROCK_3_UPGRADE_0, ROCK_3_UPGRADE_1, ROCK_3_UPGRADE_2,
+      ROCK_4_UPGRADE_0, ROCK_4_UPGRADE_1, ROCK_4_UPGRADE_2,
 
       ROCK_BUY_0,
       ROCK_BUY_1,
       ROCK_BUY_2,
       ROCK_BUY_3,
+
+      ROCK_BUY_4,
 
       SKILL_LUCK,
       SKILL_POWER,
@@ -190,8 +192,8 @@ namespace Controllers
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_0, new PurchaseInfo()
       {
         _Costs = new[]{
-          (InventoryController.ItemType.NONE, 20),
-          (InventoryController.ItemType.STONE, 10)
+          (InventoryController.ItemType.NONE, 15),
+          (InventoryController.ItemType.STONE, 5)
         },
 
         _Title = "Sharpen Pickaxe 1",
@@ -234,14 +236,6 @@ namespace Controllers
         _Description = "Increases items dropped on rock break: 7 -> 8.",
 
         _PurchaseString = "Purchased the Sharpen Pickaxe 4 upgrade."
-      });
-
-      AddPurchase(PurchaseType.ROCK_0_UPGRADE_0, new PurchaseInfo()
-      {
-        _Costs = GetSimpleCost(25),
-
-        _Title = "Stone Upgrade 1",
-        _Description = "Double the drops of the Stone rock."
       });
 
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_0, new PurchaseInfo()
@@ -328,9 +322,37 @@ namespace Controllers
         _PurchaseString = "Purchased the Iron Rock Upgrade 3."
       });
 
+      AddPurchase(PurchaseType.ROCK_4_UPGRADE_0, new PurchaseInfo()
+      {
+        _Costs = GetSimpleCost(10000),
+
+        _Title = "Coal Upgrade 1",
+        _Description = "Extra 5% chance to find Coal in Coal rocks.",
+
+        _PurchaseString = "Purchased the Coal Rock Upgrade 1."
+      });
+      AddPurchase(PurchaseType.ROCK_4_UPGRADE_1, new PurchaseInfo()
+      {
+        _Costs = GetSimpleCost(25000),
+
+        _Title = "Coal Upgrade 2",
+        _Description = "Extra 5% chance to find Coal in Coal rocks.",
+
+        _PurchaseString = "Purchased the Coal Rock Upgrade 2."
+      });
+      AddPurchase(PurchaseType.ROCK_4_UPGRADE_2, new PurchaseInfo()
+      {
+        _Costs = GetSimpleCost(50000),
+
+        _Title = "Coal Upgrade 3",
+        _Description = "Extra 5% chance to find Coal in Coal rocks.",
+
+        _PurchaseString = "Purchased the Coal Rock Upgrade 3."
+      });
+
       AddPurchase(PurchaseType.ROCK_BUY_0, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(20),
+        _Costs = GetSimpleCost(25),
 
         _Title = "Copper Rock",
         _Description = "Unlock the Copper rock.",
@@ -363,6 +385,15 @@ namespace Controllers
         _Description = "Unlock the Coal rock.",
 
         _PurchaseString = "Unlocked the Coal Rock."
+      });
+      AddPurchase(PurchaseType.ROCK_BUY_4, new PurchaseInfo()
+      {
+        _Costs = GetSimpleCost(10000),
+
+        _Title = "Boulder",
+        _Description = "Replace the Stone rock with the Boulder rock.",
+
+        _PurchaseString = "Unlocked the Boulder Rock."
       });
 
       AddPurchase(PurchaseType.SKILL_LUCK, new PurchaseInfo()
@@ -412,7 +443,7 @@ Power - A chance to do more damage!",
         if (purchaseInfo.Value._MenuEntry == null) continue;
 
         var buttonImg = purchaseInfo.Value._MenuEntry.transform.GetChild(2).GetComponent<Image>();
-        buttonImg.color = !purchaseInfo.Value._CanAffordPurchase ? new Color(0.945098f, 0.3239185f, 0.3176471f) : new Color(0.3267443f, 0.9433962f, 0.3159488f);
+        buttonImg.color = purchaseInfo.Value._CanAffordPurchase ? StringController.s_ColorGreen : StringController.s_ColorRed;
 
         // Check cost labels
         var costContainer = purchaseInfo.Value._MenuEntry.transform.GetChild(3);
@@ -438,7 +469,7 @@ Power - A chance to do more damage!",
             costEntry = costContainer.GetChild(costIndex + 1);
           }
 
-          costEntry.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().color = !hasItem ? new Color(0.945098f, 0.3239185f, 0.3176471f) : new Color(0.5660378f, 0.5660378f, 0.5660378f);
+          costEntry.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().color = !hasItem ? StringController.s_ColorRed : StringController.s_ColorGreen;
         }
       }
 
@@ -632,10 +663,6 @@ Power - A chance to do more damage!",
           break;
 
         //
-        case PurchaseType.ROCK_0_UPGRADE_0:
-          //RockController.UpgradeRock(RockController.RockType.STONE);
-
-          break;
         case PurchaseType.ROCK_1_UPGRADE_0:
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_1_UPGRADE_1);
           RockController.SetRockDropTable(RockController.RockType.COPPER, RockController.GenerateRockDropTable(new[]{
@@ -708,6 +735,30 @@ Power - A chance to do more damage!",
 
           break;
 
+        case PurchaseType.ROCK_4_UPGRADE_0:
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_4_UPGRADE_1);
+          RockController.SetRockDropTable(RockController.RockType.COAL, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.COAL, 15f),
+            (InventoryController.ItemType.DIAMOND, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
+
+          break;
+        case PurchaseType.ROCK_4_UPGRADE_1:
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_4_UPGRADE_2);
+          RockController.SetRockDropTable(RockController.RockType.COAL, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.COAL, 20f),
+            (InventoryController.ItemType.DIAMOND, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
+
+          break;
+        case PurchaseType.ROCK_4_UPGRADE_2:
+          RockController.SetRockDropTable(RockController.RockType.COAL, RockController.GenerateRockDropTable(new[]{
+            (InventoryController.ItemType.COAL, 25f),
+            (InventoryController.ItemType.DIAMOND, RockController.s_GemPercent),
+          }, InventoryController.ItemType.STONE));
+
+          break;
+
         case PurchaseType.ROCK_BUY_0:
           RockController.UnlockRock(RockController.RockType.COPPER);
           s_Singleton.UnlockPurchase(PurchaseType.FORGE);
@@ -720,21 +771,25 @@ Power - A chance to do more damage!",
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_2_UPGRADE_0);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_2);
           s_Singleton.UnlockPurchase(PurchaseType.AUTO_FORGE);
-          ForgeController.UnlockRecipe(ForgeController.RecipeType.BRONZE_INGOT);
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.IRON_INGOT);
 
           break;
         case PurchaseType.ROCK_BUY_2:
           RockController.UnlockRock(RockController.RockType.IRON);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_3_UPGRADE_0);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_3);
-          ForgeController.UnlockRecipe(ForgeController.RecipeType.IRON_INGOT);
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.STEEL_INGOT);
 
           break;
         case PurchaseType.ROCK_BUY_3:
           RockController.UnlockRock(RockController.RockType.COAL);
-          //s_Singleton.UnlockPurchase(PurchaseType.ROCK_3_UPGRADE_0);
-          //s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_3);
-          ForgeController.UnlockRecipe(ForgeController.RecipeType.STEEL_INGOT);
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_4_UPGRADE_0);
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_4);
+
+          break;
+
+        case PurchaseType.ROCK_BUY_4:
+          RockController.UnlockRock(RockController.RockType.BOULDER);
 
           break;
 

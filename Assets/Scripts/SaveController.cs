@@ -34,6 +34,9 @@ namespace Controllers
         // Gold
         Gold = SkillController.s_Singleton._Gold;
 
+        //
+        PrestiegeInfo = PrestiegeController.GetSaveInfo();
+
         // Purchases
         Purchases = ShopController.GetPurchases();
 
@@ -63,6 +66,9 @@ namespace Controllers
 
       //
       public int Gold;
+
+      //
+      public PrestiegeController.SaveInfo PrestiegeInfo;
 
       //
       public List<string> Purchases, Unlocks;
@@ -144,31 +150,37 @@ namespace Controllers
       s_Singleton._isLoading = true;
       {
 
-        // Gold
-        SkillController.s_Singleton._Gold = saveData.Gold;
+        // Check prestiege
+        PrestiegeController.SetSaveInfo(saveData.PrestiegeInfo);
+        if (!saveData.PrestiegeInfo.FreshPrestiege)
+        {
 
-        // Purchases
-        ShopController.SetPurchases(saveData.Purchases);
+          // Gold
+          SkillController.s_Singleton._Gold = saveData.Gold;
 
-        // Unlocks
-        UnlockController.SetUnlocks(saveData.Unlocks);
+          // Purchases
+          ShopController.SetPurchases(saveData.Purchases);
 
-        // Skills
-        SkillController.SetSkills(saveData.Skills);
-        SkillController.SetSaveInfo(saveData.SkillInfo);
+          // Unlocks
+          UnlockController.SetUnlocks(saveData.Unlocks);
 
-        // Pic / Rock
-        PickaxeController.PickaxeStats.SetSaveInfo(saveData.PickaxeInfo);
-        RockController.SetSaveInfo(saveData.RockInfo);
+          // Skills
+          SkillController.SetSkills(saveData.Skills);
+          SkillController.SetSaveInfo(saveData.SkillInfo);
 
-        // Forge
-        ForgeController.SetSaveInfo(saveData.ForgeInfo);
+          // Pic / Rock
+          PickaxeController.PickaxeStats.SetSaveInfo(saveData.PickaxeInfo);
+          RockController.SetSaveInfo(saveData.RockInfo);
 
-        // Hammer
-        HammerController.SetSaveInfo(saveData.HammerInfo);
+          // Forge
+          ForgeController.SetSaveInfo(saveData.ForgeInfo);
 
-        // Inventory
-        InventoryController.SetSaveInfo(saveData.InventoryInfo);
+          // Hammer
+          HammerController.SetSaveInfo(saveData.HammerInfo);
+
+          // Inventory
+          InventoryController.SetSaveInfo(saveData.InventoryInfo);
+        }
 
         // Options
         OptionsController.SetSaveInfo(saveData.OptionsInfo);

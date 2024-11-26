@@ -8,7 +8,7 @@ namespace Controllers
 
     public static string s_GameVersion = "0.0.5";
 
-    public static float s_GameSpeedMod = 3f;
+    public static float s_GameSpeedMod = 1f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -22,6 +22,7 @@ namespace Controllers
       new EventController();
       new AudioController();
       new ParticleController();
+      new PrestiegeController();
       new MainBoxMenuController();
       new MineBoxMenuController();
       //new InfoBoxMenuController();
@@ -59,20 +60,11 @@ namespace Controllers
 #if UNITY_EDITOR
       {
         if (Input.GetKeyDown(KeyCode.Space))
-          SkillController.s_Singleton._Gold += 50;
+          SkillController.s_Singleton._Gold += 500;
+
+        s_GameSpeedMod = 3f;
       }
 #endif
-
-      //
-      if (Input.GetKeyDown(KeyCode.S))
-      {
-        SaveController.Save();
-      }
-      /*if (Input.GetKeyDown(KeyCode.L))
-      {
-        SaveController.Load();
-        LogController.AppendLog("Loaded.");
-      }*/
 
       // Menu hotkeys
       if (Input.GetKeyDown(KeyCode.U))
@@ -90,6 +82,12 @@ namespace Controllers
         MainBoxMenuController.s_Singleton.SetMenuType(MainBoxMenuController.MenuType.SKILLS);
         AudioController.PlayAudio("MenuSelect");
       }
+      else if (Input.GetKeyDown(KeyCode.P))
+      {
+        MainBoxMenuController.s_Singleton.SetMenuType(MainBoxMenuController.MenuType.PRESTIEGE);
+        AudioController.PlayAudio("MenuSelect");
+      }
+
       else if (Input.GetKeyDown(KeyCode.Escape))
       {
         if (MainBoxMenuController.s_Singleton.IsVisible(MainBoxMenuController.MenuType.OPTIONS))
@@ -97,6 +95,10 @@ namespace Controllers
         else
           MainBoxMenuController.s_Singleton.SetMenuType(MainBoxMenuController.MenuType.OPTIONS);
         AudioController.PlayAudio("MenuSelect");
+      }
+      else if (Input.GetKeyDown(KeyCode.Insert))
+      {
+        SaveController.Save();
       }
 
       else if (Input.GetKeyDown(KeyCode.M))
@@ -112,6 +114,17 @@ namespace Controllers
       else if (Input.GetKeyDown(KeyCode.H))
       {
         MineBoxMenuController.s_Singleton.SetMenuType(MineBoxMenuController.MenuType.HAMMER);
+        AudioController.PlayAudio("MenuSelect");
+      }
+
+      else if (Input.GetKeyDown(KeyCode.Comma))
+      {
+        InventoryController.PageLeft();
+        AudioController.PlayAudio("MenuSelect");
+      }
+      else if (Input.GetKeyDown(KeyCode.Period))
+      {
+        InventoryController.PageRight();
         AudioController.PlayAudio("MenuSelect");
       }
     }
