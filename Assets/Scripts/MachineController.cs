@@ -13,7 +13,8 @@ namespace Controllers
     bool _isCooking;
     public bool _IsCooking { get { return _isCooking; } }
     float _cookProgress;
-    float _cookSpeed { get { return 1f * GameController.s_GameSpeedMod; } }
+    float _cookSpeed { get { return 1f * GameController.s_GameSpeedMod * _CookSpeedAction.Invoke(); } }
+    public System.Func<float> _CookSpeedAction;
 
     public bool _CookOverTime;
     bool _isLooping;

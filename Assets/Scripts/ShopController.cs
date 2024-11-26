@@ -48,6 +48,7 @@ namespace Controllers
 
       SKILL_LUCK,
       SKILL_POWER,
+      SKILL_HEAT,
     }
     class PurchaseInfo : IInfoable
     {
@@ -416,6 +417,17 @@ Power - A chance to do more damage!",
 
         _PurchaseString = "Unlocked skill: Power."
       });
+      AddPurchase(PurchaseType.SKILL_HEAT, new PurchaseInfo()
+      {
+        _Costs = GetSimpleCost(500),
+
+        _Title = "Skill - Heat",
+        _Description = @"Unlock the Heat skill.
+
+Heat - Increases forge speed!",
+
+        _PurchaseString = "Unlocked skill: Heat."
+      });
 
       //
       _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.SHOP).transform;
@@ -622,6 +634,7 @@ Power - A chance to do more damage!",
         case PurchaseType.FORGE:
           UnlockController.Unlock(UnlockController.UnlockType.FORGE);
           s_Singleton.UnlockPurchase(PurchaseType.HAMMER);
+          s_Singleton.UnlockPurchase(PurchaseType.SKILL_HEAT);
 
           break;
         case PurchaseType.HAMMER:
@@ -636,6 +649,10 @@ Power - A chance to do more damage!",
           break;
         case PurchaseType.SKILL_POWER:
           SkillController.ToggleSkill(SkillController.SkillType.POWER, true);
+
+          break;
+        case PurchaseType.SKILL_HEAT:
+          SkillController.ToggleSkill(SkillController.SkillType.HEAT, true);
 
           break;
 

@@ -112,7 +112,7 @@ namespace Controllers
             return 1f + level * 0.5f;
           },
           (Skill skill, int level, float xp, float xpMax) => {
-            return InfoController.GetInfoString("Strength", @$"Increase your pickaxe's damage.
+            return InfoController.GetInfoString("Strength", @$"Increases your pickaxe's damage.
 
 Level:  {level} / 99
 Xp:     {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
@@ -124,7 +124,7 @@ Damage: {getSafeFloat(skill._OnMaths)}");
             return 1f + level * 0.05f;
           },
           (Skill skill, int level, float xp, float xpMax) => {
-            return InfoController.GetInfoString("Speed", @$"Increase your pickaxe's speed.
+            return InfoController.GetInfoString("Speed", @$"Increases your pickaxe's speed.
 
 Level: {level} / 99
 Xp:    {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
@@ -153,6 +153,18 @@ Chance: {getSafeFloat(skill._OnMaths * 100)}%");
 Level:  {level} / 99
 Xp:     {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
 Chance: {getSafeFloat(skill._OnMaths * 100)}%");
+        }),
+
+        new Skill(SkillType.POWER, "Heat",
+          (int level) => {
+            return 1f + level * 0.05f;
+          },
+          (Skill skill, int level, float xp, float xpMax) => {
+            return InfoController.GetInfoString("Heat", @$"Increases forge speed.
+
+Level: {level} / 99
+Xp:    {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
+Speed: {getSafeFloat(skill._OnMaths * 100)}%");
         }),
 
       };

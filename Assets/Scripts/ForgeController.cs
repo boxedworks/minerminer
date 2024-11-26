@@ -89,6 +89,7 @@ namespace Controllers
         inputNodes,
         outputNodes
       );
+      _forgeController._CookSpeedAction = () => { return SkillController.GetMaths(SkillController.SkillType.HEAT); };
       _forgeController.RegisterLoopButtons(startLoopButton, stopLoopButton);
 
       UnlockRecipe(RecipeType.COPPER_INGOT);

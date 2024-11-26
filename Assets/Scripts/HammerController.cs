@@ -90,6 +90,7 @@ namespace Controllers
         inputNodes,
         outputNodes
       );
+      _hammerController._CookSpeedAction = () => { return 1f; };
       _hammerController.RegisterLoopButtons(startLoopButton, stopLoopButton);
       _hammerController.EnableLoopButtons();
       _hammerController._CookOverTime = false;
