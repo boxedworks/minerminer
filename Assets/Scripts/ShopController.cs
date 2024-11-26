@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using System.Security.Principal;
 using System;
 
 namespace Controllers
@@ -790,6 +788,8 @@ Power - A chance to do more damage!",
 
         case PurchaseType.ROCK_BUY_4:
           RockController.UnlockRock(RockController.RockType.BOULDER);
+          HammerController.UnlockRecipe(HammerController.RecipeType.MIX_0);
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.CITRINE_INGOT);
 
           break;
 

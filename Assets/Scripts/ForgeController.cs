@@ -23,6 +23,7 @@ namespace Controllers
       BRONZE_INGOT,
       IRON_INGOT,
       STEEL_INGOT,
+      CITRINE_INGOT,
     }
 
     //
@@ -233,6 +234,23 @@ namespace Controllers
             },
             new (InventoryController.ItemType, int)[]{
               (InventoryController.ItemType.STEEL_INGOT, 1)
+            }
+          );
+
+          break;
+
+        //
+        case RecipeType.CITRINE_INGOT:
+
+          s_Singleton._forgeController.UnlockRecipe(
+            (int)recipeType,
+            "Citrine Ingot",
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.IRON_INGOT, 5),
+              (InventoryController.ItemType.MIX_0, 1),
+            },
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.GEM_INGOT_0, 1)
             }
           );
 

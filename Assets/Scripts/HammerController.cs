@@ -20,7 +20,10 @@ namespace Controllers
       NONE,
 
       STONE_DUST,
-      GEM_DUST_0
+
+      GEM_DUST_0,
+
+      MIX_0,
     }
 
     //
@@ -161,7 +164,24 @@ namespace Controllers
               (InventoryController.ItemType.DIAMOND, 1),
             },
             new (InventoryController.ItemType, int)[]{
-              (InventoryController.ItemType.GEM_DUST_0, 1)
+              (InventoryController.ItemType.GEM_DUST_0, 2)
+            }
+          );
+
+          break;
+
+        //
+        case RecipeType.MIX_0:
+
+          s_Singleton._hammerController.UnlockRecipe(
+            (int)recipeType,
+            "Orange Mix",
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.GEM_DUST_0, 1),
+              (InventoryController.ItemType.STONE_CHUNK, 10),
+            },
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.MIX_0, 1)
             }
           );
 

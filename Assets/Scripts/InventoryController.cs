@@ -59,6 +59,9 @@ namespace Controllers
       STONE_DUST,
       GEM_DUST_0,
 
+      MIX_0,
+      GEM_INGOT_0,
+
     }
     class ItemInfo : IInfoable
     {
@@ -140,7 +143,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.STONE_CHUNK, new ItemInfo()
       {
         _Title = "Stone Chunk",
-        _SellValue = 65,
+        _SellValue = 50,
 
         _ParticleType = ParticleController.ParticleType.ORE_5,
       });
@@ -245,7 +248,18 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.GEM_DUST_0, new ItemInfo()
       {
         _Title = "Citrine Dust",
-        _SellValue = 1750,
+        _SellValue = 950,
+      });
+
+      AddInventoryItemInfo(ItemType.MIX_0, new ItemInfo()
+      {
+        _Title = "Orange Blend",
+        _SellValue = 3000,
+      });
+      AddInventoryItemInfo(ItemType.GEM_INGOT_0, new ItemInfo()
+      {
+        _Title = "Citrine Ingot",
+        _SellValue = 10000,
       });
 
       // Sell interface
