@@ -26,6 +26,8 @@ namespace Controllers
       FORGE,
       HAMMER,
 
+      PRESTIEGE,
+
       AUTO_ROCK,
       AUTO_FORGE,
 
@@ -167,6 +169,16 @@ namespace Controllers
         _Description = "Unlock the Hammer to create new items.",
 
         _PurchaseString = "Unlocked the Hammer menu."
+      });
+
+      AddPurchase(PurchaseType.PRESTIEGE, new PurchaseInfo()
+      {
+        _Costs = GetSimpleCost(25000),
+
+        _Title = "Prestiege",
+        _Description = "Unlock the Prestiege menu to... prestiege!",
+
+        _PurchaseString = "Unlocked the Prestiege menu."
       });
 
       AddPurchase(PurchaseType.AUTO_ROCK, new PurchaseInfo()
@@ -642,6 +654,11 @@ Heat - Increases forge speed!",
 
           break;
 
+        case PurchaseType.PRESTIEGE:
+          UnlockController.Unlock(UnlockController.UnlockType.PRESTIEGE);
+
+          break;
+
         //
         case PurchaseType.SKILL_LUCK:
           SkillController.ToggleSkill(SkillController.SkillType.LUCK, true);
@@ -807,6 +824,9 @@ Heat - Increases forge speed!",
           RockController.UnlockRock(RockController.RockType.BOULDER);
           HammerController.UnlockRecipe(HammerController.RecipeType.MIX_0);
           ForgeController.UnlockRecipe(ForgeController.RecipeType.CITRINE_INGOT);
+
+          if (!MainBoxMenuController.s_Singleton.IsMenuActive(MainBoxMenuController.MenuType.PRESTIEGE))
+            s_Singleton.UnlockPurchase(PurchaseType.PRESTIEGE);
 
           break;
 

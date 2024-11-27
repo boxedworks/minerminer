@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace Controllers
 {
@@ -111,12 +112,16 @@ namespace Controllers
 
     protected void SetMenuActive(int ofMenuIndex, bool toggle, bool useNotify, string notifyText = null)
     {
+      // Check duplicate status
+      var button = GetMenuButton(ofMenuIndex);
+      if (toggle == button.activeSelf)
+        return;
+
       // Check loading game + notify
       if (useNotify && SaveController.s_IsLoading)
         useNotify = false;
 
       //
-      var button = GetMenuButton(ofMenuIndex);
       if (toggle)
       {
         if (useNotify)

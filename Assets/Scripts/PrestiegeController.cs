@@ -43,7 +43,7 @@ namespace Controllers
       _requiredTotalLevelText = prestiegeNextContainer.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
 
       // Prestiege
-      _prestiegeButton = prestiegeNextContainer.transform.Find($"NextPrestiegeButton").GetComponent<UnityEngine.UI.Button>();
+      _prestiegeButton = prestiegeNextContainer.transform.Find($"NextPrestiegeButton").GetComponent<Button>();
       _prestiegeButton.onClick.AddListener(() =>
       {
         AudioController.PlayAudio("MenuSelect");
@@ -73,7 +73,7 @@ namespace Controllers
       s_Singleton._currentPrestiegeText.text = $"Prestiege level: {s_Singleton._prestiegeLevel}";
 
       var menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.PRESTIEGE).transform;
-      var maxLevelRequirement = 200;
+      var maxLevelRequirement = 250;
       for (var i = 1; i < prestiegeLevel + 1; i++)
       {
 
@@ -88,17 +88,24 @@ namespace Controllers
 
             break;
 
+          // Prestiege 2; double rock drops
+          case 2:
+
+            RockController.s_DropMultiplier += 1f;
+
+            break;
+
         }
 
         //
-        maxLevelRequirement += 25;
+        maxLevelRequirement += 50;
 
         // Show prestiege enabled
         var menuEntry = menu.GetChild(1 + i);
-        var button = menuEntry.GetChild(2).GetComponent<Button>();
-        var buttonText = button.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>();
+        var entryImage = menuEntry.GetChild(2).GetComponent<Image>();
+        var buttonText = entryImage.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>();
 
-        button.image.color = StringController.s_ColorGreen;
+        entryImage.color = StringController.s_ColorGreen;
         buttonText.text = "Active";
       }
 
@@ -114,6 +121,7 @@ namespace Controllers
     public static void OnTotalLevelUpdate(int toTotalLevel)
     {
       var prestiegeMet = toTotalLevel >= s_Singleton._maxLevelRequirement;
+      if (prestiegeMet && s_Singleton._prestiegeLevel > 1) prestiegeMet = false; // Max prestiege (for now)
       s_Singleton._prestiegeMet = prestiegeMet;
 
       var prestiegeColor = prestiegeMet ? "green" : "red";

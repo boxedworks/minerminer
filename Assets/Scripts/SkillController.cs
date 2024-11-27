@@ -155,7 +155,7 @@ Xp:     {getSafeFloat(xp)} / {getSafeFloat(xpMax)}
 Chance: {getSafeFloat(skill._OnMaths * 100)}%");
         }),
 
-        new Skill(SkillType.POWER, "Heat",
+        new Skill(SkillType.HEAT, "Heat",
           (int level) => {
             return 1f + level * 0.05f;
           },

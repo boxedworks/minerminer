@@ -18,6 +18,10 @@ namespace Controllers
     public static float s_GemPercent = 0.5f;
 
     //
+    public static float s_DropMultiplier { get { return s_Singleton._dropMultiplier; } set { s_Singleton._dropMultiplier = value; } }
+    float _dropMultiplier;
+
+    //
     bool _hasRock;
     public static bool s_HasRock { get { return s_Singleton._hasRock; } }
     Button _addRockButton, _toggleMineButton, _stopMineButton;
@@ -138,6 +142,8 @@ Xp:     {_XpGain}
     public RockController()
     {
       s_Singleton = this;
+
+      _dropMultiplier = 1f;
 
       //
       _menu = MineBoxMenuController.s_Singleton.GetMenu(MineBoxMenuController.MenuType.MINE).transform;
@@ -286,7 +292,7 @@ Mode: Off")
       {
         SkillController.s_Singleton.AddXp(_rocks[_currentRock]._XpGain);
 
-        DropFromDropTable(luckDropModifier + PickaxeController.s_PickaxeStats.AmountDroppedOnBreak, luckDropModifier);
+        DropFromDropTable(Mathf.RoundToInt((luckDropModifier + PickaxeController.s_PickaxeStats.AmountDroppedOnBreak) * _dropMultiplier), luckDropModifier);
 
         ToggleRock(false);
         if (_autoReplaceRock)
@@ -304,7 +310,7 @@ Mode: Off")
       // Normal damage
       else
       {
-        DropFromDropTable(luckDropModifier + PickaxeController.s_PickaxeStats.AmountDroppedOnHit, luckDropModifier);
+        DropFromDropTable(Mathf.RoundToInt((luckDropModifier + PickaxeController.s_PickaxeStats.AmountDroppedOnHit) * _dropMultiplier), luckDropModifier);
       }
 
       // Pickaxe Fx

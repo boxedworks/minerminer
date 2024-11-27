@@ -30,6 +30,8 @@ namespace Controllers
 
       FORGE,
       HAMMER,
+
+      PRESTIEGE,
     }
 
     //
@@ -156,6 +158,10 @@ namespace Controllers
           break;
         case UnlockType.HAMMER:
           MineBoxMenuController.s_Singleton.SetMenuActive(MineBoxMenuController.MenuType.HAMMER, true, true, "Hammer unlocked!");
+          break;
+
+        case UnlockType.PRESTIEGE:
+          MainBoxMenuController.s_Singleton.SetMenuActive(MainBoxMenuController.MenuType.PRESTIEGE, true, true, "Prestiege unlocked!");
           break;
 
       }
