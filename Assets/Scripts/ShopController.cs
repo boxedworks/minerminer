@@ -35,6 +35,8 @@ namespace Controllers
       PICKAXE_BREAK_UPGRADE_1,
       PICKAXE_BREAK_UPGRADE_2,
       PICKAXE_BREAK_UPGRADE_3,
+      PICKAXE_BREAK_UPGRADE_4,
+      PICKAXE_BREAK_UPGRADE_5,
 
       ROCK_1_UPGRADE_0, ROCK_1_UPGRADE_1, ROCK_1_UPGRADE_2,
       ROCK_2_UPGRADE_0, ROCK_2_UPGRADE_1, ROCK_2_UPGRADE_2,
@@ -248,6 +250,30 @@ namespace Controllers
 
         _PurchaseString = "Purchased the Sharpen Pickaxe 4 upgrade."
       });
+      AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_4, new PurchaseInfo()
+      {
+        _Costs = new[]{
+          (InventoryController.ItemType.NONE, 5000),
+          (InventoryController.ItemType.COAL, 25)
+        },
+
+        _Title = "Sharpen Pickaxe 5",
+        _Description = "Increases items dropped on rock break: 8 -> 9.",
+
+        _PurchaseString = "Purchased the Sharpen Pickaxe 5 upgrade."
+      });
+      AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_5, new PurchaseInfo()
+      {
+        _Costs = new[]{
+          (InventoryController.ItemType.NONE, 20000),
+          (InventoryController.ItemType.STONE_CHUNK, 30)
+        },
+
+        _Title = "Sharpen Pickaxe 6",
+        _Description = "Increases items dropped on rock break: 9 -> 10.",
+
+        _PurchaseString = "Purchased the Sharpen Pickaxe 6 upgrade."
+      });
 
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_0, new PurchaseInfo()
       {
@@ -399,7 +425,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_BUY_4, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(10000),
+        _Costs = GetSimpleCost(15000),
 
         _Title = "Boulder",
         _Description = "Replace the Stone rock with the Boulder rock.",
@@ -691,6 +717,16 @@ Heat - Increases forge speed!",
           break;
         case PurchaseType.PICKAXE_BREAK_UPGRADE_3:
           PickaxeController.s_PickaxeStats.SetDropOnBreak(8);
+          s_Singleton.UnlockPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_4);
+
+          break;
+        case PurchaseType.PICKAXE_BREAK_UPGRADE_4:
+          PickaxeController.s_PickaxeStats.SetDropOnBreak(9);
+          s_Singleton.UnlockPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_5);
+
+          break;
+        case PurchaseType.PICKAXE_BREAK_UPGRADE_5:
+          PickaxeController.s_PickaxeStats.SetDropOnBreak(10);
 
           break;
 
@@ -803,6 +839,7 @@ Heat - Increases forge speed!",
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_2_UPGRADE_0);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_2);
           s_Singleton.UnlockPurchase(PurchaseType.AUTO_FORGE);
+
           ForgeController.UnlockRecipe(ForgeController.RecipeType.IRON_INGOT);
 
           break;
@@ -810,6 +847,7 @@ Heat - Increases forge speed!",
           RockController.UnlockRock(RockController.RockType.IRON);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_3_UPGRADE_0);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_3);
+
           ForgeController.UnlockRecipe(ForgeController.RecipeType.STEEL_INGOT);
 
           break;
@@ -818,12 +856,14 @@ Heat - Increases forge speed!",
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_4_UPGRADE_0);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_4);
 
+          HammerController.UnlockRecipe(HammerController.RecipeType.MIX_0);
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.CITRINE_INGOT);
+
           break;
 
         case PurchaseType.ROCK_BUY_4:
           RockController.UnlockRock(RockController.RockType.BOULDER);
-          HammerController.UnlockRecipe(HammerController.RecipeType.MIX_0);
-          ForgeController.UnlockRecipe(ForgeController.RecipeType.CITRINE_INGOT);
+
 
           if (!MainBoxMenuController.s_Singleton.IsMenuActive(MainBoxMenuController.MenuType.PRESTIEGE))
             s_Singleton.UnlockPurchase(PurchaseType.PRESTIEGE);

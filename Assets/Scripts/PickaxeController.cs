@@ -38,8 +38,8 @@ namespace Controllers
           return InfoController.GetInfoString("Pickaxe", @$"Damage: {Damage}
 Speed:  {Speed * 100f}%
 
-Drop on hit:   {AmountDroppedOnHit}
-Drop on break: {AmountDroppedOnBreak}");
+Drop on hit:   {AmountDroppedOnHit * RockController.s_DropMultiplier}
+Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
         }
       }
       public RectTransform _Transform { get { return s_Singleton._pickaxeUi; } }
