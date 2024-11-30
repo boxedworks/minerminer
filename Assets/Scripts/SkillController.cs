@@ -233,7 +233,7 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
       var totalLevel = _totalLevel;
       _totalLevelText.text = $"Total level: {totalLevel}";
 
-      PrestiegeController.OnTotalLevelUpdate(totalLevel);
+      PrestigeController.OnTotalLevelUpdate(totalLevel);
     }
 
     //

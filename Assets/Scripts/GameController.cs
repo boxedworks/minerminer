@@ -6,7 +6,7 @@ namespace Controllers
   public class GameController : MonoBehaviour
   {
 
-    public static string s_GameVersion = "0.0.5";
+    public static string s_GameVersion = "0.0.6";
 
     public static float s_GameSpeedMod = 1f;
 
@@ -22,7 +22,7 @@ namespace Controllers
       new EventController();
       new AudioController();
       new ParticleController();
-      new PrestiegeController();
+      new PrestigeController();
       new MainBoxMenuController();
       new MineBoxMenuController();
       //new InfoBoxMenuController();
@@ -84,7 +84,7 @@ namespace Controllers
       }
       else if (Input.GetKeyDown(KeyCode.P))
       {
-        MainBoxMenuController.s_Singleton.SetMenuType(MainBoxMenuController.MenuType.PRESTIEGE);
+        MainBoxMenuController.s_Singleton.SetMenuType(MainBoxMenuController.MenuType.PRESTIGE);
         AudioController.PlayAudio("MenuSelect");
       }
 

@@ -21,7 +21,7 @@ namespace Controllers
       SHOP,
       SKILLS,
 
-      PRESTIEGE,
+      PRESTIGE,
 
       OPTIONS,
     }
@@ -45,8 +45,8 @@ namespace Controllers
             returnData = InventoryController.s_Singleton._InfoData;
             break;
 
-          case MenuType.PRESTIEGE:
-            returnData = PrestiegeController.s_Singleton._InfoData;
+          case MenuType.PRESTIGE:
+            returnData = PrestigeController.s_Singleton._InfoData;
             break;
 
           case MenuType.OPTIONS:
@@ -81,7 +81,7 @@ namespace Controllers
         MenuType.SHOP.ToString(),
         MenuType.SKILLS.ToString(),
 
-        MenuType.PRESTIEGE.ToString(),
+        MenuType.PRESTIGE.ToString(),
 
         MenuType.OPTIONS.ToString()
       };
@@ -187,8 +187,8 @@ namespace Controllers
 
 Gain experience by breaking rocks.");
 
-        case "PrestiegeButton":
-          return InfoController.GetInfoString("Prestiege [P]", "Gain prestiege levels by restarting the game with modifiers!");
+        case "PrestigeButton":
+          return InfoController.GetInfoString("Prestige [P]", "Gain prestige levels by restarting the game with modifiers!");
 
         case "OptionsButton":
           return InfoController.GetInfoString("Options [Esc]", "View game options.");

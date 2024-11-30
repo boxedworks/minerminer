@@ -35,7 +35,7 @@ namespace Controllers
         Gold = SkillController.s_Singleton._Gold;
 
         //
-        PrestiegeInfo = PrestiegeController.GetSaveInfo();
+        PrestigeInfo = PrestigeController.GetSaveInfo();
 
         // Purchases
         Purchases = ShopController.GetPurchases();
@@ -68,7 +68,7 @@ namespace Controllers
       public int Gold;
 
       //
-      public PrestiegeController.SaveInfo PrestiegeInfo;
+      public PrestigeController.SaveInfo PrestigeInfo;
 
       //
       public List<string> Purchases, Unlocks;
@@ -150,9 +150,9 @@ namespace Controllers
       s_Singleton._isLoading = true;
       {
 
-        // Check prestiege
-        PrestiegeController.SetSaveInfo(saveData.PrestiegeInfo);
-        if (!saveData.PrestiegeInfo.FreshPrestiege)
+        // Check prestige
+        PrestigeController.SetSaveInfo(saveData.PrestigeInfo);
+        if (!saveData.PrestigeInfo.FreshPrestige)
         {
 
           // Gold
