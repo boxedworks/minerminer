@@ -31,6 +31,11 @@ namespace Controllers
       AUTO_ROCK,
       AUTO_FORGE,
 
+      ROCK_CLICKER,
+      ROCK_CLICKER_UPGRADE_0,
+      ROCK_CLICKER_UPGRADE_1,
+      ROCK_CLICKER_UPGRADE_2,
+
       PICKAXE_BREAK_UPGRADE_0,
       PICKAXE_BREAK_UPGRADE_1,
       PICKAXE_BREAK_UPGRADE_2,
@@ -201,6 +206,49 @@ namespace Controllers
         _Description = "Automatically continue forging if you have enough resources.",
 
         _PurchaseString = "Purchased the Auto Forge upgrade."
+      });
+
+      AddPurchase(PurchaseType.ROCK_CLICKER, new PurchaseInfo()
+      {
+        _Costs = GetSimpleCost(15),
+
+        _Title = "Rock Clicker",
+        _Description = "Periodically spawn weak points on rocks that you can click to do 1/2 your pickaxe damage.",
+
+        _PurchaseString = "Purchased the Rock Clicker upgrade."
+      });
+      AddPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_0, new PurchaseInfo()
+      {
+        _Costs = new[]{
+          (InventoryController.ItemType.EMERALD, 1)
+        },
+
+        _Title = "Rock Clicker Upgrade 1",
+        _Description = "Increases the max number of weak spots that can appear: 1 -> 2.",
+
+        _PurchaseString = "Purchased Rock Clicker Upgrade 1."
+      });
+      AddPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_1, new PurchaseInfo()
+      {
+        _Costs = new[]{
+          (InventoryController.ItemType.SAPPHIRE, 2)
+        },
+
+        _Title = "Rock Clicker Upgrade 2",
+        _Description = "Slightly increase the speed that weak spots appear.",
+
+        _PurchaseString = "Purchased Rock Clicker Upgrade 2."
+      });
+      AddPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_2, new PurchaseInfo()
+      {
+        _Costs = new[]{
+          (InventoryController.ItemType.RUBY, 3)
+        },
+
+        _Title = "Rock Clicker Upgrade 3",
+        _Description = "Slightly increase the speed that weak spots appear.",
+
+        _PurchaseString = "Purchased Rock Clicker Upgrade 3."
       });
 
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_0, new PurchaseInfo()
@@ -483,6 +531,7 @@ Heat - Increases forge speed!",
       //
       UnlockPurchase(PurchaseType.SKILLS);
       UnlockPurchase(PurchaseType.ROCK_BUY_0);
+      UnlockPurchase(PurchaseType.ROCK_CLICKER);
       UnlockPurchase(PurchaseType.AUTO_ROCK);
       UnlockPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_0);
 
@@ -893,6 +942,26 @@ Heat - Increases forge speed!",
           ForgeController.UnlockAutoForge();
 
           break;
+
+        case PurchaseType.ROCK_CLICKER:
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_0);
+
+          break;
+        case PurchaseType.ROCK_CLICKER_UPGRADE_0:
+          PickaxeController.UpgradeClicker();
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_1);
+
+          break;
+        case PurchaseType.ROCK_CLICKER_UPGRADE_1:
+          PickaxeController.UpgradeClicker();
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_2);
+
+          break;
+        case PurchaseType.ROCK_CLICKER_UPGRADE_2:
+          PickaxeController.UpgradeClicker();
+          //s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_3);
+
+          break;
       }
       s_Singleton.UpdatePurchases();
       UpdatePurchasesUi();
@@ -901,6 +970,12 @@ Heat - Increases forge speed!",
       var purchaseString = s_Singleton._purchaseInfos[purchaseType]._PurchaseString;
       if (purchaseString != null)
         LogController.AppendLog(purchaseString);
+    }
+
+    //
+    public static bool IsPurchased(PurchaseType purchaseType)
+    {
+      return s_Singleton._purchaseInfos[purchaseType]._IsPurchased;
     }
 
     //

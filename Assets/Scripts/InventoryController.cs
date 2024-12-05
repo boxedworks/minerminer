@@ -146,7 +146,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.STONE_CHUNK, new ItemInfo()
       {
         _Title = "Stone Chunk",
-        _SellValue = 45,
+        _SellValue = 40,
 
         _ParticleType = ParticleController.ParticleType.ORE_5,
       });
@@ -211,14 +211,14 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.EMERALD, new ItemInfo()
       {
         _Title = "Emerald",
-        _SellValue = 20,
+        _SellValue = 15,
 
         _ParticleType = ParticleController.ParticleType.GEM_0
       });
       AddInventoryItemInfo(ItemType.SAPPHIRE, new ItemInfo()
       {
         _Title = "Sapphire",
-        _SellValue = 50,
+        _SellValue = 35,
 
         _ParticleType = ParticleController.ParticleType.GEM_1
 
@@ -226,7 +226,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.RUBY, new ItemInfo()
       {
         _Title = "Ruby",
-        _SellValue = 150,
+        _SellValue = 85,
 
         _ParticleType = ParticleController.ParticleType.GEM_2
 
@@ -234,7 +234,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.CITRINE, new ItemInfo()
       {
         _Title = "Citrine",
-        _SellValue = 250,
+        _SellValue = 150,
 
         _ParticleType = ParticleController.ParticleType.GEM_3
 
@@ -242,7 +242,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.DIAMOND, new ItemInfo()
       {
         _Title = "Diamond",
-        _SellValue = 450,
+        _SellValue = 250,
 
         _ParticleType = ParticleController.ParticleType.GEM_4
 

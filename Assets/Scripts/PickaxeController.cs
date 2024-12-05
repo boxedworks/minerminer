@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace Controllers
 {
@@ -16,6 +17,8 @@ namespace Controllers
     RectTransform _pickaxeUi;
 
     float _swingTimer, _swingTimerVisual;
+
+    ClickManager _clickManager;
 
     //
     PickaxeStats _pickaxeStats;
@@ -88,11 +91,16 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
       _pickaxeUi = GameObject.Find("PicBox").transform as RectTransform;
 
       _swingTimer = 0f;
+
+      //
+      _clickManager = new();
     }
 
     //
     public void Update()
     {
+
+      _clickManager.Update();
 
       //
       _swingTimerVisual += (_swingTimer - _swingTimerVisual) * Time.deltaTime * (_swingTimer < _swingTimerVisual ? 50f : 10f);
@@ -125,6 +133,107 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
         RockController.s_Singleton.Hit(damage);
         DamageTextController.s_Singleton.ReportDamage(damage, multiplier - 1);
       }
+    }
+
+    //
+    public static void UpgradeClicker()
+    {
+      s_Singleton._clickManager.Upgrade();
+    }
+
+    //
+    class ClickManager
+    {
+
+      Transform _container;
+
+      float _lastSpawnTime, _clickTimeToReach;
+      int _numClicks, _maxClicks;
+
+      int _upgradeLevel;
+
+      public ClickManager()
+      {
+        _container = GameObject.Find("Clicks").transform;
+
+        _clickTimeToReach = 5f;
+        _maxClicks = 1;
+      }
+
+      //
+      public void Update()
+      {
+
+        // Check unlocked
+        if (!ShopController.IsPurchased(ShopController.PurchaseType.ROCK_CLICKER))
+          return;
+
+        // Remove if rock breaks
+        if (_numClicks > 0)
+        {
+
+          if (!RockController.s_HasRock)
+          {
+            for (var i = _container.childCount - 1; i > 0; i--)
+              GameObject.DestroyImmediate(_container.GetChild(i).gameObject);
+            _numClicks = 0;
+          }
+        }
+
+        // Spawn new click
+        if (_numClicks < _maxClicks && Time.time - _lastSpawnTime > _clickTimeToReach)
+        {
+          if (!RockController.s_HasRock)
+          {
+            _lastSpawnTime = Time.time + Random.value;
+            return;
+          }
+
+          _numClicks++;
+          _lastSpawnTime = Time.time + Random.value;
+
+          var prefab = _container.GetChild(0).gameObject;
+          var newFab = GameObject.Instantiate(prefab, _container);
+
+          newFab.transform.localPosition += new Vector3(Random.Range(-1f, 1f) * 70f, Random.Range(-1f, 1f) * 70f, 0f);
+
+          var button = newFab.GetComponent<Button>();
+          button.onClick.AddListener(() =>
+          {
+
+            _numClicks--;
+
+            GameObject.Destroy(newFab);
+
+            var damage = s_PickaxeStats.Damage / 2f;
+            RockController.s_Singleton.Hit(damage);
+            DamageTextController.s_Singleton.ReportDamage(damage, 0);
+          });
+          newFab.SetActive(true);
+        }
+
+      }
+
+      //
+      public void Upgrade()
+      {
+        switch (_upgradeLevel++)
+        {
+
+          case 0:
+            _maxClicks++;
+            break;
+          case 1:
+            _clickTimeToReach -= 0.5f;
+            break;
+          case 2:
+            _clickTimeToReach -= 0.5f;
+            break;
+
+        }
+
+      }
+
     }
 
   }
