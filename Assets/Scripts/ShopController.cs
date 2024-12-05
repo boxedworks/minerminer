@@ -157,7 +157,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.FORGE, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(60),
+        _Costs = GetSimpleCost(45),
 
         _Title = "Forge",
         _Description = "Unlock the Forge for smelting.",
@@ -166,7 +166,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.HAMMER, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(400),
+        _Costs = GetSimpleCost(350),
 
         _Title = "Hammer",
         _Description = "Unlock the Hammer to create new items.",
@@ -186,7 +186,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.AUTO_ROCK, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(200),
+        _Costs = GetSimpleCost(150),
 
         _Title = "Auto Rock",
         _Description = "Automatically replace rocks when they are destroyed.",
@@ -195,7 +195,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.AUTO_FORGE, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(275),
+        _Costs = GetSimpleCost(250),
 
         _Title = "Auto Forge",
         _Description = "Automatically continue forging if you have enough resources.",
@@ -206,7 +206,7 @@ namespace Controllers
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_0, new PurchaseInfo()
       {
         _Costs = new[]{
-          (InventoryController.ItemType.NONE, 15),
+          (InventoryController.ItemType.NONE, 10),
           (InventoryController.ItemType.STONE, 5)
         },
 
@@ -218,7 +218,7 @@ namespace Controllers
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_1, new PurchaseInfo()
       {
         _Costs = new[]{
-          (InventoryController.ItemType.NONE, 100),
+          (InventoryController.ItemType.NONE, 85),
           (InventoryController.ItemType.COPPER, 5)
         },
 
@@ -230,7 +230,7 @@ namespace Controllers
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_2, new PurchaseInfo()
       {
         _Costs = new[]{
-          (InventoryController.ItemType.NONE, 300),
+          (InventoryController.ItemType.NONE, 275),
           (InventoryController.ItemType.TIN, 10)
         },
 
@@ -242,7 +242,7 @@ namespace Controllers
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_3, new PurchaseInfo()
       {
         _Costs = new[]{
-          (InventoryController.ItemType.NONE, 1250),
+          (InventoryController.ItemType.NONE, 1100),
           (InventoryController.ItemType.IRON, 20)
         },
 
@@ -254,7 +254,7 @@ namespace Controllers
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_4, new PurchaseInfo()
       {
         _Costs = new[]{
-          (InventoryController.ItemType.NONE, 5000),
+          (InventoryController.ItemType.NONE, 4500),
           (InventoryController.ItemType.COAL, 25)
         },
 
@@ -266,7 +266,7 @@ namespace Controllers
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_5, new PurchaseInfo()
       {
         _Costs = new[]{
-          (InventoryController.ItemType.NONE, 20000),
+          (InventoryController.ItemType.NONE, 17500),
           (InventoryController.ItemType.STONE_CHUNK, 30)
         },
 
@@ -278,7 +278,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_0, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(85),
+        _Costs = GetSimpleCost(65),
 
         _Title = "Copper Upgrade 1",
         _Description = "Extra 5% chance to find Copper in Copper rocks.",
@@ -287,7 +287,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_1, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(200),
+        _Costs = GetSimpleCost(175),
 
         _Title = "Copper Upgrade 2",
         _Description = "Extra 5% chance to find Copper in Copper rocks.",
@@ -296,7 +296,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_1_UPGRADE_2, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(315),
+        _Costs = GetSimpleCost(300),
 
         _Title = "Copper Upgrade 3",
         _Description = "Extra 5% chance to find Copper in Copper rocks.",
@@ -306,7 +306,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_2_UPGRADE_0, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(225),
+        _Costs = GetSimpleCost(200),
 
         _Title = "Tin Upgrade 1",
         _Description = "Extra 5% chance to find Tin in Tin rocks.",
@@ -315,7 +315,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_2_UPGRADE_1, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(350),
+        _Costs = GetSimpleCost(325),
 
         _Title = "Tin Upgrade 2",
         _Description = "Extra 5% chance to find Tin in Tin rocks.",
@@ -324,7 +324,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_2_UPGRADE_2, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(500),
+        _Costs = GetSimpleCost(475),
 
         _Title = "Tin Upgrade 3",
         _Description = "Extra 5% chance to find Tin in Tin rocks.",
@@ -334,7 +334,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_3_UPGRADE_0, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(1350),
+        _Costs = GetSimpleCost(1250),
 
         _Title = "Iron Upgrade 1",
         _Description = "Extra 5% chance to find Iron in Iron rocks.",
@@ -343,7 +343,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_3_UPGRADE_1, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(2000),
+        _Costs = GetSimpleCost(1850),
 
         _Title = "Iron Upgrade 2",
         _Description = "Extra 5% chance to find Iron in Iron rocks.",
@@ -352,7 +352,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_3_UPGRADE_2, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(3500),
+        _Costs = GetSimpleCost(3350),
 
         _Title = "Iron Upgrade 3",
         _Description = "Extra 5% chance to find Iron in Iron rocks.",
@@ -362,7 +362,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_4_UPGRADE_0, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(10000),
+        _Costs = GetSimpleCost(9500),
 
         _Title = "Coal Upgrade 1",
         _Description = "Extra 5% chance to find Coal in Coal rocks.",
@@ -371,7 +371,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_4_UPGRADE_1, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(25000),
+        _Costs = GetSimpleCost(22500),
 
         _Title = "Coal Upgrade 2",
         _Description = "Extra 5% chance to find Coal in Coal rocks.",
@@ -380,7 +380,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_4_UPGRADE_2, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(50000),
+        _Costs = GetSimpleCost(45000),
 
         _Title = "Coal Upgrade 3",
         _Description = "Extra 5% chance to find Coal in Coal rocks.",

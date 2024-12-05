@@ -62,7 +62,7 @@ namespace Controllers
         if (Input.GetKeyDown(KeyCode.Space))
           SkillController.s_Singleton._Gold += 500;
 
-        s_GameSpeedMod = 3f;
+        //s_GameSpeedMod = 3f;
       }
 #endif
 
