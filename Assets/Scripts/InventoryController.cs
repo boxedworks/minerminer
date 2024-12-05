@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using JetBrains.Annotations;
 
 namespace Controllers
 {
@@ -27,7 +28,7 @@ namespace Controllers
       {
         return s_Singleton._itemInfos
           .Where((i) => { return i.Value._InInventory; })
-          .Count() / 10;
+          .Count() / (10 + 1);
       }
     }
 
@@ -61,6 +62,8 @@ namespace Controllers
 
       MIX_0,
       GEM_INGOT_0,
+
+      COBALT, CINNABAR,
 
     }
     class ItemInfo : IInfoable
@@ -143,7 +146,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.STONE_CHUNK, new ItemInfo()
       {
         _Title = "Stone Chunk",
-        _SellValue = 50,
+        _SellValue = 45,
 
         _ParticleType = ParticleController.ParticleType.ORE_5,
       });
@@ -260,6 +263,21 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       {
         _Title = "Citrine Ingot",
         _SellValue = 10000,
+      });
+
+      AddInventoryItemInfo(ItemType.COBALT, new ItemInfo()
+      {
+        _Title = "Cobalt",
+        _SellValue = 10,
+
+        _ParticleType = ParticleController.ParticleType.ORE_6,
+      });
+      AddInventoryItemInfo(ItemType.CINNABAR, new ItemInfo()
+      {
+        _Title = "Cinnabar",
+        _SellValue = 5,
+
+        _ParticleType = ParticleController.ParticleType.ORE_7,
       });
 
       // Sell interface
@@ -404,9 +422,11 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
     //
     void SelectItem(ItemType inventoryItemType)
     {
+      var itemInfo = _itemInfos[inventoryItemType];
+      if (itemInfo._MenuEntry == null) return;
+
       _selectedItem = inventoryItemType;
 
-      var itemInfo = _itemInfos[inventoryItemType];
       _itemSelectorUi.SetParent(itemInfo._MenuEntry.transform, false);
       _itemSelectorUi.SetAsFirstSibling();
     }
@@ -538,6 +558,9 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         _itemSelectorUi.SetParent(_prefab.transform, false);
         _itemSelectorUi.SetAsFirstSibling();
       }
+
+      //
+      UpdatePageText();
     }
 
     void UpdateItemDisplay(ItemType inventoryItemType)

@@ -52,6 +52,8 @@ namespace Controllers
       COAL,
 
       BOULDER,
+
+      COBALT,
     }
     public class RockInfo : IInfoable
     {
@@ -515,7 +517,8 @@ Mode: Off")
       var percentRemaining = 100f;
       foreach (var drop in dropsAppended)
         percentRemaining -= drop.DropChance;
-      dropsAppended.Add((ItemType: baseItem, DropChance: percentRemaining));
+      if (percentRemaining > 0f)
+        dropsAppended.Add((ItemType: baseItem, DropChance: percentRemaining));
 
       return dropsAppended.ToArray();
     }
@@ -638,6 +641,24 @@ Mode: Off")
             }, InventoryController.ItemType.STONE),
           });
           s_Singleton.SetRockSelection(4, s_Singleton._rocks[rockType]);
+
+          break;
+
+        //
+        case RockType.COBALT:
+
+          AddRockType(rockType, new RockInfo()
+          {
+            _Title = "Cobalt",
+            _HealthMax = 1500f,
+            _XpGain = 1250f,
+
+            _DropTable = GenerateRockDropTable(new[] {
+              (InventoryController.ItemType.CINNABAR, 50f),
+              (InventoryController.ItemType.COBALT, 50f),
+            }, InventoryController.ItemType.STONE),
+          });
+          s_Singleton.SetRockSelection(5, s_Singleton._rocks[rockType]);
 
           break;
       }

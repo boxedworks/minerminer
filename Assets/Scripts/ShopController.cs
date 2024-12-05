@@ -49,6 +49,7 @@ namespace Controllers
       ROCK_BUY_3,
 
       ROCK_BUY_4,
+      ROCK_BUY_5,
 
       SKILL_LUCK,
       SKILL_POWER,
@@ -431,6 +432,15 @@ namespace Controllers
         _Description = "Replace the Stone rock with the Boulder rock.",
 
         _PurchaseString = "Unlocked the Boulder Rock."
+      });
+      AddPurchase(PurchaseType.ROCK_BUY_5, new PurchaseInfo()
+      {
+        _Costs = GetSimpleCost(25000),
+
+        _Title = "Cobalt",
+        _Description = "Unlock the Cobalt rock.",
+
+        _PurchaseString = "Unlocked the Cobalt Rock."
       });
 
       AddPurchase(PurchaseType.SKILL_LUCK, new PurchaseInfo()
@@ -863,10 +873,14 @@ Heat - Increases forge speed!",
 
         case PurchaseType.ROCK_BUY_4:
           RockController.UnlockRock(RockController.RockType.BOULDER);
-
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_5);
 
           if (!MainBoxMenuController.s_Singleton.IsMenuActive(MainBoxMenuController.MenuType.PRESTIGE))
             s_Singleton.UnlockPurchase(PurchaseType.PRESTIGE);
+
+          break;
+        case PurchaseType.ROCK_BUY_5:
+          RockController.UnlockRock(RockController.RockType.COBALT);
 
           break;
 
