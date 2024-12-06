@@ -237,6 +237,12 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
           case 3:
             _maxClicks++;
             break;
+          case 4:
+            _damageMultiplier *= 2f;
+            break;
+          case 5:
+            _clickTimeToReach -= 1f;
+            break;
         }
 
       }

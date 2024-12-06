@@ -36,6 +36,7 @@ namespace Controllers
       ROCK_CLICKER_UPGRADE_1,
       ROCK_CLICKER_UPGRADE_2,
       ROCK_CLICKER_UPGRADE_3,
+      ROCK_CLICKER_UPGRADE_4,
 
       PICKAXE_BREAK_UPGRADE_0,
       PICKAXE_BREAK_UPGRADE_1,
@@ -264,6 +265,18 @@ namespace Controllers
         _Description = "Increases the max number of weak spots that can appear: 2 -> 3.",
 
         _PurchaseString = "Purchased Rock Clicker Upgrade 4."
+      });
+      AddPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_4, new PurchaseInfo()
+      {
+        _Costs = new[]{
+          (InventoryController.ItemType.CITRINE, 1),
+          (InventoryController.ItemType.DIAMOND, 1)
+        },
+
+        _Title = "Rock Clicker Upgrade 5",
+        _Description = "Weak spot damage 2x -> 4x.",
+
+        _PurchaseString = "Purchased Rock Clicker Upgrade 5."
       });
 
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_0, new PurchaseInfo()
@@ -587,6 +600,9 @@ Heat - Increases forge speed!",
           }
           else
           {
+            if (costIndex < 1)
+              costIndex++;
+
             hasItem = InventoryController.GetItemAmount(costInfo.ItemType) >= costInfo.Amount;
             costEntry = costContainer.GetChild(costIndex + 1);
           }
@@ -979,7 +995,12 @@ Heat - Increases forge speed!",
           break;
         case PurchaseType.ROCK_CLICKER_UPGRADE_3:
           PickaxeController.UpgradeClicker();
-          //s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_4);
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_4);
+
+          break;
+        case PurchaseType.ROCK_CLICKER_UPGRADE_4:
+          PickaxeController.UpgradeClicker();
+          //s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_5);
 
           break;
       }
