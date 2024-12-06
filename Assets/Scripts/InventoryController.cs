@@ -251,18 +251,18 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.GEM_DUST_0, new ItemInfo()
       {
         _Title = "Citrine Dust",
-        _SellValue = 950,
+        _SellValue = 450,
       });
 
       AddInventoryItemInfo(ItemType.MIX_0, new ItemInfo()
       {
         _Title = "Orange Blend",
-        _SellValue = 3000,
+        _SellValue = 1500,
       });
       AddInventoryItemInfo(ItemType.GEM_INGOT_0, new ItemInfo()
       {
         _Title = "Citrine Ingot",
-        _SellValue = 10000,
+        _SellValue = 8500,
       });
 
       AddInventoryItemInfo(ItemType.COBALT, new ItemInfo()

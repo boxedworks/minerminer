@@ -438,7 +438,7 @@ namespace Controllers
 
       AddPurchase(PurchaseType.ROCK_4_UPGRADE_0, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(9500),
+        _Costs = GetSimpleCost(6500),
 
         _Title = "Coal Upgrade 1",
         _Description = "Extra 5% chance to find Coal in Coal rocks.",
@@ -447,7 +447,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_4_UPGRADE_1, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(22500),
+        _Costs = GetSimpleCost(12500),
 
         _Title = "Coal Upgrade 2",
         _Description = "Extra 5% chance to find Coal in Coal rocks.",
@@ -456,7 +456,7 @@ namespace Controllers
       });
       AddPurchase(PurchaseType.ROCK_4_UPGRADE_2, new PurchaseInfo()
       {
-        _Costs = GetSimpleCost(45000),
+        _Costs = GetSimpleCost(30000),
 
         _Title = "Coal Upgrade 3",
         _Description = "Extra 5% chance to find Coal in Coal rocks.",
