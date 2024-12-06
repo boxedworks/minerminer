@@ -101,7 +101,7 @@ namespace Controllers
       _dependencyInfos.Add(new SimpleInfoable()
       {
         _GameObject = discordButton.gameObject,
-        _Description = InfoController.GetInfoString("Open Discord", $"Join the discord channel for {StringController.s_GAME_NAME}!")
+        _Description = InfoController.GetInfoString("Open Discord", $"Join the discord channel for {StringController.s_GAME_NAME}!\n\nProvide feedback or give ideas for this game's development!")
       });
 
       //

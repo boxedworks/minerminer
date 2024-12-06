@@ -153,7 +153,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.STONE_DUST, new ItemInfo()
       {
         _Title = "Stone Dust",
-        _SellValue = 5
+        _SellValue = 4
       });
 
       AddInventoryItemInfo(ItemType.COPPER, new ItemInfo()

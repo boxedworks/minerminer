@@ -35,6 +35,7 @@ namespace Controllers
       ROCK_CLICKER_UPGRADE_0,
       ROCK_CLICKER_UPGRADE_1,
       ROCK_CLICKER_UPGRADE_2,
+      ROCK_CLICKER_UPGRADE_3,
 
       PICKAXE_BREAK_UPGRADE_0,
       PICKAXE_BREAK_UPGRADE_1,
@@ -231,24 +232,38 @@ namespace Controllers
       AddPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_1, new PurchaseInfo()
       {
         _Costs = new[]{
-          (InventoryController.ItemType.SAPPHIRE, 2)
+          (InventoryController.ItemType.EMERALD, 1),
+          (InventoryController.ItemType.SAPPHIRE, 1)
         },
 
         _Title = "Rock Clicker Upgrade 2",
-        _Description = "Slightly increase the speed that weak spots appear.",
+        _Description = "Weak spot damage 1x -> 2x.",
 
         _PurchaseString = "Purchased Rock Clicker Upgrade 2."
       });
       AddPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_2, new PurchaseInfo()
       {
         _Costs = new[]{
-          (InventoryController.ItemType.RUBY, 3)
+          (InventoryController.ItemType.SAPPHIRE, 1),
+          (InventoryController.ItemType.RUBY, 1)
         },
 
         _Title = "Rock Clicker Upgrade 3",
         _Description = "Slightly increase the speed that weak spots appear.",
 
-        _PurchaseString = "Purchased Rock Clicker Upgrade 3."
+        _PurchaseString = "Purchased Rock Clicker Upgrade 4."
+      });
+      AddPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_3, new PurchaseInfo()
+      {
+        _Costs = new[]{
+          (InventoryController.ItemType.RUBY, 1),
+          (InventoryController.ItemType.CITRINE, 1)
+        },
+
+        _Title = "Rock Clicker Upgrade 4",
+        _Description = "Increases the max number of weak spots that can appear: 2 -> 3.",
+
+        _PurchaseString = "Purchased Rock Clicker Upgrade 4."
       });
 
       AddPurchase(PurchaseType.PICKAXE_BREAK_UPGRADE_0, new PurchaseInfo()
@@ -959,7 +974,12 @@ Heat - Increases forge speed!",
           break;
         case PurchaseType.ROCK_CLICKER_UPGRADE_2:
           PickaxeController.UpgradeClicker();
-          //s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_3);
+          s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_3);
+
+          break;
+        case PurchaseType.ROCK_CLICKER_UPGRADE_3:
+          PickaxeController.UpgradeClicker();
+          //s_Singleton.UnlockPurchase(PurchaseType.ROCK_CLICKER_UPGRADE_4);
 
           break;
       }

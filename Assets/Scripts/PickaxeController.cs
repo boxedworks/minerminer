@@ -147,7 +147,7 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
 
       Transform _container;
 
-      float _lastSpawnTime, _clickTimeToReach;
+      float _lastSpawnTime, _clickTimeToReach, _damageMultiplier;
       int _numClicks, _maxClicks;
 
       int _upgradeLevel;
@@ -158,6 +158,8 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
 
         _clickTimeToReach = 5f;
         _maxClicks = 1;
+
+        _damageMultiplier = 1f;
       }
 
       //
@@ -205,9 +207,12 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
 
             GameObject.Destroy(newFab);
 
-            var damage = s_PickaxeStats.Damage / 2f;
+            var damage = s_PickaxeStats.Damage / 2f * _damageMultiplier;
             RockController.s_Singleton.Hit(damage);
             DamageTextController.s_Singleton.ReportDamage(damage, 0);
+
+            if (_numClicks == _maxClicks - 1)
+              _lastSpawnTime = Time.time + Random.value;
           });
           newFab.SetActive(true);
         }
@@ -224,12 +229,14 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
             _maxClicks++;
             break;
           case 1:
-            _clickTimeToReach -= 0.5f;
+            _damageMultiplier *= 2f;
             break;
           case 2:
-            _clickTimeToReach -= 0.5f;
+            _clickTimeToReach -= 1f;
             break;
-
+          case 3:
+            _maxClicks++;
+            break;
         }
 
       }
