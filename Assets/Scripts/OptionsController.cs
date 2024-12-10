@@ -6,6 +6,9 @@ namespace Controllers
   public class OptionsController
   {
 
+    Transform _menu;
+    bool _menuIsVisible { get { return MainBoxMenuController.s_Singleton.IsVisible(MainBoxMenuController.MenuType.OPTIONS); } }
+
     //
     SaveInfo _SaveInfo;
     MainBoxMenuController.MenuType _lastMenu;
@@ -25,16 +28,30 @@ namespace Controllers
     }
 
     //
+    TMPro.TextMeshProUGUI _gameVersionText;
+    public static void SetGameVersion()
+    {
+      s_Singleton._gameVersionText.text = $"Game version: {GameController.s_GameVersion}";
+    }
+
+    //
     public static OptionsController s_Singleton;
     public OptionsController()
     {
       s_Singleton = this;
 
+      //
+      _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.OPTIONS).transform;
+
+      //
       _SaveInfo = new();
 
       //
-      _volumeText = GameObject.Find($"SfxOption").transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
+      _volumeText = _menu.Find($"SfxOption").GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
       s_Volume = 3;
+
+      //
+      _gameVersionText = _menu.Find("GameVersion").GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
 
       // Set up buttons
       {
@@ -43,7 +60,7 @@ namespace Controllers
         for (var i = 0; i < 6; i++)
         {
           var volumeAmount = i;
-          GameObject.Find($"AudioButton{i}").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
+          _menu.Find($"SfxOption/Buttons/AudioButton{i}").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
           {
             AudioController.PlayAudio("MenuSelect");
 
@@ -52,7 +69,7 @@ namespace Controllers
         }
 
         // Delete save
-        GameObject.Find("DeleteSaveButton").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
+        _menu.Find("DeleteOption/DeleteSaveButton").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
         {
           AudioController.PlayAudio("MenuSelect");
 
@@ -60,7 +77,7 @@ namespace Controllers
         });
 
         // Steam
-        GameObject.Find("SteamButton").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
+        _menu.Find("SteamLink/SteamButton").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
         {
           AudioController.PlayAudio("MenuSelect");
 

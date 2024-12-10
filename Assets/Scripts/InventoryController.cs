@@ -63,7 +63,8 @@ namespace Controllers
       GEM_INGOT_0,
 
       COBALT, CINNABAR,
-
+      MIX_1,
+      COBALT_INGOT,
     }
     class ItemInfo : IInfoable
     {
@@ -277,6 +278,11 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
         _SellValue = 3,
 
         _ParticleType = ParticleController.ParticleType.ORE_7,
+      });
+      AddInventoryItemInfo(ItemType.MIX_1, new ItemInfo()
+      {
+        _Title = "Dual Blend",
+        _SellValue = 350,
       });
 
       // Sell interface

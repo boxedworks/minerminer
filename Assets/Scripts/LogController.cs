@@ -23,7 +23,6 @@ namespace Controllers
       _logText = _menu.Find("logText").GetComponent<TMPro.TextMeshProUGUI>();
 
       _log = new();
-      AppendLog($"Welcome to {StringController.s_GAME_NAME} :).");
     }
 
 

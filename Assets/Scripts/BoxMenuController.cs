@@ -25,7 +25,7 @@ namespace Controllers
 
     protected List<IInfoable> _dependencyInfos;
 
-    public void SetUpMenus(List<GameObject> buttons, string[] enumOrder)
+    public void SetUpMenus(Transform menusContainer, List<GameObject> buttons, string[] enumOrder)
     {
 
       //
@@ -51,7 +51,7 @@ namespace Controllers
         });
 
         //
-        var menu = GameObject.Find($"{enumOrder[menuIndex].ToLower()}Menu");
+        var menu = menusContainer.Find($"{enumOrder[menuIndex].ToLower()}Menu").gameObject;
         _menus.Add(menuIndex, menu);
         ToggleMenu(menuIndex, false);
 

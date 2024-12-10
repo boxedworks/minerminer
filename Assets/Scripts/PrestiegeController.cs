@@ -10,6 +10,11 @@ namespace Controllers
   public class PrestigeController : IHasInfoables
   {
 
+    //
+    Transform _menu;
+    bool _menuIsVisible { get { return MainBoxMenuController.s_Singleton.IsVisible(MainBoxMenuController.MenuType.PRESTIGE); } }
+
+    //
     int _prestigeLevel, _maxLevelRequirement;
     bool _justPrestiged;
 
@@ -37,9 +42,13 @@ namespace Controllers
     {
       s_Singleton = this;
 
-      _currentPrestigeText = GameObject.Find($"PrestigeLevel").transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
+      //
+      _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.PRESTIGE).transform;
 
-      var prestigeNextContainer = GameObject.Find($"PrestigeNext");
+      //
+      _currentPrestigeText = _menu.Find($"PrestigeLevel").transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
+
+      var prestigeNextContainer = _menu.Find($"PrestigeNext");
       _requiredTotalLevelText = prestigeNextContainer.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
 
       // Prestige
