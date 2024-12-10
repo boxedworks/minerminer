@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using JetBrains.Annotations;
 
 namespace Controllers
 {
@@ -268,14 +267,14 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.COBALT, new ItemInfo()
       {
         _Title = "Cobalt",
-        _SellValue = 10,
+        _SellValue = 6,
 
         _ParticleType = ParticleController.ParticleType.ORE_6,
       });
       AddInventoryItemInfo(ItemType.CINNABAR, new ItemInfo()
       {
         _Title = "Cinnabar",
-        _SellValue = 5,
+        _SellValue = 3,
 
         _ParticleType = ParticleController.ParticleType.ORE_7,
       });

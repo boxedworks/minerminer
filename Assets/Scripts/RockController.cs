@@ -566,6 +566,7 @@ Mode: Off")
             }, InventoryController.ItemType.STONE),
           });
           s_Singleton.SetRockSelection(0, s_Singleton._rocks[rockType]);
+          s_Singleton._rocks[RockType.STONE]._MenuEntry = null;
 
           if (s_Singleton._currentRock == RockType.STONE)
             s_Singleton.SetRockType(rockType);
