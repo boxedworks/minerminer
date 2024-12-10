@@ -49,30 +49,33 @@ namespace Controllers
       s_Singleton = this;
 
       //
+      var mineParticles = MineBoxMenuController.s_Singleton.GetMenu(MineBoxMenuController.MenuType.MINE).transform.Find("Particles");
+      var forgeParticles = MineBoxMenuController.s_Singleton.GetMenu(MineBoxMenuController.MenuType.FORGE).transform.Find("Particles");
+      var hammerParticles = MineBoxMenuController.s_Singleton.GetMenu(MineBoxMenuController.MenuType.HAMMER).transform.Find("Particles");
       _particles = new()
       {
-        { ParticleType.ROCK_HIT, GameObject.Find("RockHit").GetComponent<ParticleSystem>() },
-        { ParticleType.ROCK_DESTROY, GameObject.Find("RockDestroy").GetComponent<ParticleSystem>() },
+        { ParticleType.ROCK_HIT, mineParticles.Find("RockHit").GetComponent<ParticleSystem>() },
+        { ParticleType.ROCK_DESTROY, mineParticles.Find("RockDestroy").GetComponent<ParticleSystem>() },
 
-        { ParticleType.ORE_0, GameObject.Find("Ore0").GetComponent<ParticleSystem>() },
-        { ParticleType.ORE_1, GameObject.Find("Ore1").GetComponent<ParticleSystem>() },
-        { ParticleType.ORE_2, GameObject.Find("Ore2").GetComponent<ParticleSystem>() },
-        { ParticleType.ORE_3, GameObject.Find("Ore3").GetComponent<ParticleSystem>() },
-        { ParticleType.ORE_4, GameObject.Find("Ore4").GetComponent<ParticleSystem>() },
-        { ParticleType.ORE_5, GameObject.Find("Ore5").GetComponent<ParticleSystem>() },
-        { ParticleType.ORE_6, GameObject.Find("Ore6").GetComponent<ParticleSystem>() },
-        { ParticleType.ORE_7, GameObject.Find("Ore7").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_0, mineParticles.Find("Ores/Ore0").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_1, mineParticles.Find("Ores/Ore1").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_2, mineParticles.Find("Ores/Ore2").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_3, mineParticles.Find("Ores/Ore3").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_4, mineParticles.Find("Ores/Ore4").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_5, mineParticles.Find("Ores/Ore5").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_6, mineParticles.Find("Ores/Ore6").GetComponent<ParticleSystem>() },
+        { ParticleType.ORE_7, mineParticles.Find("Ores/Ore7").GetComponent<ParticleSystem>() },
 
-        { ParticleType.GEM_0, GameObject.Find("Gem0").GetComponent<ParticleSystem>() },
-        { ParticleType.GEM_1, GameObject.Find("Gem1").GetComponent<ParticleSystem>() },
-        { ParticleType.GEM_2, GameObject.Find("Gem2").GetComponent<ParticleSystem>() },
-        { ParticleType.GEM_3, GameObject.Find("Gem3").GetComponent<ParticleSystem>() },
-        { ParticleType.GEM_4, GameObject.Find("Gem4").GetComponent<ParticleSystem>() },
+        { ParticleType.GEM_0, mineParticles.Find("Ores/Gem0").GetComponent<ParticleSystem>() },
+        { ParticleType.GEM_1, mineParticles.Find("Ores/Gem1").GetComponent<ParticleSystem>() },
+        { ParticleType.GEM_2, mineParticles.Find("Ores/Gem2").GetComponent<ParticleSystem>() },
+        { ParticleType.GEM_3, mineParticles.Find("Ores/Gem3").GetComponent<ParticleSystem>() },
+        { ParticleType.GEM_4, mineParticles.Find("Ores/Gem4").GetComponent<ParticleSystem>() },
 
-        { ParticleType.FORGE_SMOKE, GameObject.Find("ForgeSmoke").GetComponent<ParticleSystem>() },
-        { ParticleType.FORGE_EMBERS, GameObject.Find("ForgeEmbers").GetComponent<ParticleSystem>() },
+        { ParticleType.FORGE_SMOKE, forgeParticles.Find("ForgeSmoke").GetComponent<ParticleSystem>() },
+        { ParticleType.FORGE_EMBERS, forgeParticles.Find("ForgeEmbers").GetComponent<ParticleSystem>() },
 
-        { ParticleType.HAMMER_SPARKS, GameObject.Find("HammerSparks").GetComponent<ParticleSystem>() },
+        { ParticleType.HAMMER_SPARKS, hammerParticles.Find("HammerSparks").GetComponent<ParticleSystem>() },
       };
     }
 

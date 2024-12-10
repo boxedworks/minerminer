@@ -24,6 +24,7 @@ namespace Controllers
       GEM_DUST_0,
 
       MIX_0,
+      MIX_1,
     }
 
     //
@@ -183,6 +184,23 @@ namespace Controllers
             },
             new (InventoryController.ItemType, int)[]{
               (InventoryController.ItemType.MIX_0, 1)
+            }
+          );
+
+          break;
+
+        //
+        case RecipeType.MIX_1:
+
+          s_Singleton._hammerController.UnlockRecipe(
+            (int)recipeType,
+            "Dual Mix",
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.COBALT, 10),
+              (InventoryController.ItemType.CINNABAR, 10),
+            },
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.MIX_1, 1)
             }
           );
 

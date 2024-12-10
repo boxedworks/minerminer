@@ -88,7 +88,7 @@ namespace Controllers
       var buttons = GetChildrenAsList(GameObject.Find("BoxStatsButtons").transform.GetChild(0));
       var optionsButton = GameObject.Find("OptionsButton");
       buttons.Add(optionsButton);
-      SetUpMenus(buttons, menuOrderString);
+      SetUpMenus(GameObject.Find("BoxMainMenu").transform.Find("Menus"), buttons, menuOrderString);
 
       //
       var discordButton = GameObject.Find("DiscordButton").GetComponent<Button>();

@@ -13,6 +13,11 @@ namespace Controllers
     //
     public static ForgeController s_Singleton;
 
+    //
+    Transform _menu, _menuUi, _dependencies;
+    bool _menuIsVisible { get { return MineBoxMenuController.s_Singleton.IsVisible(MineBoxMenuController.MenuType.FORGE); } }
+
+    //
     MachineController _forgeController;
     RecipeType _currentRecipe { get { return (RecipeType)_forgeController._CurrentRecipe; } }
     public enum RecipeType
@@ -25,9 +30,6 @@ namespace Controllers
       STEEL_INGOT,
       CITRINE_INGOT,
     }
-
-    //
-    Transform _menu, _menuUi, _dependencies;
 
     //
     AudioSource _forgeLoopAudio;
@@ -131,8 +133,11 @@ namespace Controllers
         {
           if (_forgeLoopAudio == null)
           {
-            _forgeLoopAudio = AudioController.PlayAudio("ForgeSmelt");
-            _forgeLoopAudio.loop = true;
+            if (_menuIsVisible)
+            {
+              _forgeLoopAudio = AudioController.PlayAudio("ForgeSmelt");
+              _forgeLoopAudio.loop = true;
+            }
           }
           else
           {

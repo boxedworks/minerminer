@@ -496,6 +496,14 @@ Mode: Off")
         _rocks[rockInfo._RockType]._MenuEntry = button.transform.parent.gameObject;
       }
     }
+    void ReplaceRockSelection(int buttonIndex, RockInfo rockInfo, RockType replaceingOf)
+    {
+      SetRockSelection(buttonIndex, s_Singleton._rocks[rockInfo._RockType]);
+      _rocks[replaceingOf]._MenuEntry = null;
+
+      if (_currentRock == replaceingOf)
+        SetRockType(rockInfo._RockType);
+    }
 
     //
     public static Sprite GetRockSprite(RockType rockType)
@@ -565,11 +573,7 @@ Mode: Off")
               (InventoryController.ItemType.EMERALD, s_GemPercent),
             }, InventoryController.ItemType.STONE),
           });
-          s_Singleton.SetRockSelection(0, s_Singleton._rocks[rockType]);
-          s_Singleton._rocks[RockType.STONE]._MenuEntry = null;
-
-          if (s_Singleton._currentRock == RockType.STONE)
-            s_Singleton.SetRockType(rockType);
+          s_Singleton.ReplaceRockSelection(0, s_Singleton._rocks[rockType], RockType.STONE);
 
           break;
 

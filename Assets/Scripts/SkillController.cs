@@ -224,7 +224,7 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
       if (_goldVisual != _gold)
       {
         _goldVisual += _goldVisual > _gold ? Mathf.FloorToInt((Mathf.Abs(_gold) - Mathf.Abs(_goldVisual)) * 0.02f) : Mathf.CeilToInt((Mathf.Abs(_gold) - Mathf.Abs(_goldVisual)) * 0.02f);// * (_goldVisual < _gold ? 1 : -1);
-        GameObject.Find("Money").transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = $"${_goldVisual}";
+        GameObject.Find("Money").transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = $"${_goldVisual:N0}";
       }
     }
 

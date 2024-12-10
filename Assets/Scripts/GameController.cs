@@ -6,7 +6,7 @@ namespace Controllers
   public class GameController : MonoBehaviour
   {
 
-    public static string s_GameVersion = "0.0.8";
+    public static string s_GameVersion = "0.0.9";
 
     public static float s_GameSpeedMod = 1f;
 
@@ -14,20 +14,21 @@ namespace Controllers
     void Start()
     {
 
-      GameObject.Find("GameVersion").transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"Game version: {s_GameVersion}";
+      //
+      new MainBoxMenuController();
+      new MineBoxMenuController();
+      new InfoController();
+      new LogController();
 
       //
       new OptionsController();
+      OptionsController.SetGameVersion();
+
       new SaveController();
       new EventController();
       new AudioController();
       new ParticleController();
       new PrestigeController();
-      new MainBoxMenuController();
-      new MineBoxMenuController();
-      //new InfoBoxMenuController();
-      new InfoController();
-      new LogController();
       new SkillController();
       new InventoryController();
       new ShopController();
@@ -40,6 +41,9 @@ namespace Controllers
 
       //
       SaveController.Load();
+
+      //
+      LogController.AppendLog($"Welcome to {StringController.s_GAME_NAME} :).");
     }
 
     // Update is called once per frame

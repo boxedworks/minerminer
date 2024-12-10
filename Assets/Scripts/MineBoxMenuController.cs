@@ -75,7 +75,7 @@ namespace Controllers
         MenuType.HAMMER.ToString(),
       };
       var buttons = GetChildrenAsList(GameObject.Find("BoxMineButtons").transform.GetChild(0));
-      SetUpMenus(buttons, menuOrderString);
+      SetUpMenus(GameObject.Find("BoxMine").transform, buttons, menuOrderString);
 
       //
       SetMenuActive(MenuType.MINE, true, false);

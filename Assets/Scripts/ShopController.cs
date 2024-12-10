@@ -146,6 +146,9 @@ namespace Controllers
       s_Singleton = this;
 
       //
+      _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.SHOP).transform;
+
+      //
       _purchases = new();
       _purchaseInfos = new();
       void AddPurchase(PurchaseType purchaseType, PurchaseInfo purchaseInfo)
@@ -554,9 +557,6 @@ Heat - Increases forge speed!",
       });
 
       //
-      _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.SHOP).transform;
-
-      //
       UnlockPurchase(PurchaseType.SKILLS);
       UnlockPurchase(PurchaseType.ROCK_BUY_0);
       UnlockPurchase(PurchaseType.ROCK_CLICKER);
@@ -961,6 +961,8 @@ Heat - Increases forge speed!",
           break;
         case PurchaseType.ROCK_BUY_5:
           RockController.UnlockRock(RockController.RockType.COBALT);
+          HammerController.UnlockRecipe(HammerController.RecipeType.MIX_1);
+          //ForgeController.UnlockRecipe()
 
           break;
 
