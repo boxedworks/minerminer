@@ -18,12 +18,12 @@ namespace Controllers
 
     public bool _CookOverTime;
     bool _isLooping;
+    public bool _IsLooping { get { return _isLooping; } }
 
     //
     Dictionary<int, Recipe> _recipes;
     Recipe _currentRecipe;
     public int _CurrentRecipe { get { return _currentRecipe == null ? 0 : _currentRecipe._RecipeType; } }
-    int _recipePage;
 
     CraftingNode[] _inputNodes, _outputNodes;
 
@@ -160,9 +160,16 @@ namespace Controllers
       UpdateRecipesUi();
     }
 
+    public void TakeRecipeInputs()
+    {
+      foreach (var node in _currentRecipe._Inputs)
+        InventoryController.s_Singleton.RemoveItemAmount(node.ItemType, node.Amount);
+    }
+
     //
     public void Update()
     {
+
       //
       if (_CookOverTime)
         if (_isCooking)
@@ -178,11 +185,13 @@ namespace Controllers
           _isCooking = false;
           _startButton.gameObject.SetActive(true);
           _showRecipesButton.gameObject.SetActive(false);
+
+          SetRecipeInputs(_currentRecipe, true);
         }
         else
         {
-          foreach (var node in _currentRecipe._Inputs)
-            InventoryController.s_Singleton.RemoveItemAmount(node.ItemType, node.Amount);
+          if (_CookOverTime)
+            TakeRecipeInputs();
         }
 
         //
@@ -193,8 +202,6 @@ namespace Controllers
           if (i < _currentRecipe._Outputs.Length)
             node._Amount += _currentRecipe._Outputs[i].Amount;
         }
-        if (!continueCooking)
-          SetRecipeInputs(_currentRecipe, true);
         SetRecipeOutputs(_currentRecipe);
       }
 
@@ -223,6 +230,14 @@ namespace Controllers
       _stopLoopButton.onClick.AddListener(() =>
       {
         ToggleLoop(false);
+        if (!_CookOverTime)
+        {
+          _isCooking = false;
+
+          _startButton.gameObject.SetActive(true);
+          if (_outputNodes[0]._Amount == 0)
+            _setRecipeButton.gameObject.SetActive(true);
+        }
 
         AudioController.PlayAudio("MenuSelect");
       });
@@ -403,8 +418,8 @@ namespace Controllers
         _showRecipesButton.gameObject.SetActive(true);
         _setRecipeButton.gameObject.SetActive(false);
 
-        foreach (var node in _currentRecipe._Inputs)
-          InventoryController.s_Singleton.RemoveItemAmount(node.ItemType, node.Amount);
+        if (_CookOverTime)
+          TakeRecipeInputs();
         SetRecipeInputs(_currentRecipe, false);
 
         _isCooking = true;

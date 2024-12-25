@@ -122,6 +122,7 @@ namespace Controllers
         _swingTimer -= 1f;
 
         //
+        _hammerController.TakeRecipeInputs();
         _hammerController.InstantCook();
 
         ParticleController.PlayParticles(ParticleController.ParticleType.HAMMER_SPARKS);
