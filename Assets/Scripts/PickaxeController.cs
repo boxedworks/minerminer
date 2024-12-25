@@ -105,7 +105,7 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
       //
       _swingTimerVisual += (_swingTimer - _swingTimerVisual) * Time.deltaTime * (_swingTimer < _swingTimerVisual ? 50f : 10f);
       _pickaxeModel.rotation = Quaternion.Euler(0f, 0f, Mathf.Lerp(-50f, 65f, Easings.EaseInOutElastic(_swingTimerVisual)));
-      _pickaxeModel.localPosition = Vector3.Lerp(new Vector3(-0.7f, 0.2f, 0f), new Vector3(-2f, 1f, 0f), Easings.EaseInOutElastic(_swingTimerVisual));
+      _pickaxeModel.localPosition = Vector3.Lerp(new Vector3(-890f, 320f, 0f), new Vector3(-1030f, 420f, 0f), Easings.EaseInOutElastic(_swingTimerVisual));
 
       //
       _swingTimer += Time.deltaTime * s_PickaxeStats.Speed * 0.25f;
