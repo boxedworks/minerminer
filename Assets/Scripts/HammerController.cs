@@ -111,7 +111,7 @@ namespace Controllers
       _hammerController.Update();
 
       //
-      _swingTimerVisual += (_swingTimer - _swingTimerVisual) * Time.deltaTime * (_swingTimer < _swingTimerVisual ? 50f : 10f);
+      _swingTimerVisual = Mathf.Clamp(_swingTimerVisual + (_swingTimer - _swingTimerVisual) * Time.deltaTime * (_swingTimer < _swingTimerVisual ? 50f : 10f), 0f, 1f);
       _hammerModel.localPosition = Vector3.Lerp(new Vector3(0f, 0.5f, 100f), new Vector3(0f, 1.5f, 100f), _swingTimerVisual);
 
       //
