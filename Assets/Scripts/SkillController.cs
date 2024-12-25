@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using NUnit.Framework.Constraints;
+using UnityEngine.UI;
 
 namespace Controllers
 {
@@ -30,6 +31,7 @@ namespace Controllers
         _gold = value;
 
         ShopController.UpdatePurchasesUi();
+        UpdateBuyXp();
       }
     }
 
@@ -62,6 +64,10 @@ namespace Controllers
     int _currentSkill;
     Transform _skillSelectorUi;
 
+    TMPro.TextMeshProUGUI _buyXpText;
+    Button _buyXpButton;
+    SimpleInfoable _buyXpInfo;
+
     TMPro.TextMeshProUGUI _totalLevelText;
 
     //
@@ -74,6 +80,8 @@ namespace Controllers
         var returnList = new List<IInfoable>();
         foreach (var skill in _skills)
           returnList.Add(skill);
+        returnList.Add(_buyXpInfo);
+
         returnData._Infos = returnList;
 
         returnData._DefaultInfo = _skills[_currentSkill];
@@ -95,11 +103,15 @@ namespace Controllers
 
       //
       _menu = MainBoxMenuController.s_Singleton.GetMenu(MainBoxMenuController.MenuType.SKILLS).transform;
-      _prefab = _menu.GetChild(0);
+      _prefab = _menu.GetChild(0).GetChild(0);
 
-      _totalLevelText = _menu.GetChild(1).GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
+      _totalLevelText = _menu.GetChild(0).GetChild(1).GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
 
-      _skillSelectorUi = _menu.GetChild(0).GetChild(0);
+      _skillSelectorUi = _prefab.GetChild(0);
+
+      var buyXpContainer = _menu.Find("BuyXp");
+      _buyXpText = buyXpContainer.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>();
+      _buyXpButton = buyXpContainer.GetChild(1).GetChild(0).GetComponent<Button>();
 
       string getSafeFloat(float inFloat)
       {
@@ -169,7 +181,7 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
 
       };
 
-      SetSkillSelector(0);
+      SetCurrentSkill(0);
       ToggleSkill(SkillType.DAMAGE, true);
       ToggleSkill(SkillType.SPEED, true);
     }
@@ -180,12 +192,47 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
         return;
       _skills[_currentSkill].AddXp(xpAmount);
     }
-    void SetSkillSelector(int index)
+    void SetCurrentSkill(int index)
     {
       _currentSkill = index;
 
       _skillSelectorUi.SetParent(_skills[index]._MenuEntry, false);
       _skillSelectorUi.SetAsFirstSibling();
+
+      // Update buy xp amount
+      UpdateBuyXp();
+    }
+
+    void UpdateBuyXp()
+    {
+      if (_skills == null) return;
+
+      var currentSkill = _skills[_currentSkill];
+
+      var xpPercent = 0.25f;
+      var xpAmount = (int)(currentSkill.GetXpMax() * xpPercent);
+      var xpCost = xpAmount * 1;
+      _buyXpText.text = $"{xpAmount}xp for ${xpCost}";
+      _buyXpInfo = new SimpleInfoable()
+      {
+        _GameObject = _buyXpButton.gameObject,
+        _Description = $"Buy 25% of the xp cap for the {currentSkill._Name} skill for ${xpCost}."
+      };
+      _buyXpButton.onClick.RemoveAllListeners();
+      _buyXpButton.onClick.AddListener(() =>
+      {
+        if (_Gold < xpCost)
+        {
+          AudioController.PlayAudio("MenuSelect");
+          return;
+        }
+
+        AddXp(xpAmount);
+        _Gold -= xpCost;
+
+        AudioController.PlayAudio("ShopBuy");
+      });
+      _buyXpButton.image.color = _Gold >= xpCost ? StringController.s_ColorGreen : StringController.s_ColorRed; ;
     }
 
     //
@@ -204,7 +251,7 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
           if (Input.GetMouseButtonDown(0))
             if (RectTransformUtility.RectangleContainsScreenPoint(skill._MenuEntry as RectTransform, mousePos, Camera.main))
             {
-              SetSkillSelector(skillIndex);
+              SetCurrentSkill(skillIndex);
 
               AudioController.PlayAudio("MenuSelect");
               break;
@@ -254,6 +301,7 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
 
       SkillType _skillType;
       string _name;
+      public string _Name { get { return _name; } }
 
       float _xp, _xpVisual, _xpMax;
       int _level;
@@ -262,7 +310,7 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
       Transform _uiComponents;
       public Transform _MenuEntry { get { return _uiComponents; } }
       TMPro.TextMeshProUGUI _uiText;
-      UnityEngine.UI.Slider _uiSlider;
+      Slider _uiSlider;
 
       System.Func<Skill, int, float, float, string> _onInfo;
       public string _Info { get { return _onInfo.Invoke(this, _level, _xpVisual, _xpMax); } }
@@ -325,6 +373,9 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
             LogController.AppendLog($"Skill leveled: {_name} ({_level - 1} -> {_level})");
 
             s_Singleton.UpdateTotalLevel();
+
+            if (s_Singleton._currentSkill == ((int)_skillType - 1))
+              s_Singleton.UpdateBuyXp();
           }
 
           UpdateUi();
@@ -348,6 +399,11 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
       {
         _uiText.text = $"{_name} - {_level}/99";
         _uiSlider.value = _xpVisual / _xpMax;
+      }
+
+      public float GetXpMax()
+      {
+        return _xpMax;
       }
 
       //
@@ -423,7 +479,7 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
     {
       if (System.Enum.TryParse(saveInfo.ActiveSkill, true, out SkillType skillType))
       {
-        s_Singleton.SetSkillSelector(((int)skillType) - 1);
+        s_Singleton.SetCurrentSkill(((int)skillType) - 1);
       }
     }
 
