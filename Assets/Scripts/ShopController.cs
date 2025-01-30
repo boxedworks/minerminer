@@ -923,6 +923,7 @@ Heat - Increases forge speed!",
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_1_UPGRADE_0);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_1);
 
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.COPPER_INGOT);
           break;
         case PurchaseType.ROCK_BUY_1:
           RockController.UnlockRock(RockController.RockType.TIN);
@@ -930,7 +931,7 @@ Heat - Increases forge speed!",
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_2);
           s_Singleton.UnlockPurchase(PurchaseType.AUTO_FORGE);
 
-          ForgeController.UnlockRecipe(ForgeController.RecipeType.IRON_INGOT);
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.BRONZE_INGOT);
 
           break;
         case PurchaseType.ROCK_BUY_2:
@@ -938,7 +939,7 @@ Heat - Increases forge speed!",
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_3_UPGRADE_0);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_3);
 
-          ForgeController.UnlockRecipe(ForgeController.RecipeType.STEEL_INGOT);
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.IRON_INGOT);
 
           break;
         case PurchaseType.ROCK_BUY_3:
@@ -947,13 +948,15 @@ Heat - Increases forge speed!",
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_4);
 
           HammerController.UnlockRecipe(HammerController.RecipeType.MIX_0);
-          ForgeController.UnlockRecipe(ForgeController.RecipeType.CITRINE_INGOT);
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.STEEL_INGOT);
 
           break;
 
         case PurchaseType.ROCK_BUY_4:
           RockController.UnlockRock(RockController.RockType.BOULDER);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_5);
+
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.CITRINE_INGOT);
 
           if (!MainBoxMenuController.s_Singleton.IsMenuActive(MainBoxMenuController.MenuType.PRESTIGE))
             s_Singleton.UnlockPurchase(PurchaseType.PRESTIGE);

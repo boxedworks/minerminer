@@ -24,6 +24,8 @@ namespace Controllers
     {
       NONE,
 
+      BRICK,
+
       COPPER_INGOT,
       BRONZE_INGOT,
       IRON_INGOT,
@@ -94,8 +96,7 @@ namespace Controllers
       _forgeController._CookSpeedAction = () => { return SkillController.GetMaths(SkillController.SkillType.HEAT); };
       _forgeController.RegisterLoopButtons(startLoopButton, stopLoopButton);
 
-      UnlockRecipe(RecipeType.COPPER_INGOT);
-      UnlockRecipe(RecipeType.BRONZE_INGOT);
+      UnlockRecipe(RecipeType.BRICK);
     }
 
     //
@@ -177,6 +178,22 @@ namespace Controllers
 
       switch (recipeType)
       {
+
+        //
+        case RecipeType.BRICK:
+
+          s_Singleton._forgeController.UnlockRecipe(
+            (int)recipeType,
+            "Brick",
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.STONE_DUST, 10)
+            },
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.BRICK, 1)
+            }
+          );
+
+          break;
 
         //
         case RecipeType.COPPER_INGOT:
@@ -273,11 +290,11 @@ namespace Controllers
     }
 
     //
-    public static MachineController.SaveInfo GetSaveInfo()
+    public static MachineController.SaveInfo GetMachineSaveInfo()
     {
       return s_Singleton._forgeController.GetSaveInfo();
     }
-    public static void SetSaveInfo(MachineController.SaveInfo saveInfo)
+    public static void SetMachineSaveInfo(MachineController.SaveInfo saveInfo)
     {
       s_Singleton._forgeController.SetSaveInfo(saveInfo);
     }

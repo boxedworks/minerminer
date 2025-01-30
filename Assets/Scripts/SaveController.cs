@@ -52,10 +52,11 @@ namespace Controllers
         RockInfo = RockController.GetSaveInfo();
 
         // Forge
-        ForgeInfo = ForgeController.GetSaveInfo();
+        ForgeMachineInfo = ForgeController.GetMachineSaveInfo();
 
         // Hammer
         HammerInfo = HammerController.GetSaveInfo();
+        HammerMachineInfo = HammerController.GetMachineSaveInfo();
 
         // Inventory
         InventoryInfo = InventoryController.GetSaveInfo();
@@ -80,9 +81,10 @@ namespace Controllers
       //
       public PickaxeController.PickaxeStats.SaveInfo PickaxeInfo;
       public RockController.SaveInfo RockInfo;
+      public HammerController.SaveInfo HammerInfo;
 
       //
-      public MachineController.SaveInfo ForgeInfo, HammerInfo;
+      public MachineController.SaveInfo ForgeMachineInfo, HammerMachineInfo;
 
       //
       public InventoryController.SaveInfo InventoryInfo;
@@ -173,10 +175,11 @@ namespace Controllers
           RockController.SetSaveInfo(saveData.RockInfo);
 
           // Forge
-          ForgeController.SetSaveInfo(saveData.ForgeInfo);
+          ForgeController.SetMachineSaveInfo(saveData.ForgeMachineInfo);
 
           // Hammer
           HammerController.SetSaveInfo(saveData.HammerInfo);
+          HammerController.SetMachineSaveInfo(saveData.HammerMachineInfo);
 
           // Inventory
           InventoryController.SetSaveInfo(saveData.InventoryInfo);

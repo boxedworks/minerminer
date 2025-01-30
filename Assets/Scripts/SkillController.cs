@@ -370,7 +370,7 @@ Speed: {getSafeFloat(skill._OnMaths * 100)}%");
             _level++;
             _xpMax += _level;
 
-            LogController.AppendLog($"Skill leveled: {_name} ({_level - 1} -> {_level})");
+            LogController.AppendLog($"<color=#00FFFF>Skill leveled: {_name} ({_level - 1} -> {_level})</color>");
 
             s_Singleton.UpdateTotalLevel();
 

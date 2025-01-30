@@ -39,6 +39,7 @@ namespace Controllers
       FORGE_EMBERS,
 
       HAMMER_SPARKS,
+      HAMMER_CLICK,
 
     }
     Dictionary<ParticleType, ParticleSystem> _particles;
@@ -76,6 +77,7 @@ namespace Controllers
         { ParticleType.FORGE_EMBERS, forgeParticles.Find("ForgeEmbers").GetComponent<ParticleSystem>() },
 
         { ParticleType.HAMMER_SPARKS, hammerParticles.Find("HammerSparks").GetComponent<ParticleSystem>() },
+        { ParticleType.HAMMER_CLICK, hammerParticles.Find("HammerClick").GetComponent<ParticleSystem>() },
       };
     }
 

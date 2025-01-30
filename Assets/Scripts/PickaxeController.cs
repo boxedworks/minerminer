@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace Controllers
 {
@@ -154,7 +155,7 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
 
       public ClickManager()
       {
-        _container = GameObject.Find("Clicks").transform;
+        _container = GameObject.Find("MineDependancies").transform.Find("Clicks").transform;
 
         _clickTimeToReach = 5f;
         _maxClicks = 1;
@@ -199,8 +200,10 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
 
           newFab.transform.localPosition += new Vector3(Random.Range(-1f, 1f) * 70f, Random.Range(-1f, 1f) * 70f, 0f);
 
-          var button = newFab.GetComponent<Button>();
-          button.onClick.AddListener(() =>
+          var eventTrigger = newFab.GetComponent<EventTrigger>();
+          var entry = new EventTrigger.Entry();
+          entry.eventID = EventTriggerType.PointerDown;
+          entry.callback.AddListener((data) =>
           {
 
             _numClicks--;
@@ -214,6 +217,8 @@ Drop on break: {AmountDroppedOnBreak * RockController.s_DropMultiplier}");
             if (_numClicks == _maxClicks - 1)
               _lastSpawnTime = Time.time + Random.value;
           });
+          eventTrigger.triggers.Add(entry);
+
           newFab.SetActive(true);
         }
 

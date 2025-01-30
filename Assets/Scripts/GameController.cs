@@ -6,7 +6,7 @@ namespace Controllers
   public class GameController : MonoBehaviour
   {
 
-    public static string s_GameVersion = "0.0.10";
+    public static string s_GameVersion = "0.0.11";
 
     public static float s_GameSpeedMod = 1f;
 
@@ -63,8 +63,14 @@ namespace Controllers
       // Cheats
 #if UNITY_EDITOR
       {
-        if (Input.GetKeyDown(KeyCode.Space))
-          SkillController.s_Singleton._Gold += 500;
+        if (Input.GetKey(KeyCode.Space))
+          SkillController.s_Singleton._Gold += 30;
+
+        if (Input.GetKey(KeyCode.M))
+          SkillController.s_Singleton.AddXp(30);
+
+        if (Input.GetKey(KeyCode.N))
+          InventoryController.s_Singleton.AddItemAmount(1);
 
         //s_GameSpeedMod = 3f;
       }

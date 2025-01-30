@@ -31,12 +31,15 @@ namespace Controllers
       }
     }
 
+    GameObject _button_sell1, _button_sell5, _button_sellAll;
+
     public enum ItemType
     {
       NONE,
 
       STONE,
       STONE_CHUNK,
+
 
       COPPER,
       COPPER_INGOT,
@@ -57,6 +60,8 @@ namespace Controllers
       DIAMOND,
 
       STONE_DUST,
+      BRICK,
+
       GEM_DUST_0,
 
       MIX_0,
@@ -85,9 +90,9 @@ namespace Controllers
         get
         {
           return InfoController.GetInfoString(_Title, @$"Amount:      {_AmountHeld}
-Sell Price: ${_SellValue}
+Sell Price: ${_SellValue:N0}
 
-Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
+Sum Value:  ${GetItemValue(_ItemType, _AmountHeld):N0}");
         }
       }
       public RectTransform _Transform { get { return _MenuEntry == null ? null : _MenuEntry.transform as RectTransform; } }
@@ -108,6 +113,52 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
             returnList.Add(item.Value);
         foreach (var otherInfo in _otherInfoables)
           returnList.Add(otherInfo);
+
+        if (_selectedItem == ItemType.NONE)
+        {
+          returnList.Add(new SimpleInfoable()
+          {
+            _GameObject = _button_sell1,
+            _Description = InfoController.GetInfoString("Sell 1", $"Sell 1 of the selected item.")
+          });
+          returnList.Add(new SimpleInfoable()
+          {
+            _GameObject = _button_sell5,
+            _Description = InfoController.GetInfoString("Sell 5", $"Sell 5 of the selected item.")
+          });
+          returnList.Add(new SimpleInfoable()
+          {
+            _GameObject = _button_sellAll,
+            _Description = InfoController.GetInfoString("Sell all", $"Sell all of the selected item.")
+          });
+        }
+        else
+        {
+          var itemInfo = _itemInfos[_selectedItem];
+          var itemName = itemInfo._Title;
+          var amount = 1;
+          var tryAmount = Mathf.Clamp(amount, 0, itemInfo._AmountHeld);
+          returnList.Add(new SimpleInfoable()
+          {
+            _GameObject = _button_sell1,
+            _Description = InfoController.GetInfoString("Sell 1", $"Sell {tryAmount} {itemName}.\n\nValue: ${GetItemValue(_selectedItem, tryAmount):N0}")
+          });
+          amount = 5;
+          tryAmount = Mathf.Clamp(amount, 0, itemInfo._AmountHeld);
+          returnList.Add(new SimpleInfoable()
+          {
+            _GameObject = _button_sell5,
+            _Description = InfoController.GetInfoString("Sell 5", $"Sell {tryAmount} {itemName}.\n\nValue: ${GetItemValue(_selectedItem, tryAmount):N0}")
+          });
+          amount = int.MaxValue;
+          tryAmount = Mathf.Clamp(amount, 0, itemInfo._AmountHeld);
+          returnList.Add(new SimpleInfoable()
+          {
+            _GameObject = _button_sellAll,
+            _Description = InfoController.GetInfoString("Sell 5", $"Sell all ({tryAmount}) of your {itemName}.\n\nValue: ${GetItemValue(_selectedItem, tryAmount):N0}")
+          });
+        }
+
         returnData._Infos = returnList;
 
         if (_selectedItem != ItemType.NONE)
@@ -154,6 +205,11 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       {
         _Title = "Stone Dust",
         _SellValue = 4
+      });
+      AddInventoryItemInfo(ItemType.BRICK, new ItemInfo()
+      {
+        _Title = "Brick",
+        _SellValue = 100
       });
 
       AddInventoryItemInfo(ItemType.COPPER, new ItemInfo()
@@ -282,48 +338,31 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
       AddInventoryItemInfo(ItemType.MIX_1, new ItemInfo()
       {
         _Title = "Dual Blend",
-        _SellValue = 350,
+        _SellValue = 150,
       });
 
       // Sell interface
       _otherInfoables = new();
-      var buttonSell1 = _menu.GetChild(1).GetChild(1).GetChild(0).GetComponent<Button>();
-      buttonSell1.onClick.AddListener(() =>
+      _button_sell1 = _menu.GetChild(1).GetChild(1).GetChild(0).gameObject;
+      _button_sell1.GetComponent<Button>().onClick.AddListener(() =>
       {
         AudioController.PlayAudio("MenuSelect");
 
         SellItem(1);
       });
-      _otherInfoables.Add(new SimpleInfoable()
-      {
-        _GameObject = buttonSell1.gameObject,
-        _Description = InfoController.GetInfoString("Sell 1", "Sell 1 of the selected item.")
-      });
-
-      var buttonSell5 = _menu.GetChild(1).GetChild(1).GetChild(1).GetComponent<Button>();
-      buttonSell5.onClick.AddListener(() =>
+      _button_sell5 = _menu.GetChild(1).GetChild(1).GetChild(1).gameObject;
+      _button_sell5.GetComponent<Button>().onClick.AddListener(() =>
       {
         AudioController.PlayAudio("MenuSelect");
 
         SellItem(5);
       });
-      _otherInfoables.Add(new SimpleInfoable()
-      {
-        _GameObject = buttonSell5.gameObject,
-        _Description = InfoController.GetInfoString("Sell 5", "Sell 5 of the selected item.")
-      });
-
-      var buttonSellAll = _menu.GetChild(1).GetChild(1).GetChild(2).GetComponent<Button>();
-      buttonSellAll.onClick.AddListener(() =>
+      _button_sellAll = _menu.GetChild(1).GetChild(1).GetChild(2).gameObject;
+      _button_sellAll.GetComponent<Button>().onClick.AddListener(() =>
       {
         AudioController.PlayAudio("MenuSelect");
 
-        SellItem(10000000);
-      });
-      _otherInfoables.Add(new SimpleInfoable()
-      {
-        _GameObject = buttonSellAll.gameObject,
-        _Description = InfoController.GetInfoString("Sell All", "Sell all of the selected item.\n\nYou can also use middle mouse on an inventory item to do this.")
+        SellItem(int.MaxValue);
       });
 
       // Page buttons
@@ -408,7 +447,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
 
       var sellValueTotal = sellAmount * itemInfo._SellValue;
 
-      LogController.AppendLog($"Sold {sellAmount} {GetItemName(_selectedItem)} for ${sellValueTotal}.");
+      LogController.AppendLog($"Sold {sellAmount} {GetItemName(_selectedItem)} for ${sellValueTotal:N0}.");
 
       SkillController.s_Singleton._Gold += sellValueTotal;
       AudioController.PlayAudio("SellItems");
@@ -443,6 +482,10 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld)}");
     }
 
     //
+    public void AddItemAmount(int amount)
+    {
+      AddItemAmount(_selectedItem, amount);
+    }
     public void AddItemAmount(ItemType itemType, int amount)
     {
       if (amount < 1)

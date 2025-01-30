@@ -69,5 +69,22 @@ namespace Controllers
       return audio;
     }
 
+    public static AudioSource PlayAudio(string name, float pitch)
+    {
+      var audio = new GameObject().AddComponent<AudioSource>();
+      audio.transform.position = Vector3.zero;
+      audio.transform.SetParent(s_Singleton._audioContainer);
+
+      var audioObject = s_Singleton._audioObjects[name];
+      audio.clip = audioObject.AudioClip;
+      audio.volume = audioObject.Volume;
+      audio.pitch = pitch;
+
+      s_Singleton._audios.Add((AudioSource: audio, Volume: audioObject.Volume));
+      audio.Play();
+
+      return audio;
+    }
+
   }
 }
