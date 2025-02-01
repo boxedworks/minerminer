@@ -761,6 +761,8 @@ Heat - Increases forge speed!",
           break;
         case PurchaseType.FORGE:
           UnlockController.Unlock(UnlockController.UnlockType.FORGE);
+          s_Singleton.UnlockPurchase(PurchaseType.AUTO_FORGE);
+
           s_Singleton.UnlockPurchase(PurchaseType.HAMMER);
           s_Singleton.UnlockPurchase(PurchaseType.SKILL_HEAT);
 
@@ -929,7 +931,6 @@ Heat - Increases forge speed!",
           RockController.UnlockRock(RockController.RockType.TIN);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_2_UPGRADE_0);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_2);
-          s_Singleton.UnlockPurchase(PurchaseType.AUTO_FORGE);
 
           ForgeController.UnlockRecipe(ForgeController.RecipeType.BRONZE_INGOT);
 

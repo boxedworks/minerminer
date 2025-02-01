@@ -6,7 +6,7 @@ namespace Controllers
   public class GameController : MonoBehaviour
   {
 
-    public static string s_GameVersion = "0.0.11";
+    public static string s_GameVersion = "0.0.12";
 
     public static float s_GameSpeedMod = 1f;
 
