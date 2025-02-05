@@ -948,6 +948,8 @@ Heat - Increases forge speed!",
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_4_UPGRADE_0);
           s_Singleton.UnlockPurchase(PurchaseType.ROCK_BUY_4);
 
+          HammerController.UnlockRecipe(HammerController.RecipeType.GEM_DUST_0);
+          HammerController.UnlockRecipe(HammerController.RecipeType.GEM_DUST_1);
           HammerController.UnlockRecipe(HammerController.RecipeType.MIX_0);
           ForgeController.UnlockRecipe(ForgeController.RecipeType.STEEL_INGOT);
 
@@ -966,7 +968,7 @@ Heat - Increases forge speed!",
         case PurchaseType.ROCK_BUY_5:
           RockController.UnlockRock(RockController.RockType.COBALT);
           HammerController.UnlockRecipe(HammerController.RecipeType.MIX_1);
-          //ForgeController.UnlockRecipe()
+          ForgeController.UnlockRecipe(ForgeController.RecipeType.DUAL_INGOT);
 
           break;
 

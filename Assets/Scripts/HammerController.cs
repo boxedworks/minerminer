@@ -29,6 +29,7 @@ namespace Controllers
       STONE_DUST,
 
       GEM_DUST_0,
+      GEM_DUST_1,
 
       MIX_0,
       MIX_1,
@@ -48,7 +49,16 @@ namespace Controllers
     {
       get
       {
-        return _Machine._InfoData;
+        var machineInfo = _Machine._InfoData;
+
+        var hammerSpeed = new SimpleInfoable()
+        {
+          _GameObject = _hammerSpeedSlider.gameObject,
+          _Description = $"Hammer Speed\n\nCurrent speed: {_hammerSpeed:0.00} / {_hammerSpeedMax:0.00}\n\nIncrease speed by clicking at the correct time."
+        };
+        machineInfo._Infos.Add(hammerSpeed);
+
+        return machineInfo;
       }
     }
 
@@ -113,7 +123,6 @@ namespace Controllers
       _clickManager = new();
 
       UnlockRecipe(RecipeType.STONE_DUST);
-      UnlockRecipe(RecipeType.GEM_DUST_0);
 
       //
       _hammerModel = _menu.Find("Hammer").transform;
@@ -203,6 +212,21 @@ namespace Controllers
             },
             new (InventoryController.ItemType, int)[]{
               (InventoryController.ItemType.GEM_DUST_0, 2)
+            }
+          );
+
+          break;
+        case RecipeType.GEM_DUST_1:
+
+          s_Singleton._Machine.UnlockRecipe(
+            (int)recipeType,
+            "Emerald Dust",
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.EMERALD, 2),
+              (InventoryController.ItemType.DIAMOND, 1),
+            },
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.GEM_DUST_1, 2)
             }
           );
 

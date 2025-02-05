@@ -70,6 +70,9 @@ namespace Controllers
       COBALT, CINNABAR,
       MIX_1,
       COBALT_INGOT,
+
+      GEM_DUST_1,
+      DUAL_INGOT,
     }
     class ItemInfo : IInfoable
     {
@@ -260,7 +263,7 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld):N0}");
       });
       AddInventoryItemInfo(ItemType.STEEL_INGOT, new ItemInfo()
       {
-        _Title = "Steel Ingot",
+        _Title = "Steel Plate",
         _SellValue = 4500
       });
 
@@ -317,8 +320,19 @@ Sum Value:  ${GetItemValue(_ItemType, _AmountHeld):N0}");
       });
       AddInventoryItemInfo(ItemType.GEM_INGOT_0, new ItemInfo()
       {
-        _Title = "Citrine Ingot",
-        _SellValue = 8500,
+        _Title = "Citrine Plate",
+        _SellValue = 8000,
+      });
+
+      AddInventoryItemInfo(ItemType.GEM_DUST_1, new ItemInfo()
+      {
+        _Title = "Emerald Dust",
+        _SellValue = 250,
+      });
+      AddInventoryItemInfo(ItemType.DUAL_INGOT, new ItemInfo()
+      {
+        _Title = "Dual Plate",
+        _SellValue = 9000,
       });
 
       AddInventoryItemInfo(ItemType.COBALT, new ItemInfo()

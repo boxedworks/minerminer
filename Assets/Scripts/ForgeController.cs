@@ -31,6 +31,7 @@ namespace Controllers
       IRON_INGOT,
       STEEL_INGOT,
       CITRINE_INGOT,
+      DUAL_INGOT,
     }
 
     //
@@ -250,7 +251,7 @@ namespace Controllers
 
           s_Singleton._forgeController.UnlockRecipe(
             (int)recipeType,
-            "Steel Ingot",
+            "Steel Plate",
             new (InventoryController.ItemType, int)[]{
               (InventoryController.ItemType.IRON_INGOT, 2),
               (InventoryController.ItemType.COAL, 25),
@@ -267,13 +268,30 @@ namespace Controllers
 
           s_Singleton._forgeController.UnlockRecipe(
             (int)recipeType,
-            "Citrine Ingot",
+            "Citrine Plate",
             new (InventoryController.ItemType, int)[]{
-              (InventoryController.ItemType.IRON_INGOT, 5),
+              (InventoryController.ItemType.IRON_INGOT, 4),
               (InventoryController.ItemType.MIX_0, 1),
             },
             new (InventoryController.ItemType, int)[]{
               (InventoryController.ItemType.GEM_INGOT_0, 1)
+            }
+          );
+
+          break;
+
+        //
+        case RecipeType.DUAL_INGOT:
+
+          s_Singleton._forgeController.UnlockRecipe(
+            (int)recipeType,
+            "Dual Plate",
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.MIX_1, 25),
+              (InventoryController.ItemType.GEM_DUST_1, 1),
+            },
+            new (InventoryController.ItemType, int)[]{
+              (InventoryController.ItemType.DUAL_INGOT, 1)
             }
           );
 
